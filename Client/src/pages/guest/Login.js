@@ -1,83 +1,175 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   View,
-  SafeAreaView,
   Text,
   TextInput,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import {
   FontAwesome,
   MaterialCommunityIcons,
   Feather,
-  MaterialIcons,
   EvilIcons,
 } from "@expo/vector-icons";
-import { s } from "react-native-wind";
 
-function Login() {
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+function Login({ navigation }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [hide, setHide] = useState(true);
 
   const handleLogin = () => {
-    // Xử lý việc đăng nhập hoặc gửi dữ liệu form lên máy chủ tại đây
-    console.log("Email: ", formData.email);
-    console.log("Password: ", formData.password);
+    console.log("Email: ", email);
+    console.log("Password: ", password);
   };
+
   return (
-    <SafeAreaView>
-      <View style={s` flex-1 bg-white py-4 border-b-2 border-b-gray-200`}>
+    <View style={styles.container}>
+      <View style={styles.header}>
         <FontAwesome
-          style={s`absolute left-1`}
+          style={styles.backIcon}
           name="angle-left"
           size={24}
           onPress={() => navigation.goBack()}
         />
       </View>
-
-      <View style={s`w-full pt-40 flex justify-center`}>
-        <Text style={s`text-2xl text-[#F24405]`}>SMART STUDY HUB</Text>
-      </View>
-      <View style={s`border-b-2 border-b-gray-200 w-full pt-10`}>
-        <MaterialCommunityIcons name="email-outline" size={24} color="black" />
-        <TextInput
-          placeholder="Email"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={(e) => setEmail(e)}
-        ></TextInput>
-      </View>
-      <View
-        style={s`border-b-2 flex flex-row justify-between border-b-gray-200 w-full pt-5`}
-      >
-        <View>
-          <EvilIcons name="lock" size={24} color="black" />
+      <View style={styles.content}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>SMART STUDY HUB</Text>
+        </View>
+        <View style={styles.inputContainer}>
+          <MaterialCommunityIcons
+            name="email-outline"
+            size={24}
+            color="black"
+            style={styles.inputIcon}
+          />
+          <TextInput
+            placeholder="Email"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={(e) => setEmail(e)}
+            style={styles.input}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <EvilIcons
+            name="lock"
+            size={24}
+            color="black"
+            style={styles.inputIcon}
+          />
           <TextInput
             placeholder="Password"
-            secureTextEntry={!hide}
+            secureTextEntry={hide}
             value={password}
             onChangeText={(e) => setPassword(e)}
-          ></TextInput>
-        </View>
-        <View>
+            style={styles.input}
+          />
           <Feather
             name={hide ? "eye-off" : "eye"}
             onPress={() => setHide(!hide)}
             size={24}
             color="black"
+            style={styles.showPasswordIcon}
           />
         </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Đăng nhập</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.buttonContainer}>
+          <Text style={styles.textMin}>Quên mật khẩu?</Text>
+        </View>
+        <View style={styles.buttonContainer}>
+          <Text style={styles.textMin}>Hoặc</Text>
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.registerBtn} onPress={() => navigation.navigate('Register')}>
+            <Text>Đăng ký</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      <View>
-        <TouchableOpacity style={s`w-1/5 items-center`} onPress={handleLogin}>
-          <Text style={s`bg-[#F24405] text-white p-2 rounded-md`}>
-            Đăng nhập
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+  header: {
+    padding: 10,
+    backgroundColor: "white",
+    justifyContent: "flex-end",
+  },
+  backIcon: {
+    paddingLeft: 10,
+  },
+  content: {
+    flex: 5,
+    paddingHorizontal: 60,
+    paddingTop: 100,
+  },
+  titleContainer: {
+    alignItems: "center",
+    paddingBottom: 50,
+  },
+  title: {
+    fontSize: 24,
+    color: "#e27602",
+    fontWeight: "bold",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    borderBottomWidth: 2,
+    borderBottomColor: "gray",
+    paddingBottom: 10,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+  },
+  showPasswordIcon: {
+    position: "absolute",
+    right: 10,
+  },
+  buttonContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  button: {
+    backgroundColor: "#FFA500",
+    marginTop: 40,
+    padding: 15,
+    borderRadius: 25,
+    width:300,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+  },
+  textMin: {
+    fontSize: 14,
+    marginTop: 10,
+    color: "gray",
+  },
+  registerBtn: {
+    marginTop: 20, 
+    borderColor: "#FFA500",
+    borderWidth: 2,
+    padding: 15,
+    borderRadius: 25,
+    width:300,
+    alignItems: "center",
+  },
+});
 
 export default Login;
