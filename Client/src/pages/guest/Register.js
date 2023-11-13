@@ -17,10 +17,11 @@ function Register({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [hide, setHide] = useState(true);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
-  const handleLogin = () => {
-    console.log("Email: ", email);
-    console.log("Password: ", password);
+  const handleRegister = () => {
+    
   };
 
   return (
@@ -48,7 +49,7 @@ function Register({ navigation }) {
             placeholder="Email"
             keyboardType="email-address"
             value={email}
-            onChangeText={(e) => setEmail(e)}
+            onChangeText={(text) => setEmail(text)}
             style={styles.input}
           />
         </View>
@@ -63,10 +64,10 @@ function Register({ navigation }) {
             placeholder="Password"
             secureTextEntry={hide}
             value={password}
-            onChangeText={(e) => setPassword(e)}
+            onChangeText={(text) => setPassword(text)}
             style={styles.input}
           />
-          
+
           <Feather
             name={hide ? "eye-off" : "eye"}
             onPress={() => setHide(!hide)}
@@ -76,67 +77,27 @@ function Register({ navigation }) {
           />
         </View>
         <View style={styles.inputContainer}>
-          <MaterialCommunityIcons
-            name="email-outline"
-            size={24}
-            color="black"
-            style={styles.inputIcon}
-          />
           <TextInput
-            placeholder="Họ"
-            value={email}
-            onChangeText={(e) => setEmail(e)}
+            placeholder="First Name"
+            value={firstName}
+            onChangeText={(text) => setFirstName(text)}
             style={styles.input}
           />
+          
         </View>
         <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Tên"
-            value={email}
-            onChangeText={(e) => setEmail(e)}
-            style={styles.input}
+        <TextInput
+            placeholder="Last Name"
+            value={lastName}
+            onChangeText={(text) => setLastName(text)}
+            style={styles.halfInput}
           />
         </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Số Điện Thoại"
-            keyboardType="number"
-            value={email}
-            onChangeText={(e) => setEmail(e)}
-            style={styles.input}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Ngày Sinh"
-            value={email}
-            onChangeText={(e) => setEmail(e)}
-            style={styles.input}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Địa chỉ"
-            value={email}
-            onChangeText={(e) => setEmail(e)}
-            style={styles.input}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Quốc Gia"
-            value={email}
-            onChangeText={(e) => setEmail(e)}
-            style={styles.input}
-          />
-        </View>
-        
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Đăng Ký</Text>
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
+            <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
         </View>
-        
       </View>
     </View>
   );
@@ -218,5 +179,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
+
 
 export default Register;

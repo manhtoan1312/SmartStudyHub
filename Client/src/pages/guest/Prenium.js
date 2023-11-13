@@ -23,276 +23,147 @@ function Prenium() {
         <Text style={s`font-medium text-2xl`}>Nâng cấp lên Prenium</Text>
       </View>
       <View style={s`flex flex-col bg-white px-3`}>
-      <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
+        <View style={s`flex flex-row justify-between py-2 mt-2`}>
+          <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
               name="calendar-arrow-left"
               size={24}
               color="red"
             />
-            <Text style={s`h-full flex items-center pl-2`}>Đồng bộ hóa dữ liệu tất cả thiết bị.</Text>
+            <Text style={s`h-full flex items-center pl-2`}>
+              Đồng bộ hóa dữ liệu tất cả thiết bị.
+            </Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
         </View>
 
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
+          <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
               name="calendar-arrow-left"
               size={24}
               color="red"
             />
-            <Text style={s`h-full flex items-center pl-2`}>Sao lưu dữ liệu trên Cloud.</Text>
+            <Text style={s`h-full flex items-center pl-2`}>
+              Sao lưu dữ liệu trên Cloud.
+            </Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
         </View>
 
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
+          <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
               name="calendar-arrow-left"
               size={24}
               color="red"
             />
-            <Text style={s`h-full flex items-center pl-2`}>Báo cáo thống kê chi tiết</Text>
+            <Text style={s`h-full flex items-center pl-2`}>
+              Báo cáo thống kê chi tiết
+            </Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
         </View>
 
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
+          <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
               name="calendar-arrow-left"
               size={24}
               color="red"
             />
-            <Text style={s`h-full flex items-center pl-2`}>Không giới hạn số lượng dự án</Text>
+            <Text style={s`h-full flex items-center pl-2`}>
+              Không giới hạn số lượng dự án
+            </Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
         </View>
 
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
+          <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
               name="calendar-arrow-left"
               size={24}
               color="red"
             />
-            <Text style={s`h-full flex items-center pl-2`}>Tạo nhãn cho các nhiệm vụ</Text>
+            <Text style={s`h-full flex items-center pl-2`}>
+              Tạo nhãn cho các nhiệm vụ
+            </Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
         </View>
 
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
+          <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
               name="calendar-arrow-left"
               size={24}
               color="red"
             />
-            <Text style={s`h-full flex items-center pl-2`}>Chế độ nghiêm ngặt: Lật úp điện thoại</Text>
+            <Text style={s`h-full flex items-center pl-2`}>
+              Chế độ nghiêm ngặt: Lật úp điện thoại
+            </Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
         </View>
 
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
+          <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
               name="calendar-arrow-left"
               size={24}
               color="red"
             />
-            <Text style={s`h-full flex items-center pl-2`}>Lên lịch trình cho các nhiệm vụ</Text>
+            <Text style={s`h-full flex items-center pl-2`}>
+              Lên lịch trình cho các nhiệm vụ
+            </Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
         </View>
 
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
+          <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
               name="calendar-arrow-left"
               size={24}
               color="red"
             />
-            <Text style={s`h-full flex items-center pl-2`}>Tạo thư mục cho các dự án</Text>
+            <Text style={s`h-full flex items-center pl-2`}>
+              Tạo thư mục cho các dự án
+            </Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
         </View>
 
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
+          <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
               name="calendar-arrow-left"
               size={24}
               color="red"
             />
-            <Text style={s`h-full flex items-center pl-2`}>Tùy chỉnh độ dài thời gian Pomodoro cho các nhiệm vụ</Text>
+            <Text style={s`h-full flex items-center pl-2`}>
+              Tùy chỉnh độ dài thời gian Pomodoro cho các nhiệm vụ
+            </Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
         </View>
 
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
+          <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
               name="calendar-arrow-left"
               size={24}
               color="red"
             />
-            <Text style={s`h-full flex items-center pl-2`}>Thêm và chỉnh sửa bản ghi Pomodoro thủ công</Text>
+            <Text style={s`h-full flex items-center pl-2`}>
+              Thêm và chỉnh sửa bản ghi Pomodoro thủ công
+            </Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
         </View>
 
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
+          <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
               name="calendar-arrow-left"
               size={24}
               color="red"
             />
-            <Text style={s`h-full flex items-center pl-2`}>Đồng bộ hóa dữ liệu tất cả thiết bị</Text>
+            <Text style={s`h-full flex items-center pl-2`}>
+              Đồng bộ hóa dữ liệu tất cả thiết bị
+            </Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
-            <MaterialCommunityIcons
-              name="calendar-arrow-left"
-              size={24}
-              color="red"
-            />
-            <Text style={s`h-full flex items-center pl-2`}>Đồng bộ hóa dữ liệu tất cả thiết bị</Text>
-          </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
-            <MaterialCommunityIcons
-              name="calendar-arrow-left"
-              size={24}
-              color="red"
-            />
-            <Text style={s`h-full flex items-center pl-2`}>Đồng bộ hóa dữ liệu tất cả thiết bị</Text>
-          </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
-            <MaterialCommunityIcons
-              name="calendar-arrow-left"
-              size={24}
-              color="red"
-            />
-            <Text style={s`h-full flex items-center pl-2`}>Đồng bộ hóa dữ liệu tất cả thiết bị</Text>
-          </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
-            <MaterialCommunityIcons
-              name="calendar-arrow-left"
-              size={24}
-              color="red"
-            />
-            <Text style={s`h-full flex items-center pl-2`}>Đồng bộ hóa dữ liệu tất cả thiết bị</Text>
-          </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`} >
-            <MaterialCommunityIcons
-              name="calendar-arrow-left"
-              size={24}
-              color="red"
-            />
-            <Text style={s`h-full flex items-center pl-2`}>Đồng bộ hóa dữ liệu tất cả thiết bị</Text>
-          </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
         </View>
       </View>
     </SafeAreaView>

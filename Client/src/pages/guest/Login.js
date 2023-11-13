@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 import {
   FontAwesome,
@@ -12,15 +13,69 @@ import {
   Feather,
   EvilIcons,
 } from "@expo/vector-icons";
+import { login } from "../../services/AccountService";
 
 function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [hide, setHide] = useState(true);
-
-  const handleLogin = () => {
-    console.log("Email: ", email);
-    console.log("Password: ", password);
+  const [errorMessage,setErrorMessage] = useState('')
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const response = await login(email, password);
+    if (response.success) {
+      Alert.alert(
+        'Smart Study Hub anoucement',
+        "thanh cong",
+        [
+          {
+            text: 'cancel',
+            onPress: () => {
+              console.log('Hủy')
+              navigation.goBack()
+            },
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => {
+              console.log('OK')
+              navigation.goBack()
+            },
+            
+          },
+        ],
+        { cancelable: false }
+      )
+      // let checked = false;
+      // if (document.querySelector("#remember").checked) {
+      //   checked = true;
+      // }
+      // contextLogin(checked, response.token);
+      // navigate("/checkin");
+    } else {
+      setErrorMessage(response.message)
+      // setEmail("");
+      // setPassword("");
+      // document.querySelector("#floating_email").focus();
+      Alert.alert(
+        'Smart Study Hub anoucement',
+        'sai roi',
+        [
+          {
+            text: 'cancel',
+            onPress: () => console.log('Hủy'),
+            style: 'cancel',
+          },
+          {
+            text: 'OK',
+            onPress: () => console.log('OK'),
+          },
+        ],
+        { cancelable: false }
+      )
+      
+    }
   };
 
   return (
@@ -76,18 +131,18 @@ function Login({ navigation }) {
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Đăng nhập</Text>
+            <Text style={styles.buttonText}>Log in</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonContainer}>
-          <Text style={styles.textMin}>Quên mật khẩu?</Text>
+          <Text style={styles.textMin}>Forgot password?</Text>
         </View>
         <View style={styles.buttonContainer}>
-          <Text style={styles.textMin}>Hoặc</Text>
+          <Text style={styles.textMin}>Or</Text>
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.registerBtn} onPress={() => navigation.navigate('Register')}>
-            <Text>Đăng ký</Text>
+            <Text>Sign Up</Text>
           </TouchableOpacity>
         </View>
       </View>
