@@ -4,11 +4,11 @@ import { useEffect } from "react";
 import {
   View,
   Text,
-  Button,
   SafeAreaView,
-  Image,
   StyleSheet,
   ImageBackground,
+  TouchableOpacity,
+  Linking,
 } from "react-native";
 import { s } from "react-native-wind";
 import {
@@ -18,12 +18,15 @@ import {
   AntDesign,
   Feather,
 } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/native";
 export default function Home({ navigation }) {
   const [login, setLogin] = useState({});
   let group = true;
   let plan = true;
   let rating = true;
   let prenium = false;
+  const route = useRoute();
+  const { params } = route;
   useEffect(() => {
     const getSetting = async () => {
       try {
@@ -40,7 +43,22 @@ export default function Home({ navigation }) {
       }
     };
     getSetting();
+
+    
   }, []);
+  useEffect(() => {
+    var parsedUrl = new URL(window.location.href);
+    console.log(parsedUrl.searchParams.get('token'))
+    if (params && params.token) {
+      console.log(params.token);
+    }
+  },[params])
+
+  const handlePress = () => {
+    // Mở đường dẫn bên ngoài khi nút được nhấn
+    Linking.openURL("http://localhost:8080/oauth2/authorization/google");
+  };
+
   return (
     <SafeAreaView style={s`h-full bg-white`}>
       <View>
@@ -69,31 +87,38 @@ export default function Home({ navigation }) {
         </View>
       </View>
       <View style={styles.body}>
-      <View style={styles.headers}>
-        <View style={styles.row}>
-          <Feather
-            name="sun"
-            style={styles.itemRow}
-            size={20}
-            color="#21D375"
-          />
-          <Text>Today</Text>
+        <View style={styles.headers}>
+          <View style={styles.row}>
+            <Feather
+              name="sun"
+              style={styles.itemRow}
+              size={20}
+              color="#21D375"
+            />
+            <Text>Today</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.itemRow}>1h 40m</Text>
+            <Text>1</Text>
+          </View>
         </View>
-        <View style={styles.row}>
-          <Text style={styles.itemRow}>1h 40m</Text>
-          <Text>1</Text>
+        <View style={styles.headers}>
+          <View style={styles.row}>
+            <MaterialCommunityIcons
+              name="weather-sunset"
+              size={24}
+              color="orange"
+            />
+            <Text>Tomorrow</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.itemRow}>1h 40m</Text>
+            <Text>1</Text>
+          </View>
         </View>
-      </View>
-      <View style={styles.headers}>
-        <View style={styles.row}>
-        <MaterialCommunityIcons name="weather-sunset" size={24} color="orange" />
-          <Text>Tomorrow</Text>
-        </View>
-        <View style={styles.row}>
-          <Text style={styles.itemRow}>1h 40m</Text>
-          <Text>1</Text>
-        </View>
-      </View>
+        <TouchableOpacity onPress={handlePress}>
+          <Text>Open External Link</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
