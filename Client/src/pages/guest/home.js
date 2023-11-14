@@ -1,18 +1,141 @@
 import React from "react";
-import { View, Text, Button } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useState } from "react";
+import { useEffect } from "react";
+import {
+  View,
+  Text,
+  Button,
+  SafeAreaView,
+  Image,
+  StyleSheet,
+  ImageBackground,
+} from "react-native";
 import { s } from "react-native-wind";
-
+import {
+  FontAwesome5,
+  MaterialCommunityIcons,
+  EvilIcons,
+  AntDesign,
+  Feather,
+} from "@expo/vector-icons";
 export default function Home({ navigation }) {
+  const [login, setLogin] = useState({});
+  let group = true;
+  let plan = true;
+  let rating = true;
+  let prenium = false;
+  useEffect(() => {
+    const getSetting = async () => {
+      try {
+        const storedData = await AsyncStorage.getItem("settings");
+        if (storedData) {
+          const parsedData = JSON.parse(storedData);
+          console.log(parsedData);
+          group = parsedData.group || true;
+          plan = parsedData.plan || true;
+          rating = parsedData.ratings || true;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getSetting();
+  }, []);
   return (
-    <SafeAreaView style={s`h-full`}>
-      <View style={s`flex-1 bg-white py-50 items-center`}>
-        <Text style={s`text-2xl`}>Trang chủ</Text>
-        <Button
-          title="Di đến Setting"
-          onPress={() => navigation.navigate("Setting")}
-        />
+    <SafeAreaView style={s`h-full bg-white`}>
+      <View>
+        <View style={styles.headers}>
+          <ImageBackground
+            style={styles.avt}
+            resizeMode="center"
+            source={require("../../images/avt.jpg")}
+          >
+            {/* <View style={styles.preavt}>
+            <FontAwesome5 style={{flex:1, justifyContent:"center", alignItems:"center"}} name="crown" size={8} color="gray" />
+            </View> */}
+          </ImageBackground>
+          <Text style={{ fontSize: 20, color: "red" }}>Đăng Nhập</Text>
+          <FontAwesome5 name="crown" size={24} color="#FFD300" />
+          {group && (
+            <MaterialCommunityIcons
+              name="account-group-outline"
+              size={24}
+              color="black"
+            />
+          )}
+          {plan && <FontAwesome5 name="seedling" size={24} color="black" />}
+          {rating && <EvilIcons name="trophy" size={24} color="black" />}
+          <AntDesign name="barschart" size={24} color="black" />
+        </View>
+      </View>
+      <View style={styles.body}>
+      <View style={styles.headers}>
+        <View style={styles.row}>
+          <Feather
+            name="sun"
+            style={styles.itemRow}
+            size={20}
+            color="#21D375"
+          />
+          <Text>Today</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.itemRow}>1h 40m</Text>
+          <Text>1</Text>
+        </View>
+      </View>
+      <View style={styles.headers}>
+        <View style={styles.row}>
+        <MaterialCommunityIcons name="weather-sunset" size={24} color="orange" />
+          <Text>Tomorrow</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.itemRow}>1h 40m</Text>
+          <Text>1</Text>
+        </View>
+      </View>
       </View>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  avt: {
+    position: "relative",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+  headers: {
+    marginTop: 10,
+    marginHorizontal: 10,
+    flexDirection: "row",
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "space-between",
+    height: 50,
+  },
+  body: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "flex-start",
+  },
+  preavt: {
+    position: "absolute",
+    width: 15,
+    height: 15,
+    bottom: -10,
+    right: -10,
+    borderRadius: 10,
+    backgroundColor: "#676767",
+    borderWidth: 1,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  itemRow: {
+    marginRight: 5,
+  },
+});
