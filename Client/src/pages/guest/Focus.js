@@ -35,7 +35,7 @@ const Focus = ({ navigation }) => {
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [timerMode, setTimerMode] = useState(0);
   const [selectedTask, setSelectedTask] = useState({});
-  const [percentage, setPercentage] = useState(100); 
+  const [percentage, setPercentage] = useState(100);
   const settingsInfo = {
     workMinutes: 25,
     breakMinutes: 5,
@@ -104,7 +104,7 @@ const Focus = ({ navigation }) => {
       />
       <View style={styles.overlay}>
         <View>
-          <View style={{ justifyContent: "space-around", flex: 1 }}>
+          <View style={{ justifyContent: "space-between", flex: 1 }}>
             <TouchableOpacity style={styles.downButton}>
               <AntDesign name="down" size={24} color="white" />
             </TouchableOpacity>
@@ -151,28 +151,32 @@ const Focus = ({ navigation }) => {
           </View>
         </View>
 
-        <CircularProgress
-          style={styles.circularProgress}
-          size={200}
-          width={15}
-          fill={percentage}
-          tintColor={mode === "work" ? red : green}
-          backgroundColor="rgba(255, 255, 255, 0.2)"
-          rotation={0}
-          lineCap="round"
-        >
-          {() => (
-            <Text style={styles.progressText}>{minutes + ":" + seconds}</Text>
-          )}
-        </CircularProgress>
-
-        <View style={styles.controlButtons}>
-          <TouchableOpacity style={styles.startButton}>
-            <Entypo name="controller-play" size={20} color="green" />
-            <Text style={{ color: "green", fontSize: 16 }}>
-              Start Focus Mode
-            </Text>
-          </TouchableOpacity>
+        <View>
+          <CircularProgress
+            style={styles.circularProgress}
+            size={200}
+            width={15}
+            fill={percentage}
+            tintColor={mode === "work" ? red : green}
+            backgroundColor="rgba(255, 255, 255, 0.2)"
+            rotation={0}
+            lineCap="round"
+          >
+            {() => (
+              <Text style={styles.progressText}>
+                {String(minutes).padStart(2, "0")}:
+                {String(seconds).padStart(2, "0")}
+              </Text>
+            )}
+          </CircularProgress>
+          <View style={styles.controlButtons}>
+            <TouchableOpacity style={styles.startButton}>
+              <Entypo name="controller-play" style={{marginBottom:-4, marginRight:5}} size={20} color="green" />
+              <Text style={{ color: "green", fontSize: 16 }}>
+                Start Focus Mode
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.settingsButtons}>
@@ -215,8 +219,9 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   overlay: {
-    flex: 2,
-    justifyContent: "space-around",
+    paddingVertical: 20,
+    flex: 1,
+    justifyContent: "space-between",
     alignItems: "center",
   },
   downButton: {
@@ -225,7 +230,7 @@ const styles = StyleSheet.create({
   },
   taskContainer: {
     alignItems: "center",
-    marginBottom: 20,
+    paddingTop: 20,
     flex: 1,
     flexDirection: "row",
   },
@@ -257,19 +262,18 @@ const styles = StyleSheet.create({
     height: 20,
   },
   // Section 3: Process (Circular Progress)
-  circularProgress: {
-    flex: 1,
-    marginTop: 20,
-  },
+  circularProgress: {},
   progressText: {
     color: "#fff",
+    fontSize: 32,
+    fontFamily: "bold",
   },
   // Section 4: Control Buttons
   controlButtons: {
-    marginTop: 20,
     backgroundColor: "white",
-    paddingHorizontal: 20,
+    alignItems:'center',
     paddingVertical: 10,
+    marginTop: 50,
     borderRadius: 20,
   },
   startButton: {
@@ -278,14 +282,12 @@ const styles = StyleSheet.create({
   },
   // Section 5: Settings Buttons
   settingsButtons: {
-    marginTop: 20,
     flexDirection: "row",
     justifyContent: "space-around",
     width: "80%",
   },
   settingsIcon: {
     alignItems: "center",
-    marginBottom: 20,
     justifyContent: "space-between",
     width: 50,
   },
