@@ -17,14 +17,29 @@ import {
   EvilIcons,
   AntDesign,
   Feather,
+  Fontisto,
+  FontAwesome,
+  MaterialIcons,
 } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
 export default function Home({ navigation }) {
   const [login, setLogin] = useState({});
-  let group = true;
-  let plan = true;
-  let rating = true;
-  let prenium = false;
+  const [outOfDate, setOutOfDate] = useState(true);
+  const [tomorow, setTomorow] = useState(true);
+  const [thisWeek, setThisWeek] = useState(true);
+  const [next7Day, setnext7Day] = useState(true);
+  const [hightPriority, setHightPriority] = useState(true);
+  const [mediumPriority, setMediumPriority] = useState(true);
+  const [lowPriority, setLowPriority] = useState(true);
+  const [planed, setPlaned] = useState(true);
+  const [all, setAll] = useState(true);
+  const [someDay, setSomeDay] = useState(true);
+  const [event, setEvent] = useState(true);
+  const [done, setDone] = useState(true);
+  const [plan, setPlan] = useState(true);
+  const [group, setGroup] = useState(true);
+  const [rating, setRating] = useState(true);
+  const [prenium, setPrenium] = useState(true);
   const route = useRoute();
   const { params } = route;
   useEffect(() => {
@@ -34,28 +49,50 @@ export default function Home({ navigation }) {
         if (storedData) {
           const parsedData = JSON.parse(storedData);
           console.log(parsedData);
-          group = parsedData.group || true;
-          plan = parsedData.plan || true;
-          rating = parsedData.ratings || true;
+          setGroup(parsedData.group);
+          setPlan(parsedData.plan);
+          setRating(parsedData.ratings);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const fetchData = async () => {
+      try {
+        const storedData = await AsyncStorage.getItem("projectData");
+        if (storedData) {
+          const parsedData = JSON.parse(storedData);
+          setOutOfDate(parsedData.outOfDate);
+          setTomorow(parsedData.tomorow);
+          setThisWeek(parsedData.thisWeek);
+          setnext7Day(parsedData.next7Day);
+          setHightPriority(parsedData.hightPriority);
+          setMediumPriority(parsedData.mediumPriority);
+          setLowPriority(parsedData.lowPriority);
+          setPlaned(parsedData.planed);
+          setAll(parsedData.all);
+          setSomeDay(parsedData.someDay);
+          setEvent(parsedData.event);
+          setDone(parsedData.done);
         }
       } catch (error) {
         console.log(error);
       }
     };
     getSetting();
-
-    
+    fetchData();
   }, []);
+
   useEffect(() => {
     var parsedUrl = new URL(window.location.href);
-    console.log(parsedUrl.searchParams.get('token'))
+    console.log(parsedUrl.searchParams.get("token"));
     if (params && params.token) {
       console.log(params.token);
     }
-  },[params])
+  }, [params]);
 
   const handlePress = () => {
-    // Mở đường dẫn bên ngoài khi nút được nhấn
     Linking.openURL("http://localhost:8080/oauth2/authorization/google");
   };
 
@@ -67,23 +104,49 @@ export default function Home({ navigation }) {
             style={styles.avt}
             resizeMode="center"
             source={require("../../images/avt.jpg")}
+          ></ImageBackground>
+          <Text
+            style={{ fontSize: 20, color: "red" }}
+            onPress={() => navigation.navigate("Setting")}
           >
-            {/* <View style={styles.preavt}>
-            <FontAwesome5 style={{flex:1, justifyContent:"center", alignItems:"center"}} name="crown" size={8} color="gray" />
-            </View> */}
-          </ImageBackground>
-          <Text style={{ fontSize: 20, color: "red" }}>Đăng Nhập</Text>
-          <FontAwesome5 name="crown" size={24} color="#FFD300" />
+            Đăng Nhập
+          </Text>
+          <FontAwesome5
+            name="crown"
+            style={styles.itemRow}
+            size={20}
+            color="#FFD300"
+          />
           {group && (
             <MaterialCommunityIcons
               name="account-group-outline"
-              size={24}
+              style={styles.itemRow}
+              size={20}
               color="black"
             />
           )}
-          {plan && <FontAwesome5 name="seedling" size={24} color="black" />}
-          {rating && <EvilIcons name="trophy" size={24} color="black" />}
-          <AntDesign name="barschart" size={24} color="black" />
+          {plan && (
+            <FontAwesome5
+              name="seedling"
+              style={styles.itemRow}
+              size={20}
+              color="black"
+            />
+          )}
+          {rating && (
+            <EvilIcons
+              name="trophy"
+              style={styles.itemRow}
+              size={20}
+              color="black"
+            />
+          )}
+          <AntDesign
+            name="barschart"
+            style={styles.itemRow}
+            size={20}
+            color="black"
+          />
         </View>
       </View>
       <View style={styles.body}>
@@ -104,21 +167,249 @@ export default function Home({ navigation }) {
         </View>
         <View style={styles.headers}>
           <View style={styles.row}>
-            <MaterialCommunityIcons
-              name="weather-sunset"
-              size={24}
-              color="orange"
+            <MaterialIcons
+              style={styles.itemRow}
+              name="assignment-late"
+              size={20}
+              color="red"
             />
-            <Text>Tomorrow</Text>
+            <Text>Out of Date</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.itemRow}>1h 40m</Text>
             <Text>1</Text>
           </View>
         </View>
+        {tomorow && (
+          <View style={styles.headers}>
+            <View style={styles.row}>
+              <MaterialCommunityIcons
+                name="weather-sunset"
+                style={styles.itemRow}
+                size={20}
+                color="orange"
+              />
+              <Text>Tomorrow</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.itemRow}>1h 40m</Text>
+              <Text>1</Text>
+            </View>
+          </View>
+        )}
+        {thisWeek && (
+          <View style={styles.headers}>
+            <View style={styles.row}>
+              <MaterialCommunityIcons
+                name="calendar-range-outline"
+                style={styles.itemRow}
+                size={20}
+                color="purple"
+              />
+              <Text>This Week</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.itemRow}>1h 40m</Text>
+              <Text>1</Text>
+            </View>
+          </View>
+        )}
+        {next7Day && (
+          <View style={styles.headers}>
+            <View style={styles.row}>
+              <MaterialCommunityIcons
+                name="calendar-arrow-right"
+                style={styles.itemRow}
+                size={20}
+                color="#32CD32"
+              />
+              <Text>The next 7 days</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.itemRow}>1h 40m</Text>
+              <Text>1</Text>
+            </View>
+          </View>
+        )}
+        {hightPriority && (
+          <View style={styles.headers}>
+            <View style={styles.row}>
+              <Fontisto
+                name="flag"
+                style={styles.itemRow}
+                size={20}
+                color="red"
+              />
+              <Text>Hight Priority</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.itemRow}>1h 40m</Text>
+              <Text>1</Text>
+            </View>
+          </View>
+        )}
+        {mediumPriority && (
+          <View style={styles.headers}>
+            <View style={styles.row}>
+              <Fontisto
+                name="flag"
+                style={styles.itemRow}
+                size={20}
+                color="orange"
+              />
+              <Text>Medium Priority</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.itemRow}>1h 40m</Text>
+              <Text>1</Text>
+            </View>
+          </View>
+        )}
+        {lowPriority && (
+          <View style={styles.headers}>
+            <View style={styles.row}>
+              <Fontisto
+                name="flag"
+                style={styles.itemRow}
+                size={20}
+                color="#00FF7F"
+              />
+              <Text>Low Priority</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.itemRow}>1h 40m</Text>
+              <Text>1</Text>
+            </View>
+          </View>
+        )}
+        {planed && (
+          <View style={styles.headers}>
+            <View style={styles.row}>
+              <MaterialCommunityIcons
+                name="calendar-check-outline"
+                style={styles.itemRow}
+                size={20}
+                color="#87CEFA"
+              />
+              <Text>Planed</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.itemRow}>1h 40m</Text>
+              <Text>1</Text>
+            </View>
+          </View>
+        )}
+        {all && (
+          <View style={styles.headers}>
+            <View style={styles.row}>
+              <MaterialCommunityIcons
+                name="select-all"
+                style={styles.itemRow}
+                size={20}
+                color="orange"
+              />
+              <Text>All</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.itemRow}>1h 40m</Text>
+              <Text>1</Text>
+            </View>
+          </View>
+        )}
+        {someDay && (
+          <View style={styles.headers}>
+            <View style={styles.row}>
+              <MaterialCommunityIcons
+                name="calendar-text-outline"
+                style={styles.itemRow}
+                size={20}
+                color="purple"
+              />
+              <Text>Some day</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.itemRow}>1h 40m</Text>
+              <Text>1</Text>
+            </View>
+          </View>
+        )}
+        {event && (
+          <View style={styles.headers}>
+            <View style={styles.row}>
+              <MaterialIcons
+                name="event"
+                style={styles.itemRow}
+                size={20}
+                color="#32CD32"
+              />
+              <Text>Event</Text>
+            </View>
+          </View>
+        )}
+        {done && (
+          <View style={styles.headers}>
+            <View style={styles.row}>
+              <AntDesign name="checkcircleo" size={20} color="gray" />
+              <Text>Done</Text>
+            </View>
+          </View>
+        )}
+        <View style={styles.headers}>
+          <View style={styles.row}>
+            <FontAwesome
+              name="tasks"
+              style={styles.itemRow}
+              size={20}
+              color="#87CEFA"
+            />
+            <Text>Task</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.itemRow}>1h 40m</Text>
+            <Text>1</Text>
+          </View>
+        </View>
+        <View style={styles.headers}>
+          <View style={styles.row}>
+            <AntDesign
+              name="plus"
+              style={styles.itemRow}
+              size={20}
+              color="red"
+            />
+            <Text>Add a Project</Text>
+          </View>
+          <View style={styles.row}>
+            <MaterialCommunityIcons
+              style={styles.itemRow}
+              name="tag-plus-outline"
+              size={20}
+              color="red"
+            />
+            <AntDesign name="addfolder" size={20} color="red" />
+          </View>
+        </View>
+        <View></View>
         <TouchableOpacity onPress={handlePress}>
           <Text>Open External Link</Text>
         </TouchableOpacity>
+      </View>
+      <View>
+        <ImageBackground
+          source={require("../../images/bg_focus_1.jpg")}
+          resizeMode="center"
+          
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            width: 50,
+            height: 50,
+            borderRadius: 25,
+          }}
+        >
+          <Text style={{ color: "white", fontSize: 24 }} onPress={() => navigation.navigate('Focus')}>25</Text>
+        </ImageBackground>
       </View>
     </SafeAreaView>
   );
@@ -162,5 +453,14 @@ const styles = StyleSheet.create({
   },
   itemRow: {
     marginRight: 5,
+  },
+  iconFocus: {
+    flex: 1,
+    position: "absolute",
+    bottom: 0,
+    right: -50,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
   },
 });

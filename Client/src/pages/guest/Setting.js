@@ -122,7 +122,7 @@ export default function Setting({ navigation }) {
 
   return (
     <ScrollView style={s`flex-1 bg-gray`}>
-      <View style={s` flex-1 bg-white justify-center items-center my-2 px-2`}>
+      <View style={s` flex-1 bg-white justify-center items-center mb-4`}>
         <Feather
           style={s`absolute left-1`}
           size={24}
@@ -138,7 +138,7 @@ export default function Setting({ navigation }) {
             style={s`w-12 h-12 rounded-3xl`}
           />
         </View>
-        <View style={s`flex flex-col px-3`}>
+        <View style={s`flex flex-col px-2`}>
           <View style={s`flex flex-row items-center`}>
             <View style={s`mr-2`}>
               <Text
@@ -162,14 +162,14 @@ export default function Setting({ navigation }) {
             name="crown"
             style={s`text-lg font-medium pr-1 text-yellow-400`}
           />
-          <Text style={s`text-yellow-400 text-lg font-medium`}>
-            Upgrade to Premium
+          <Text style={s`text-yellow-400 text-lg font-medium`} onPress={() => navigation.navigate('Prenium')}>
+            Upgrade to Premium 
           </Text>
         </View>
 
         <View style={s`flex flex-row`}>
-          <Text style={s`text-red-500 text-lg`}>{preTime} Date</Text>
-          <AntDesign style={s`text-lg`} name="right" />
+          <Text style={s`text-red-500 text-lg`} onPress={() => navigation.navigate('Prenium')}>{preTime} Date</Text>
+          <AntDesign style={s`text-lg`} name="right" onPress={() => navigation.navigate('Prenium')}/>
         </View>
       </View>
 

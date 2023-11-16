@@ -8,30 +8,31 @@ import {
 } from "@expo/vector-icons";
 import { s } from "react-native-wind";
 
-function Prenium() {
+function Prenium({ navigation }) {
   return (
     <SafeAreaView>
       <View
-        style={s` flex-1 bg-white justify-center items-center py-4 border-b-2 border-b-gray-200`}
+        style={s`flex-1 bg-white justify-center items-center py-4 border-b-2 border-b-gray-200`}
       >
         <FontAwesome
           style={s`absolute left-1`}
           name="angle-left"
           size={24}
+          color="#000" // Thay đổi màu cho icon angle-left
           onPress={() => navigation.goBack()}
         />
-        <Text style={s`font-medium text-2xl`}>Nâng cấp lên Prenium</Text>
+        <Text style={s`font-medium text-2xl text-yellow-400`}>Upgrade to Premium</Text>
       </View>
       <View style={s`flex flex-col bg-white px-3`}>
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
-              name="calendar-arrow-left"
+              name="sync"
               size={24}
-              color="red"
+              color="#00BFFF" // Thay đổi màu cho icon sync
             />
             <Text style={s`h-full flex items-center pl-2`}>
-              Đồng bộ hóa dữ liệu tất cả thiết bị.
+              Sync data across all devices.
             </Text>
           </View>
         </View>
@@ -39,12 +40,12 @@ function Prenium() {
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
-              name="calendar-arrow-left"
+              name="backup-restore"
               size={24}
-              color="red"
+              color="#00FF00" // Thay đổi màu cho icon backup-restore
             />
             <Text style={s`h-full flex items-center pl-2`}>
-              Sao lưu dữ liệu trên Cloud.
+              Backup data to Cloud.
             </Text>
           </View>
         </View>
@@ -52,12 +53,12 @@ function Prenium() {
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
-              name="calendar-arrow-left"
+              name="chart-line"
               size={24}
-              color="red"
+              color="#CCCC00" // Thay đổi màu cho icon chart-line
             />
             <Text style={s`h-full flex items-center pl-2`}>
-              Báo cáo thống kê chi tiết
+              Detailed statistical reports.
             </Text>
           </View>
         </View>
@@ -65,12 +66,12 @@ function Prenium() {
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
-              name="calendar-arrow-left"
+              name="format-list-bulleted"
               size={24}
-              color="red"
+              color="#DC143C" // Thay đổi màu cho icon format-list-bulleted
             />
             <Text style={s`h-full flex items-center pl-2`}>
-              Không giới hạn số lượng dự án
+              Unlimited number of projects.
             </Text>
           </View>
         </View>
@@ -78,12 +79,12 @@ function Prenium() {
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
-              name="calendar-arrow-left"
+              name="label-outline"
               size={24}
-              color="red"
+              color="##FF6347" // Thay đổi màu cho icon label-outline
             />
             <Text style={s`h-full flex items-center pl-2`}>
-              Tạo nhãn cho các nhiệm vụ
+              Create labels for tasks.
             </Text>
           </View>
         </View>
@@ -91,12 +92,12 @@ function Prenium() {
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
-              name="calendar-arrow-left"
+              name="cellphone-lock"
               size={24}
-              color="red"
+              color="#4169E1" // Thay đổi màu cho icon cellphone-lock
             />
             <Text style={s`h-full flex items-center pl-2`}>
-              Chế độ nghiêm ngặt: Lật úp điện thoại
+              Strict mode: Flip the phone face down.
             </Text>
           </View>
         </View>
@@ -104,12 +105,12 @@ function Prenium() {
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
-              name="calendar-arrow-left"
+              name="calendar-clock"
               size={24}
-              color="red"
+              color="#33CC99" // Thay đổi màu cho icon calendar-clock
             />
             <Text style={s`h-full flex items-center pl-2`}>
-              Lên lịch trình cho các nhiệm vụ
+              Schedule for tasks.
             </Text>
           </View>
         </View>
@@ -117,12 +118,12 @@ function Prenium() {
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
-              name="calendar-arrow-left"
+              name="folder-outline"
               size={24}
-              color="red"
+              color="#CC66FF" // Thay đổi màu cho icon folder-outline
             />
             <Text style={s`h-full flex items-center pl-2`}>
-              Tạo thư mục cho các dự án
+              Create folders for projects.
             </Text>
           </View>
         </View>
@@ -130,12 +131,12 @@ function Prenium() {
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
-              name="calendar-arrow-left"
+              name="timer"
               size={24}
-              color="red"
+              color="#6633FF" // Thay đổi màu cho icon timer
             />
             <Text style={s`h-full flex items-center pl-2`}>
-              Tùy chỉnh độ dài thời gian Pomodoro cho các nhiệm vụ
+              Customize Pomodoro timer duration for tasks.
             </Text>
           </View>
         </View>
@@ -143,12 +144,12 @@ function Prenium() {
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
-              name="calendar-arrow-left"
+              name="pencil-plus-outline"
               size={24}
-              color="red"
+              color="#CC0000" // Thay đổi màu cho icon pencil-plus-outline
             />
             <Text style={s`h-full flex items-center pl-2`}>
-              Thêm và chỉnh sửa bản ghi Pomodoro thủ công
+              Add and edit Pomodoro records manually.
             </Text>
           </View>
         </View>
@@ -156,12 +157,12 @@ function Prenium() {
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
-              name="calendar-arrow-left"
+              name="sync"
               size={24}
-              color="red"
+              color="#778899" // Thay đổi màu cho icon sync
             />
             <Text style={s`h-full flex items-center pl-2`}>
-              Đồng bộ hóa dữ liệu tất cả thiết bị
+              Sync data across all devices.
             </Text>
           </View>
         </View>
