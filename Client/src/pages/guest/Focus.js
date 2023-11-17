@@ -6,6 +6,7 @@ import {
   Dimensions,
   TouchableOpacity,
   StyleSheet,
+  ScrollView,
 } from "react-native";
 import { CheckBox } from "react-native-elements";
 import { CircularProgress } from "react-native-circular-progress";
@@ -97,7 +98,7 @@ const Focus = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScrollView style={styles.container}>
       <Image
         style={styles.imageBg}
         source={require("../../images/bg_focus_1.jpg")}
@@ -106,7 +107,7 @@ const Focus = ({ navigation }) => {
         <View>
           <View style={{ justifyContent: "space-between", flex: 1 }}>
             <TouchableOpacity style={styles.downButton}>
-              <AntDesign name="down" size={24} color="white" />
+              <AntDesign name="down" size={24} color="white" onPress={() => navigation.goBack()} />
             </TouchableOpacity>
 
             <View style={styles.taskContainer}>
@@ -205,7 +206,7 @@ const Focus = ({ navigation }) => {
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    </ScrollView>
   );
 };
 
@@ -266,7 +267,6 @@ const styles = StyleSheet.create({
   progressText: {
     color: "#fff",
     fontSize: 32,
-    fontFamily: "bold",
   },
   // Section 4: Control Buttons
   controlButtons: {
