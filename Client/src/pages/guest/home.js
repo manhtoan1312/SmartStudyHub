@@ -396,12 +396,11 @@ export default function Home({ navigation }) {
             <Text>Open External Link</Text>
           </TouchableOpacity>
         </View>
-        <View>
+        <View >
           <ImageBackground
             source={require("../../images/bg_focus_1.jpg")}
             resizeMode="center"
             style={{
-              flex: 1,
               alignItems: "center",
               justifyContent: "center",
               width: 50,
@@ -436,7 +435,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     height: 50,
-    marginTop: Platform.OS === "ios" ? 20 : 10,
+    marginTop: 10
   },
   body: {
     flex: 1,

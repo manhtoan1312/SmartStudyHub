@@ -35,7 +35,7 @@ const Focus = ({ navigation }) => {
   const [mode, setMode] = useState("work");
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [timerMode, setTimerMode] = useState(0);
-  const [selectedTask, setSelectedTask] = useState({});
+  const [selectedTask, setSelectedTask] = useState(false);
   const [percentage, setPercentage] = useState(100);
   const settingsInfo = {
     workMinutes: 25,
@@ -231,9 +231,15 @@ const styles = StyleSheet.create({
   },
   taskContainer: {
     alignItems: "center",
-    paddingTop: 20,
+    marginTop: 20,
     flex: 1,
     flexDirection: "row",
+    paddingVertical: 10,
+    paddingHorizontal:20,
+    borderRadius:20,
+    backgroundColor:'white',
+    opacity:0.5,
+    color:'gray'
   },
   selectedTask: {
     flexDirection: "row",
