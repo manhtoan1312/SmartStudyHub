@@ -89,17 +89,17 @@ const Focus = ({ navigation }) => {
           secondLeftDefault = parsedSettings.pomodoroTime * 60;
           setSecondsLeft(secondLeftDefault);
         }
-        if(secondLeft && secondLeft !==0) {
-          setSecondsLeft(secondLeft)
+        if(secondLeft && secondLeft !=='0') {
+          setSecondsLeft(parseInt(secondLeft))
         }
         if(countWork){
-          setCountWork(countWork)
+          setCountWork(parseInt(countWork))
         }
       } catch (error) {
         console.log(error);
         Alert.alert(
           "Smart Study Hub Announcement",
-          "An error occurred while saving the settings",
+          "An error occurred while get settings",
           [
             {
               text: "Cancel",
@@ -118,15 +118,16 @@ const Focus = ({ navigation }) => {
 
   const calculateTotalSeconds = () => {
     return mode === "work"
-      ? minutes * 60 + seconds
+      ? secondLeftDefault
       : (mode === "shortBreak" ? shortBreakTime : longBreakTime) * 60;
+      
   };
 
   const updateProgress = () => {
     const totalSeconds = calculateTotalSeconds();
-    secondsLeftRef.current = totalSeconds;
+
     const percentage = Math.round(
-      (secondsLeftRef.current / totalSeconds) * 100
+      (secondsLeft / totalSeconds) * 100
     );
     setPercentage(percentage);
   };
@@ -155,8 +156,6 @@ const Focus = ({ navigation }) => {
   };
 
   const startFocus = () => {
-    const initialSecondsLeft = calculateTotalSeconds();
-    setSecondsLeft(initialSecondsLeft);
     setIsPaused(!isPaused);
   };
   const handleCloseTask = () => {
@@ -167,14 +166,13 @@ const Focus = ({ navigation }) => {
   
   const handleStop = () => {
     setIsPaused(true);
-    console.log(secondLeftDefault);
     setSecondsLeft(secondLeftDefault);
     setPercentage(100);
   };
   const backtoHome = async() => {
     try {
-      await AsyncStorage.setItem("secondsLeft", secondsLeft);
-      await AsyncStorage.setItem("countWork", countWork);
+      await AsyncStorage.setItem("secondsLeft", String(secondsLeft));
+      await AsyncStorage.setItem("countWork", String(countWork));
       
       navigation.goBack();
     } catch (error) {

@@ -75,31 +75,65 @@ export default function Setting({ navigation }) {
       }
     };
 
-    fetchSettings();
+     fetchSettings();
   }, []);
 
+  const updateData = async () => {
+    const settings = {
+      preTime,
+      workSound,
+      breakSound,
+      focusSound,
+      vibrate,
+      pomodoroTime,
+      shortBreakTime,
+      longBreakTime,
+      breakAfter,
+      autoStartPo,
+      autoStartBreak,
+      disableBreakTime,
+      appNotification,
+      notifyEveryday,
+      group,
+      ratings,
+      plan,
+    };
+    await AsyncStorage.setItem("settings", JSON.stringify(settings));
+  }
+
+  const navigate = async (to) => {
+    try {
+      await updateData()
+      navigation.navigate(to);
+    } catch (e) {
+      console.log(e);
+      Alert.alert(
+        "Smart Study Hub Announcement",
+        "An error occurred while saving the settings",
+        [
+          {
+            text: "Cancel",
+          },
+          {
+            text: "OK",
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  }
+  const toSignIn = () => {
+    navigate('Login')
+  }
+  const toPrenium = () => {
+    navigate('Prenium')
+  }
+  const toProject = () => {
+    navigate('Project')
+  }
   const handleSaveSettings = async () => {
     try {
-      const settings = {
-        preTime,
-        workSound,
-        breakSound,
-        focusSound,
-        vibrate,
-        pomodoroTime,
-        shortBreakTime,
-        longBreakTime,
-        breakAfter,
-        autoStartPo,
-        autoStartBreak,
-        disableBreakTime,
-        appNotification,
-        notifyEveryday,
-        group,
-        ratings,
-        plan,
-      };
-      await AsyncStorage.setItem("settings", JSON.stringify(settings));
+      await updateData()
       navigation.goBack();
     } catch (e) {
       console.log(e);
@@ -142,7 +176,7 @@ export default function Setting({ navigation }) {
             <View style={s`mr-2`}>
               <Text
                 style={s` text-lg font-medium`}
-                onPress={() => navigation.navigate("Login")}
+                onPress={() => toSignIn()}
               >
                 Sign In | Sign Up
               </Text>
@@ -161,23 +195,23 @@ export default function Setting({ navigation }) {
             name="crown"
             style={s`text-lg font-medium pr-1 text-yellow-400`}
           />
-          <Text style={s`text-yellow-400 text-lg font-medium`} onPress={() => navigation.navigate('Prenium')}>
+          <Text style={s`text-yellow-400 text-lg font-medium`} onPress={() => toPrenium()}>
             Upgrade to Premium 
           </Text>
         </View>
 
         <View style={s`flex flex-row`}>
-          <Text style={s`text-red-500 text-lg`} onPress={() => navigation.navigate('Prenium')}>{preTime} Date</Text>
-          <AntDesign style={s`text-lg`} name="right" onPress={() => navigation.navigate('Prenium')}/>
+          <Text style={s`text-red-500 text-lg`} onPress={() => toPrenium()}>{preTime} Date</Text>
+          <AntDesign style={s`text-lg`} name="right" onPress={() => toPrenium()}/>
         </View>
       </View>
 
       <View style={s`flex flex-row justify-between px-2 mt-6 bg-white py-4`}>
-        <Text style={s` text-lg font-medium`}>Project</Text>
+        <Text style={s` text-lg font-medium`} onPress={() => toProject()}>Project</Text>
         <AntDesign
           style={s`text-lg font-medium`}
           name="right"
-          onPress={() => navigation.navigate("Project")}
+          onPress={() => toProject()}
         />
       </View>
 
