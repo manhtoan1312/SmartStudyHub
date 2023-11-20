@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Switch, View, SafeAreaView, Text } from "react-native";
+import { Switch, View, SafeAreaView, Text,Alert } from "react-native";
 import {
   FontAwesome,
   MaterialCommunityIcons,
@@ -8,7 +8,6 @@ import {
 } from "@expo/vector-icons";
 import { s } from "react-native-wind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 function Project({ navigation }) {
   const [outOfDate, setOutOfDate] = useState(false);
   const [tomorow, setTomorow] = useState(false);

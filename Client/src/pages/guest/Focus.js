@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Alert,
 } from "react-native";
 import { CheckBox } from "react-native-elements";
 import { CircularProgress } from "react-native-circular-progress";
@@ -17,9 +18,10 @@ import {
   FontAwesome5,
   Entypo,
   MaterialIcons,
+  Ionicons,
 } from "@expo/vector-icons";
 import { Image } from "react-native";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const { width, height } = Dimensions.get("screen");
 
 const red = "#f54e4e";
@@ -37,47 +39,92 @@ const Focus = ({ navigation }) => {
   const [timerMode, setTimerMode] = useState(0);
   const [selectedTask, setSelectedTask] = useState(false);
   const [percentage, setPercentage] = useState(100);
-  const settingsInfo = {
-    workMinutes: 25,
-    breakMinutes: 5,
-  };
+  const [shortBreakTime, setShortBreakTime] = useState(5);
+  const [longBreakTime, setLongBreakTime] = useState(15);
+  const [breakAfter, setBreakAfter] = useState(4);
+  const [autoStartPo, setAutoStartPo] = useState(false);
+  const [autoStartBreak, setAutoStartBreak] = useState(false);
+  let secondLeftDefault = 25 * 60; 
   const secondsLeftRef = useRef(secondsLeft);
-  const isPausedRef = useRef(isPaused);
   const modeRef = useRef(mode);
 
   useEffect(() => {
-    secondsLeftRef.current = calculateTotalSeconds();
-    setSecondsLeft(secondsLeftRef.current);
+    if (!isPaused) {
+      const interval = setInterval(() => {
+        setSecondsLeft((prevSeconds) => {
+          if (prevSeconds === 0) {
+            switchMode();
+            return calculateTotalSeconds();
+          }
+          return prevSeconds - 1;
+        });
+      }, 1000);
 
-    const interval = setInterval(() => {
-      if (isPausedRef.current) {
-        return;
+      return () => clearInterval(interval);
+    }
+  }, [isPaused, mode, timerMode, secondsLeft]);
+
+  useEffect(() => {
+    setMinutes(Math.floor(secondsLeft / 60));
+    setSeconds(secondsLeft % 60);
+    updateProgress();
+  }, [secondsLeft, isPaused]); 
+  
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const storedSettings = await AsyncStorage.getItem("settings");
+        const secondLeft = await AsyncStorage.getItem("secondsLeft")
+        const countWork = await AsyncStorage.getItem("countWork")
+
+        if (storedSettings) {
+          const parsedSettings = JSON.parse(storedSettings);
+          setMinutes(parsedSettings.pomodoroTime);
+          setShortBreakTime(parsedSettings.shortBreakTime);
+          setLongBreakTime(parsedSettings.longBreakTime);
+          setBreakAfter(parsedSettings.breakAfter);
+          setAutoStartPo(parsedSettings.autoStartPo);
+          setAutoStartBreak(parsedSettings.autoStartBreak);
+          secondLeftDefault = parsedSettings.pomodoroTime * 60;
+          setSecondsLeft(secondLeftDefault);
+        }
+        if(secondLeft && secondLeft !==0) {
+          setSecondsLeft(secondLeft)
+        }
+        if(countWork){
+          setCountWork(countWork)
+        }
+      } catch (error) {
+        console.log(error);
+        Alert.alert(
+          "Smart Study Hub Announcement",
+          "An error occurred while saving the settings",
+          [
+            {
+              text: "Cancel",
+            },
+            {
+              text: "OK",
+            },
+          ],
+          { cancelable: false }
+        );
       }
-      if (secondsLeftRef.current === 0) {
-        switchMode();
-        return;
-      }
+    };
 
-      tick();
-      updateProgress();
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isPaused, mode, timerMode]);
+    fetchSettings();
+  }, []);
 
   const calculateTotalSeconds = () => {
     return mode === "work"
-      ? settingsInfo.workMinutes * 60
-      : settingsInfo.breakMinutes * 60;
-  };
-
-  const tick = () => {
-    secondsLeftRef.current--;
-    setSecondsLeft(secondsLeftRef.current);
+      ? minutes * 60 + seconds
+      : (mode === "shortBreak" ? shortBreakTime : longBreakTime) * 60;
   };
 
   const updateProgress = () => {
     const totalSeconds = calculateTotalSeconds();
+    secondsLeftRef.current = totalSeconds;
     const percentage = Math.round(
       (secondsLeftRef.current / totalSeconds) * 100
     );
@@ -85,17 +132,68 @@ const Focus = ({ navigation }) => {
   };
 
   const switchMode = () => {
-    const nextMode = modeRef.current === "work" ? "break" : "work";
+    const nextMode = modeRef.current === "work" ? "shortBreak" : "work";
     modeRef.current = nextMode;
 
-    setMode(nextMode);
-    setSecondsLeft(calculateTotalSeconds());
-    secondsLeftRef.current = calculateTotalSeconds();
+    if (nextMode === "work") {
+      setCountWork((prevCount) => prevCount + 1);
+      if (countWork % breakAfter === 0) {
+        setMode("longBreak");
+        setSecondsLeft(longBreakTime * 60);
+      } else {
+        setMode("shortBreak");
+        setSecondsLeft(shortBreakTime * 60);
+      }
+    } else {
+      setMode("work");
+      setSecondsLeft(minutes * 60);
+    }
+
+    if ((nextMode === "shortBreak" && autoStartBreak) || (nextMode === "work" && autoStartPo)) {
+      startFocus();
+    }
   };
 
+  const startFocus = () => {
+    const initialSecondsLeft = calculateTotalSeconds();
+    setSecondsLeft(initialSecondsLeft);
+    setIsPaused(!isPaused);
+  };
   const handleCloseTask = () => {
     setSelectedTask({});
   };
+  
+  
+  
+  const handleStop = () => {
+    setIsPaused(true);
+    console.log(secondLeftDefault);
+    setSecondsLeft(secondLeftDefault);
+    setPercentage(100);
+  };
+  const backtoHome = async() => {
+    try {
+      await AsyncStorage.setItem("secondsLeft", secondsLeft);
+      await AsyncStorage.setItem("countWork", countWork);
+      
+      navigation.goBack();
+    } catch (error) {
+      console.log(error);
+      Alert.alert(
+        "Smart Study Hub Announcement",
+        "An error occurred while saving the settings",
+        [
+          {
+            text: "Cancel",
+          },
+          {
+            text: "OK",
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -107,7 +205,12 @@ const Focus = ({ navigation }) => {
         <View>
           <View style={{ justifyContent: "space-between", flex: 1 }}>
             <TouchableOpacity style={styles.downButton}>
-              <AntDesign name="down" size={24} color="white" onPress={() => navigation.goBack()} />
+              <AntDesign
+                name="down"
+                size={24}
+                color="white"
+                onPress={() => backtoHome()}
+              />
             </TouchableOpacity>
 
             <View style={styles.taskContainer}>
@@ -171,12 +274,33 @@ const Focus = ({ navigation }) => {
             )}
           </CircularProgress>
           <View style={styles.controlButtons}>
-            <TouchableOpacity style={styles.startButton}>
-              <Entypo name="controller-play" style={{marginBottom:-4, marginRight:5}} size={20} color="green" />
-              <Text style={{ color: "green", fontSize: 16 }}>
-                Start Focus Mode
+            <TouchableOpacity style={styles.startButton} onPress={startFocus}>
+              <Entypo
+                name={isPaused ? "controller-play" : "controller-paus"}
+                style={{ marginBottom: -4, marginRight: 5 }}
+                size={20}
+                color={isPaused ? "green" : "orange"}
+              />
+              <Text
+                style={{ color: isPaused ? "green" : "orange", fontSize: 16 }}
+              >
+                {isPaused ? "Start Focus Mode" : "Pause"}
               </Text>
             </TouchableOpacity>
+            {!isPaused && (
+              <TouchableOpacity
+                style={styles.stopButton}
+                onPress={() => handleStop()}
+              >
+                <MaterialIcons
+                  name="stop"
+                  style={{ marginBottom: -4, marginRight: 5 }}
+                  size={20}
+                  color="red"
+                />
+                <Text style={{ color: "red", fontSize: 16 }}>Stop</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 
@@ -235,11 +359,11 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     paddingVertical: 10,
-    paddingHorizontal:20,
-    borderRadius:20,
-    backgroundColor:'white',
-    opacity:0.5,
-    color:'gray'
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    backgroundColor: "white",
+    opacity: 0.5,
+    color: "gray",
   },
   selectedTask: {
     flexDirection: "row",
@@ -276,15 +400,25 @@ const styles = StyleSheet.create({
   },
   // Section 4: Control Buttons
   controlButtons: {
-    backgroundColor: "white",
-    alignItems:'center',
-    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
     marginTop: 50,
     borderRadius: 20,
   },
   startButton: {
     flexDirection: "row",
     alignItems: "center",
+    padding: 10,
+    backgroundColor: "white",
+    borderRadius: 10,
+  },
+  stopButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "white",
+    borderRadius: 10,
   },
   // Section 5: Settings Buttons
   settingsButtons: {

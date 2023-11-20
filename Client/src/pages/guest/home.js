@@ -22,7 +22,7 @@ import {
   FontAwesome,
   MaterialIcons,
 } from "@expo/vector-icons";
-import { useRoute } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Home({ navigation }) {
   const [login, setLogin] = useState({});
@@ -42,48 +42,47 @@ export default function Home({ navigation }) {
   const [group, setGroup] = useState(true);
   const [rating, setRating] = useState(true);
   const [prenium, setPrenium] = useState(true);
-  // const route = useRoute();
-  // const { params } = route;
-  useEffect(() => {
-    const getSetting = async () => {
-      try {
-        const storedData = await AsyncStorage.getItem("settings");
-        if (storedData) {
-          const parsedData = JSON.parse(storedData);
-          setGroup(parsedData.group);
-          setPlan(parsedData.plan);
-          setRating(parsedData.ratings);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  const [minutesLeft, setMinutesLeft] = useState(25);
 
-    const fetchData = async () => {
-      try {
-        const storedData = await AsyncStorage.getItem("projectData");
-        if (storedData) {
-          const parsedData = JSON.parse(storedData);
-          setOutOfDate(parsedData.outOfDate);
-          setTomorow(parsedData.tomorow);
-          setThisWeek(parsedData.thisWeek);
-          setnext7Day(parsedData.next7Day);
-          setHightPriority(parsedData.hightPriority);
-          setMediumPriority(parsedData.mediumPriority);
-          setLowPriority(parsedData.lowPriority);
-          setPlaned(parsedData.planed);
-          setAll(parsedData.all);
-          setSomeDay(parsedData.someDay);
-          setEvent(parsedData.event);
-          setDone(parsedData.done);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const storedData = await AsyncStorage.getItem("projectData");
+          const secondLeft = await AsyncStorage.getItem("secondsLeft");
+          const settings = await AsyncStorage.getItem("settings");
+          if (settings) {
+            const parsedData = JSON.parse(settings);
+            setGroup(parsedData.group);
+            setPlan(parsedData.plan);
+            setRating(parsedData.ratings);
+          }
+          if (storedData) {
+            const parsedData = JSON.parse(storedData);
+            setOutOfDate(parsedData.outOfDate);
+            setTomorow(parsedData.tomorow);
+            setThisWeek(parsedData.thisWeek);
+            setnext7Day(parsedData.next7Day);
+            setHightPriority(parsedData.hightPriority);
+            setMediumPriority(parsedData.mediumPriority);
+            setLowPriority(parsedData.lowPriority);
+            setPlaned(parsedData.planed);
+            setAll(parsedData.all);
+            setSomeDay(parsedData.someDay);
+            setEvent(parsedData.event);
+            setDone(parsedData.done);
+          }
+          if (secondLeft) {
+            setMinutesLeft(Math.floor(secondLeft / 60));
+          }
+        } catch (error) {
+          console.log(error);
         }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getSetting();
-    fetchData();
-  }, []);
+      };
+
+      fetchData();
+    }, [])
+  );
 
   // useEffect(() => {
   //   var parsedUrl = new URL(window.location.href);
@@ -396,7 +395,7 @@ export default function Home({ navigation }) {
             <Text>Open External Link</Text>
           </TouchableOpacity>
         </View>
-        <View >
+        <View>
           <ImageBackground
             source={require("../../images/bg_focus_1.jpg")}
             resizeMode="center"
@@ -412,7 +411,7 @@ export default function Home({ navigation }) {
               style={{ color: "white", fontSize: 24 }}
               onPress={() => navigation.navigate("Focus")}
             >
-              25
+              {minutesLeft}
             </Text>
           </ImageBackground>
         </View>
@@ -435,7 +434,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     height: 50,
-    marginTop: 10
+    marginTop: 10,
   },
   body: {
     flex: 1,

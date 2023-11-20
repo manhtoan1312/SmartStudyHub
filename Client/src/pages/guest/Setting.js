@@ -20,10 +20,10 @@ export default function Setting({ navigation }) {
   const [breakSound, setBreakSound] = useState("Timer");
   const [focusSound, setFocusSound] = useState("None");
   const [vibrate, setVibrate] = useState(true);
-  const [pomodoroTime, setPomodoroTime] = useState("25 minutes");
-  const [shortBreakTime, setShortBreakTime] = useState("5 minutes");
-  const [longBreakTime, setLongBreakTime] = useState("15 minutes");
-  const [breakAfter, setBreakAfter] = useState("4 Pomodoros");
+  const [pomodoroTime, setPomodoroTime] = useState(25);
+  const [shortBreakTime, setShortBreakTime] = useState(5);
+  const [longBreakTime, setLongBreakTime] = useState(15);
+  const [breakAfter, setBreakAfter] = useState(4);
   const [autoStartPo, setAutoStartPo] = useState(false);
   const [autoStartBreak, setAutoStartBreak] = useState(false);
   const [disableBreakTime, setDisableBreakTime] = useState(false);
@@ -99,7 +99,6 @@ export default function Setting({ navigation }) {
         ratings,
         plan,
       };
-      console.log('hi')
       await AsyncStorage.setItem("settings", JSON.stringify(settings));
       navigation.goBack();
     } catch (e) {
@@ -222,7 +221,7 @@ export default function Setting({ navigation }) {
         <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Pomodoro Time</Text>
           <View style={s`flex flex-row`}>
-            <Text style={s`text-gray-500 text-lg`}>{pomodoroTime}</Text>
+            <Text style={s`text-gray-500 text-lg`}>{pomodoroTime} Minutes</Text>
             <AntDesign style={s`text-lg`} name="right" />
           </View>
         </View>
@@ -230,14 +229,14 @@ export default function Setting({ navigation }) {
         <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Short Break Time</Text>
           <View style={s`flex flex-row`}>
-            <Text style={s`text-gray-500 text-lg`}>{shortBreakTime}</Text>
+            <Text style={s`text-gray-500 text-lg`}>{shortBreakTime} Minutes</Text>
             <AntDesign style={s`text-lg`} name="right" />
           </View>
         </View>
         <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Long Break Time</Text>
           <View style={s`flex flex-row`}>
-            <Text style={s`text-gray-500 text-lg`}>{longBreakTime}</Text>
+            <Text style={s`text-gray-500 text-lg`}>{longBreakTime} Minutes</Text>
             <AntDesign style={s`text-lg`} name="right" />
           </View>
         </View>
@@ -245,7 +244,7 @@ export default function Setting({ navigation }) {
         <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Long break after</Text>
           <View style={s`flex flex-row`}>
-            <Text style={s`text-gray-500 text-lg`}>{breakAfter}</Text>
+            <Text style={s`text-gray-500 text-lg`}>{breakAfter} Pomodoro</Text>
             <AntDesign style={s`text-lg`} name="right" />
           </View>
         </View>
@@ -324,7 +323,7 @@ export default function Setting({ navigation }) {
             trackColor={{ false: "gray", true: "red" }}
             thumbColor={"white"}
             value={ratings}
-            onValueChange={() => SetRatings(!ratings)}
+            onValueChange={() => setRatings(!ratings)}
           />
         </View>
 
