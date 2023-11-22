@@ -43,14 +43,17 @@ export default function Home({ navigation }) {
   const [rating, setRating] = useState(true);
   const [prenium, setPrenium] = useState(true);
   const [minutesLeft, setMinutesLeft] = useState(25);
-
+  let countPomodoro = 0;
+  let isPlay = true;
+  let secondLeft = 0;
   useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
         try {
           const storedData = await AsyncStorage.getItem("projectData");
-          const secondLeft = await AsyncStorage.getItem("secondsLeft");
+          const seconds = await AsyncStorage.getItem("secondsLeft");
           const settings = await AsyncStorage.getItem("settings");
+          const play = await AsyncStorage.getItem("play");
           if (settings) {
             const parsedData = JSON.parse(settings);
             setGroup(parsedData.group);
@@ -72,8 +75,11 @@ export default function Home({ navigation }) {
             setEvent(parsedData.event);
             setDone(parsedData.done);
           }
-          if (secondLeft) {
-            setMinutesLeft(Math.floor(secondLeft / 60));
+          if (seconds) {
+            secondLeft = parseInt(seconds);
+          }
+          if (play) {
+            isPlay = play;
           }
         } catch (error) {
           console.log(error);
@@ -81,8 +87,27 @@ export default function Home({ navigation }) {
       };
 
       fetchData();
+      if (play) {
+        interval = setInterval(() => {
+          if (secondLeft === 0) {
+            countPomodoro++;
+            secondLeft = 25*60
+          }
+          secondLeft--;
+        }, 1000);
+      }
+
+      return (async () => {
+        await AsyncStorage.setItem("secondsLeft", String(secondLeft));
+        await AsyncStorage.setItem("countPomodoro", String(countPomodoro));
+
+        clearInterval(interval)
+      });
     }, [])
   );
+  useEffect(() => {
+    setMinutesLeft(Math.floor(secondLeft / 60));
+  }, [secondLeft]);
 
   // useEffect(() => {
   //   var parsedUrl = new URL(window.location.href);

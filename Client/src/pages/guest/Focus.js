@@ -45,9 +45,8 @@ const Focus = ({ navigation }) => {
   const [autoStartPo, setAutoStartPo] = useState(false);
   const [autoStartBreak, setAutoStartBreak] = useState(false);
   let secondLeftDefault = 25 * 60; 
-  const secondsLeftRef = useRef(secondsLeft);
   const modeRef = useRef(mode);
-
+  let countPo =0;
   useEffect(() => {
     if (!isPaused) {
       const interval = setInterval(() => {
@@ -77,7 +76,8 @@ const Focus = ({ navigation }) => {
         const storedSettings = await AsyncStorage.getItem("settings");
         const secondLeft = await AsyncStorage.getItem("secondsLeft")
         const countWork = await AsyncStorage.getItem("countWork")
-
+        const pause = await AsyncStorage.getItem("play")
+        const count = await AsyncStorage.getItem("countPomodoro")
         if (storedSettings) {
           const parsedSettings = JSON.parse(storedSettings);
           setMinutes(parsedSettings.pomodoroTime);
@@ -94,6 +94,12 @@ const Focus = ({ navigation }) => {
         }
         if(countWork){
           setCountWork(parseInt(countWork))
+        }
+        if(pause){
+          setIsPaused(!pause)
+        }
+        if(count){
+          countPo = count
         }
       } catch (error) {
         console.log(error);
@@ -133,6 +139,9 @@ const Focus = ({ navigation }) => {
   };
 
   const switchMode = () => {
+    if (modeRef.current === "work"){
+      countPo++;
+    }
     const nextMode = modeRef.current === "work" ? "shortBreak" : "work";
     modeRef.current = nextMode;
 
@@ -165,14 +174,32 @@ const Focus = ({ navigation }) => {
   
   
   const handleStop = () => {
-    setIsPaused(true);
-    setSecondsLeft(secondLeftDefault);
-    setPercentage(100);
+    Alert.alert(
+      "Smart Study Hub Announcement",
+      "Do you want to stop this Pomodoro?",
+      [
+        {
+          text: "Cancel",
+        },
+        {
+          text: "OK",
+          onPress: (() => {
+            countPo = 0
+            setIsPaused(true);
+            setSecondsLeft(secondLeftDefault);
+            setPercentage(100);
+          })
+        },
+      ],
+    );
+    
   };
   const backtoHome = async() => {
     try {
       await AsyncStorage.setItem("secondsLeft", String(secondsLeft));
       await AsyncStorage.setItem("countWork", String(countWork));
+      await AsyncStorage.setItem("play", !isPaused);
+      await AsyncStorage.setItem("countPomodoro", countPo);
       
       navigation.goBack();
     } catch (error) {
