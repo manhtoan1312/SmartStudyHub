@@ -24,6 +24,7 @@ import {
 } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Focus from "../../components/Focus";
 export default function Home({ navigation }) {
   const [login, setLogin] = useState({});
   const [outOfDate, setOutOfDate] = useState(true);
@@ -43,17 +44,15 @@ export default function Home({ navigation }) {
   const [rating, setRating] = useState(true);
   const [prenium, setPrenium] = useState(true);
   const [minutesLeft, setMinutesLeft] = useState(25);
-  let countPomodoro = 0;
-  let isPlay = true;
-  let secondLeft = 0;
+  
+  
   useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
         try {
           const storedData = await AsyncStorage.getItem("projectData");
-          const seconds = await AsyncStorage.getItem("secondsLeft");
           const settings = await AsyncStorage.getItem("settings");
-          const play = await AsyncStorage.getItem("play");
+          
           if (settings) {
             const parsedData = JSON.parse(settings);
             setGroup(parsedData.group);
@@ -75,52 +74,17 @@ export default function Home({ navigation }) {
             setEvent(parsedData.event);
             setDone(parsedData.done);
           }
-          if (seconds) {
-            secondLeft = parseInt(seconds);
-          }
-          if (play) {
-            isPlay = play;
-          }
+          
         } catch (error) {
           console.log(error);
         }
       };
 
       fetchData();
-      if (play) {
-        interval = setInterval(() => {
-          if (secondLeft === 0) {
-            countPomodoro++;
-            secondLeft = 25*60
-          }
-          secondLeft--;
-        }, 1000);
-      }
-
-      return (async () => {
-        await AsyncStorage.setItem("secondsLeft", String(secondLeft));
-        await AsyncStorage.setItem("countPomodoro", String(countPomodoro));
-
-        clearInterval(interval)
-      });
+      
     }, [])
   );
-  useEffect(() => {
-    setMinutesLeft(Math.floor(secondLeft / 60));
-  }, [secondLeft]);
-
-  // useEffect(() => {
-  //   var parsedUrl = new URL(window.location.href);
-  //   console.log(parsedUrl.searchParams.get("token"));
-  //   if (params && params.token) {
-  //     console.log(params.token);
-  //   }
-  // }, [params]);
-
-  const handlePress = () => {
-    Linking.openURL("http://localhost:8080/oauth2/authorization/google");
-  };
-
+  
   return (
     <View style={s`h-full bg-white`}>
       <ScrollView>
@@ -420,26 +384,7 @@ export default function Home({ navigation }) {
             <Text>Open External Link</Text>
           </TouchableOpacity>
         </View>
-        <View>
-          <ImageBackground
-            source={require("../../images/bg_focus_1.jpg")}
-            resizeMode="center"
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              width: 50,
-              height: 50,
-              borderRadius: 25,
-            }}
-          >
-            <Text
-              style={{ color: "white", fontSize: 24 }}
-              onPress={() => navigation.navigate("Focus")}
-            >
-              {minutesLeft}
-            </Text>
-          </ImageBackground>
-        </View>
+        <Focus />
       </ScrollView>
     </View>
   );
