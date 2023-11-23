@@ -24,7 +24,7 @@ import {
 } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Focus from "../../components/Focus";
+import ImageFocus from "../../components/Image_Focus";
 export default function Home({ navigation }) {
   const [login, setLogin] = useState({});
   const [outOfDate, setOutOfDate] = useState(true);
@@ -379,12 +379,8 @@ export default function Home({ navigation }) {
               <AntDesign name="addfolder" size={20} color="red" />
             </View>
           </View>
-          <View></View>
-          <TouchableOpacity onPress={handlePress}>
-            <Text>Open External Link</Text>
-          </TouchableOpacity>
         </View>
-        <Focus />
+        <ImageFocus navigation={navigation}/>
       </ScrollView>
     </View>
   );

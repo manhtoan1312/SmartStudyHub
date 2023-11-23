@@ -95,8 +95,8 @@ const Focus = ({ navigation }) => {
         if(countWork){
           setCountWork(parseInt(countWork))
         }
-        if(pause){
-          setIsPaused(!pause)
+        if(pause==='true'){
+          setIsPaused(false)
         }
         if(count){
           countPo = count
@@ -198,10 +198,15 @@ const Focus = ({ navigation }) => {
     try {
       await AsyncStorage.setItem("secondsLeft", String(secondsLeft));
       await AsyncStorage.setItem("countWork", String(countWork));
-      await AsyncStorage.setItem("play", !isPaused);
+      if(isPaused){
+        await AsyncStorage.setItem("play", 'false');
+      }
+      else{
+        await AsyncStorage.setItem("play", 'true');
+      }
       await AsyncStorage.setItem("countPomodoro", countPo);
       
-      navigation.goBack();
+      navigation.navigate("Home");
     } catch (error) {
       console.log(error);
       Alert.alert(
@@ -228,7 +233,7 @@ const Focus = ({ navigation }) => {
       />
       <View style={styles.overlay}>
         <View>
-          <View style={{ justifyContent: "space-between", flex: 1 }}>
+          <View >
             <TouchableOpacity style={styles.downButton}>
               <AntDesign
                 name="down"
@@ -361,7 +366,7 @@ const Focus = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 2,
   },
   imageBg: {
     width: width,
@@ -375,11 +380,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   downButton: {
-    flex: 1,
     alignItems: "flex-start",
   },
   taskContainer: {
     alignItems: "center",
+    height:50,
     marginTop: 20,
     flex: 1,
     flexDirection: "row",
@@ -413,17 +418,14 @@ const styles = StyleSheet.create({
   closeButton: {
     flex: 1,
   },
-  // Add spacing between sections
   sectionSpacing: {
     height: 20,
   },
-  // Section 3: Process (Circular Progress)
   circularProgress: {},
   progressText: {
     color: "#fff",
     fontSize: 32,
   },
-  // Section 4: Control Buttons
   controlButtons: {
     flexDirection: "row",
     alignItems: "center",
@@ -445,7 +447,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 10,
   },
-  // Section 5: Settings Buttons
   settingsButtons: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -459,3 +460,4 @@ const styles = StyleSheet.create({
 });
 
 export default Focus;
+

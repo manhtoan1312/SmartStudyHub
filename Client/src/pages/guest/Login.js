@@ -12,6 +12,8 @@ import {
   MaterialCommunityIcons,
   Feather,
   EvilIcons,
+  AntDesign,
+  Entypo,
 } from "@expo/vector-icons";
 import { login } from "../../services/AccountService";
 
@@ -19,34 +21,33 @@ function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [hide, setHide] = useState(true);
-  const [errorMessage,setErrorMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState("");
   const handleLogin = async (e) => {
     e.preventDefault();
     const response = await login(email, password);
     if (response.success) {
       Alert.alert(
-        'Smart Study Hub anoucement',
+        "Smart Study Hub anoucement",
         "thanh cong",
         [
           {
-            text: 'cancel',
+            text: "cancel",
             onPress: () => {
-              console.log('Hủy')
-              navigation.goBack()
+              console.log("Hủy");
+              navigation.goBack();
             },
-            style: 'cancel',
+            style: "cancel",
           },
           {
-            text: 'OK',
+            text: "OK",
             onPress: () => {
-              console.log('OK')
-              navigation.goBack()
+              console.log("OK");
+              navigation.goBack();
             },
-            
           },
         ],
         { cancelable: false }
-      )
+      );
       // let checked = false;
       // if (document.querySelector("#remember").checked) {
       //   checked = true;
@@ -54,27 +55,26 @@ function Login({ navigation }) {
       // contextLogin(checked, response.token);
       // navigate("/checkin");
     } else {
-      setErrorMessage(response.message)
+      setErrorMessage(response.message);
       // setEmail("");
       // setPassword("");
       // document.querySelector("#floating_email").focus();
       Alert.alert(
-        'Smart Study Hub anoucement',
-        'sai roi',
+        "Smart Study Hub anoucement",
+        "sai roi",
         [
           {
-            text: 'cancel',
-            onPress: () => console.log('Hủy'),
-            style: 'cancel',
+            text: "cancel",
+            onPress: () => console.log("Hủy"),
+            style: "cancel",
           },
           {
-            text: 'OK',
-            onPress: () => console.log('OK'),
+            text: "OK",
+            onPress: () => console.log("OK"),
           },
         ],
         { cancelable: false }
-      )
-      
+      );
     }
   };
 
@@ -141,7 +141,30 @@ function Login({ navigation }) {
           <Text style={styles.textMin}>Or</Text>
         </View>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.registerBtn} onPress={() => navigation.navigate('Register')}>
+          <TouchableOpacity style={styles.googleButton}>
+            <AntDesign name="google" size={24} color="white" />
+            <Text style={styles.buttonTextSecondary}>Login With Google</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.githubButton}>
+            <AntDesign name="github" size={24} color="white" />
+            <Text style={styles.buttonTextSecondary}>Login With GitHub</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.facebookButton}>
+            <Entypo name="facebook-with-circle" size={24} color="white" />
+            <Text style={styles.buttonTextSecondary}>Login With Facebook</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.registerBtn}
+            onPress={() => navigation.navigate("Register")}
+          >
             <Text>Sign Up</Text>
           </TouchableOpacity>
         </View>
@@ -204,7 +227,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
     padding: 15,
     borderRadius: 25,
-    width:300,
+    width: 300,
     alignItems: "center",
   },
   buttonText: {
@@ -217,13 +240,51 @@ const styles = StyleSheet.create({
     color: "gray",
   },
   registerBtn: {
-    marginTop: 20, 
+    marginTop: 20,
     borderColor: "#FFA500",
     borderWidth: 2,
     padding: 15,
     borderRadius: 25,
-    width:300,
+    width: 300,
     alignItems: "center",
+  },
+  googleButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "green",
+    borderRadius: 25,
+    marginTop: 20,
+    padding: 15,
+    width: 300,
+    justifyContent: "center",
+  },
+
+  githubButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "black",
+    borderRadius: 25,
+    marginTop: 20,
+    padding: 15,
+    width: 300,
+    justifyContent: "center",
+  },
+
+  facebookButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "blue",
+    borderRadius: 25,
+    marginTop: 20,
+    padding: 15,
+    width: 300,
+    justifyContent: "center",
+  },
+
+  buttonTextSecondary: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: "white",
   },
 });
 
