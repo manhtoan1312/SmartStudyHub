@@ -1,22 +1,16 @@
 // ImageFocus.js
-import React, { useEffect } from "react";
+import React from "react";
 import { View, Text, StyleSheet, ImageBackground } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import TimerService from "../services/TimerService";
+import useTimerService from "../hooks/useTimerService";
 
 const ImageFocus = ({ navigation }) => {
-  useFocusEffect(
-    React.useCallback(() => {
-      TimerService.setFocusStatus(true);
+  const timerService = useTimerService();
 
-      return () => {
-        TimerService.setFocusStatus(false);
-      };
-    }, [])
-  );
+  
 
   const toPomodoro = () => {
-    TimerService.stopTimer();
+    timerService.stopTimer();
     navigation.navigate("Focus");
   };
 
@@ -31,7 +25,7 @@ const ImageFocus = ({ navigation }) => {
           style={{ color: "white", fontSize: 24 }}
           onPress={() => toPomodoro()}
         >
-          {TimerService.minutesLeft}
+          {timerService.minutesLeft}
         </Text>
       </ImageBackground>
     </View>

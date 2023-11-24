@@ -1,79 +1,75 @@
 // TimerService.js
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useEffect } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useEffect } from "react";
 
-const useTimerService = () => {
-  let minutesLeft = 0;
-  let isPlay = 0;
-  let secondLeftRef = 25 * 60;
-  let countPomodoro = 0;
-  let intervalRef = null;
+class TimerService {
+  constructor() {
+    this.minutesLeft = 0;
+    this.isPlay = 0;
+    this.secondLeftRef = 25 * 60;
+    this.countPomodoro = 0;
+    this.intervalRef = null;
+    this.navigation = null;
+  }
 
-  const navigation = useNavigation();
+  setFocusStatus() {
+    this.stopTimer();
+  }
 
-  const setFocusStatus = (focusStatus) => {};
-
-  const startTimer = async () => {
+  async startTimer() {
     const seconds = await AsyncStorage.getItem("secondsLeft");
     const play = await AsyncStorage.getItem("play");
 
     if (seconds) {
-      secondLeftRef = parseInt(seconds);
-      minutesLeft = Math.floor(secondLeftRef / 60);
+      this.secondLeftRef = parseInt(seconds);
+      this.minutesLeft = Math.floor(this.secondLeftRef / 60);
     }
 
     if (play) {
-      isPlay = parseInt(play);
+      this.isPlay = parseInt(play);
     }
 
-    if (isPlay === 1) {
-      intervalRef = setInterval(() => {
-        if (secondLeftRef === 0) {
-          countPomodoro++;
-          secondLeftRef = 25 * 60;
+    if (this.isPlay === 1) {
+      this.intervalRef = setInterval(() => {
+        if (this.secondLeftRef === 0) {
+          this.countPomodoro++;
+          this.secondLeftRef = 25 * 60;
         } else {
-          console.log(secondLeftRef);
-          minutesLeft = Math.floor(secondLeftRef / 60);
-          secondLeftRef -= 1;
+          console.log(this.secondLeftRef);
+          this.minutesLeft = Math.floor(this.secondLeftRef / 60);
+          this.secondLeftRef -= 1;
         }
       }, 1000);
     }
-  };
+  }
 
-  const stopTimer = async () => {
-    if (isPlay === 1) {
-      clearInterval(intervalRef);
-      await AsyncStorage.setItem("secondsLeft", String(secondLeftRef));
-      await AsyncStorage.setItem("countPomodoro", String(countPomodoro));
+  async stopTimer() {
+    if (this.isPlay === 1) {
+      clearInterval(this.intervalRef);
+      await AsyncStorage.setItem("secondsLeft", String(this.secondLeftRef));
+      await AsyncStorage.setItem("countPomodoro", String(this.countPomodoro));
+      this.isPlay = 0; 
     }
-  };
+  }
 
-  const toggleTimer = () => {
-    if (isPlay === 1) {
-      stopTimer();
+  toggleTimer() {
+    if (this.isPlay === 1) {
+      this.stopTimer();
     } else {
-      startTimer();
+      this.startTimer();
     }
-  };
+  }
 
-  useEffect(() => {
-    if (!navigation) {
-      console.error("Navigation object is not available yet");
-      return;
-    }
+  setNavigation(navigation) {
+    this.navigation = navigation;
 
-  }, [navigation]);
+    useEffect(() => {
+      if (!this.navigation) {
+        console.error("Navigation object is not available yet");
+        return;
+      }
+    }, [this.navigation]);
+  }
+}
 
-  return {
-    startTimer,
-    stopTimer,
-    toggleTimer,
-    setFocusStatus,
-    get minutesLeft() {
-      return minutesLeft;
-    },
-  };
-};
-
-export default useTimerService;
+export default TimerService;
