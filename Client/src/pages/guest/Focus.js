@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
-  SafeAreaView,
   View,
   Text,
   Dimensions,
@@ -22,6 +21,7 @@ import {
 } from "@expo/vector-icons";
 import { Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
 const { width, height } = Dimensions.get("screen");
 
 const red = "#f54e4e";
@@ -35,7 +35,7 @@ const Focus = ({ navigation }) => {
   const [seconds, setSeconds] = useState(0);
   const [isPaused, setIsPaused] = useState(true);
   const [mode, setMode] = useState("work");
-  const [secondsLeft, setSecondsLeft] = useState(0);
+  const [secondsLeft, setSecondsLeft] = useState(25 * 60);
   const [timerMode, setTimerMode] = useState(0);
   const [selectedTask, setSelectedTask] = useState(false);
   const [percentage, setPercentage] = useState(100);
@@ -44,102 +44,104 @@ const Focus = ({ navigation }) => {
   const [breakAfter, setBreakAfter] = useState(4);
   const [autoStartPo, setAutoStartPo] = useState(false);
   const [autoStartBreak, setAutoStartBreak] = useState(false);
-  let secondLeftDefault = 25 * 60; 
+  let secondLeftDefault = 25 * 60;
   const modeRef = useRef(mode);
-  let countPo =0;
-  useEffect(() => {
-    if (!isPaused) {
-      const interval = setInterval(() => {
-        setSecondsLeft((prevSeconds) => {
-          if (prevSeconds === 0) {
-            switchMode();
-            return calculateTotalSeconds();
-          }
-          return prevSeconds - 1;
-        });
-      }, 1000);
+  let countPo = 0;
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!isPaused) {
+        const interval = setInterval(() => {
+          setSecondsLeft((prevSeconds) => {
+            if (prevSeconds === 0) {
+              switchMode();
+              return calculateTotalSeconds();
+            }
+            return prevSeconds - 1;
+          });
+        }, 1000);
 
-      return () => clearInterval(interval);
-    }
-  }, [isPaused, mode, timerMode, secondsLeft]);
-
-  useEffect(() => {
-    setMinutes(Math.floor(secondsLeft / 60));
-    setSeconds(secondsLeft % 60);
-    updateProgress();
-  }, [secondsLeft, isPaused]); 
-  
-
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const storedSettings = await AsyncStorage.getItem("settings");
-        const secondLeft = await AsyncStorage.getItem("secondsLeft")
-        const countWork = await AsyncStorage.getItem("countWork")
-        const pause = await AsyncStorage.getItem("play")
-        const count = await AsyncStorage.getItem("countPomodoro")
-        if (storedSettings) {
-          const parsedSettings = JSON.parse(storedSettings);
-          setMinutes(parsedSettings.pomodoroTime);
-          setShortBreakTime(parsedSettings.shortBreakTime);
-          setLongBreakTime(parsedSettings.longBreakTime);
-          setBreakAfter(parsedSettings.breakAfter);
-          setAutoStartPo(parsedSettings.autoStartPo);
-          setAutoStartBreak(parsedSettings.autoStartBreak);
-          secondLeftDefault = parsedSettings.pomodoroTime * 60;
-          setSecondsLeft(secondLeftDefault);
-        }
-        if(secondLeft && secondLeft !=='0') {
-          setSecondsLeft(parseInt(secondLeft))
-        }
-        if(countWork){
-          setCountWork(parseInt(countWork))
-        }
-        if(pause==='true'){
-          setIsPaused(false)
-        }
-        if(count){
-          countPo = count
-        }
-      } catch (error) {
-        console.log(error);
-        Alert.alert(
-          "Smart Study Hub Announcement",
-          "An error occurred while get settings",
-          [
-            {
-              text: "Cancel",
-            },
-            {
-              text: "OK",
-            },
-          ],
-          { cancelable: false }
-        );
+        return () => clearInterval(interval);
       }
-    };
+    }, [isPaused, mode, timerMode, secondsLeft])
+  );
 
-    fetchSettings();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      setMinutes(Math.floor(secondsLeft / 60));
+      setSeconds(secondsLeft % 60);
+      updateProgress();
+    }, [secondsLeft, isPaused])
+  );
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchSettings = async () => {
+        try {
+          const storedSettings = await AsyncStorage.getItem("settings");
+          const secondLeft = await AsyncStorage.getItem("secondsLeft");
+          const countWork = await AsyncStorage.getItem("countWork");
+          const pause = await AsyncStorage.getItem("play");
+          const count = await AsyncStorage.getItem("countPomodoro");
+          if (storedSettings) {
+            const parsedSettings = JSON.parse(storedSettings);
+            setMinutes(parsedSettings.pomodoroTime);
+            setShortBreakTime(parsedSettings.shortBreakTime);
+            setLongBreakTime(parsedSettings.longBreakTime);
+            setBreakAfter(parsedSettings.breakAfter);
+            setAutoStartPo(parsedSettings.autoStartPo);
+            setAutoStartBreak(parsedSettings.autoStartBreak);
+            secondLeftDefault = parsedSettings.pomodoroTime * 60;
+            setSecondsLeft(secondLeftDefault);
+          }
+          if (secondLeft && secondLeft !== "0") {
+            setSecondsLeft(parseInt(secondLeft));
+          }
+          if (countWork) {
+            setCountWork(parseInt(countWork));
+          }
+          if (pause) {
+            setIsPaused(pause === "1" ? false : true);
+          }
+          if (count) {
+            countPo = count;
+          }
+        } catch (error) {
+          console.log(error);
+          Alert.alert(
+            "Smart Study Hub Announcement",
+            "An error occurred while get settings",
+            [
+              {
+                text: "Cancel",
+              },
+              {
+                text: "OK",
+              },
+            ],
+            { cancelable: false }
+          );
+        }
+      };
+
+      fetchSettings();
+    }, [])
+  );
 
   const calculateTotalSeconds = () => {
     return mode === "work"
       ? secondLeftDefault
       : (mode === "shortBreak" ? shortBreakTime : longBreakTime) * 60;
-      
   };
 
   const updateProgress = () => {
     const totalSeconds = calculateTotalSeconds();
 
-    const percentage = Math.round(
-      (secondsLeft / totalSeconds) * 100
-    );
+    const percentage = Math.round((secondsLeft / totalSeconds) * 100);
     setPercentage(percentage);
   };
 
   const switchMode = () => {
-    if (modeRef.current === "work"){
+    if (modeRef.current === "work") {
       countPo++;
     }
     const nextMode = modeRef.current === "work" ? "shortBreak" : "work";
@@ -159,7 +161,10 @@ const Focus = ({ navigation }) => {
       setSecondsLeft(minutes * 60);
     }
 
-    if ((nextMode === "shortBreak" && autoStartBreak) || (nextMode === "work" && autoStartPo)) {
+    if (
+      (nextMode === "shortBreak" && autoStartBreak) ||
+      (nextMode === "work" && autoStartPo)
+    ) {
       startFocus();
     }
   };
@@ -170,9 +175,7 @@ const Focus = ({ navigation }) => {
   const handleCloseTask = () => {
     setSelectedTask({});
   };
-  
-  
-  
+
   const handleStop = () => {
     Alert.alert(
       "Smart Study Hub Announcement",
@@ -183,29 +186,26 @@ const Focus = ({ navigation }) => {
         },
         {
           text: "OK",
-          onPress: (() => {
-            countPo = 0
+          onPress: () => {
+            countPo = 0;
             setIsPaused(true);
             setSecondsLeft(secondLeftDefault);
             setPercentage(100);
-          })
+          },
         },
-      ],
+      ]
     );
-    
   };
-  const backtoHome = async() => {
+  const backtoHome = async () => {
     try {
       await AsyncStorage.setItem("secondsLeft", String(secondsLeft));
       await AsyncStorage.setItem("countWork", String(countWork));
-      if(isPaused){
-        await AsyncStorage.setItem("play", 'false');
-      }
-      else{
-        await AsyncStorage.setItem("play", 'true');
+      if (isPaused) {
+        await AsyncStorage.setItem("play", "0");
+      } else {
+        await AsyncStorage.setItem("play", "1");
       }
       await AsyncStorage.setItem("countPomodoro", countPo);
-      
       navigation.navigate("Home");
     } catch (error) {
       console.log(error);
@@ -223,7 +223,7 @@ const Focus = ({ navigation }) => {
         { cancelable: false }
       );
     }
-  }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -233,7 +233,7 @@ const Focus = ({ navigation }) => {
       />
       <View style={styles.overlay}>
         <View>
-          <View >
+          <View>
             <TouchableOpacity style={styles.downButton}>
               <AntDesign
                 name="down"
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
   },
   taskContainer: {
     alignItems: "center",
-    height:50,
+    height: 50,
     marginTop: 20,
     flex: 1,
     flexDirection: "row",
@@ -460,4 +460,3 @@ const styles = StyleSheet.create({
 });
 
 export default Focus;
-

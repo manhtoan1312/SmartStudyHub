@@ -1,14 +1,10 @@
 import React from "react";
 import { useState } from "react";
-import { useEffect } from "react";
 import {
   View,
   Text,
-  SafeAreaView,
   StyleSheet,
   ImageBackground,
-  TouchableOpacity,
-  Linking,
   ScrollView,
 } from "react-native";
 import { s } from "react-native-wind";
