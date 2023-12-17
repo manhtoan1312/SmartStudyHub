@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Linking,
 } from "react-native";
 import {
   FontAwesome,
@@ -16,66 +17,59 @@ import {
   Entypo,
 } from "@expo/vector-icons";
 import { login } from "../../services/AccountService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import jwt_decode from "jwt-decode";
 
 function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [hide, setHide] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
   const handleLogin = async (e) => {
     e.preventDefault();
     const response = await login(email, password);
     if (response.success) {
-      Alert.alert(
-        "Smart Study Hub anoucement",
-        "thanh cong",
-        [
-          {
-            text: "cancel",
-            onPress: () => {
-              console.log("Hủy");
-              navigation.goBack();
-            },
-            style: "cancel",
-          },
-          {
-            text: "OK",
-            onPress: () => {
-              console.log("OK");
-              navigation.goBack();
-            },
-          },
-        ],
-        { cancelable: false }
-      );
-      // let checked = false;
-      // if (document.querySelector("#remember").checked) {
-      //   checked = true;
-      // }
-      // contextLogin(checked, response.token);
-      // navigate("/checkin");
+      await AsyncStorage.setItem("token", response.token);
+      const role = jwt_decode(response.token);
+      const subArray = role.sub.split("-");
+      const id = subArray[0];
+      await AsyncStorage.setItem("id", id);
+
+      navigation.navigate("Home");
     } else {
-      setErrorMessage(response.message);
-      // setEmail("");
-      // setPassword("");
-      // document.querySelector("#floating_email").focus();
-      Alert.alert(
-        "Smart Study Hub anoucement",
-        "sai roi",
-        [
-          {
-            text: "cancel",
-            onPress: () => console.log("Hủy"),
-            style: "cancel",
-          },
-          {
-            text: "OK",
-            onPress: () => console.log("OK"),
-          },
-        ],
-        { cancelable: false }
-      );
+      if (response.status === "2_4_f") {
+        Alert.alert(
+          "Your account has been deleted",
+          "Do you want to recover your account?",
+          [
+            {
+              text: "No",
+              style: "cancel",
+            },
+            { text: "Yes", onPress: () => navigation.navigate("Recover") },
+          ]
+        );
+      } else {
+        Alert.alert("Smart Study Hub anoucement", response.message);
+      }
     }
+  };
+
+  const handleGoogleLogin = () => {
+    Linking.openURL(
+      "https://api-smart-study-hub.onrender.com/oauth2/authorization/google"
+    );
+  };
+
+  const handleGitHubLogin = () => {
+    Linking.openURL(
+      "https://api-smart-study-hub.onrender.com/oauth2/authorization/github"
+    );
+  };
+
+  const handleFacebookLogin = () => {
+    Linking.openURL(
+      "https://api-smart-study-hub.onrender.com/oauth2/authorization/facebook"
+    );
   };
 
   return (
@@ -129,37 +123,47 @@ function Login({ navigation }) {
             style={styles.showPasswordIcon}
           />
         </View>
+        <View style={styles.forgot}>
+          <Text style={styles.textMin} onPress={() => navigation.navigate("ForgotPasswordEmail")}>Forgot password?</Text>
+        </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
             <Text style={styles.buttonText}>Log in</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.buttonContainer}>
-          <Text style={styles.textMin}>Forgot password?</Text>
-        </View>
+        
         <View style={styles.buttonContainer}>
           <Text style={styles.textMin}>Or</Text>
         </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.googleButton}>
+        {/* <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.googleButton}
+            onPress={handleGoogleLogin}
+          >
             <AntDesign name="google" size={24} color="white" />
             <Text style={styles.buttonTextSecondary}>Login With Google</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.githubButton}>
+          <TouchableOpacity
+            style={styles.githubButton}
+            onPress={handleGitHubLogin}
+          >
             <AntDesign name="github" size={24} color="white" />
             <Text style={styles.buttonTextSecondary}>Login With GitHub</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.facebookButton}>
+          <TouchableOpacity
+            style={styles.facebookButton}
+            onPress={handleFacebookLogin}
+          >
             <Entypo name="facebook-with-circle" size={24} color="white" />
             <Text style={styles.buttonTextSecondary}>Login With Facebook</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.registerBtn}
@@ -286,6 +290,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
   },
+  forgot:{
+    alignItems:'flex-end'
+  }
 });
 
 export default Login;

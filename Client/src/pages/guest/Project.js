@@ -4,24 +4,24 @@ import {
   FontAwesome,
   MaterialCommunityIcons,
   Feather,
-  MaterialIcons,
+  MaterialIcons,EvilIcons
 } from "@expo/vector-icons";
 import { s } from "react-native-wind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 function Project({ navigation }) {
-  const [outOfDate, setOutOfDate] = useState(false);
-  const [tomorow, setTomorow] = useState(false);
-  const [thisWeek, setThisWeek] = useState(false);
-  const [next7Day, setnext7Day] = useState(false);
-  const [hightPriority, setHightPriority] = useState(false);
-  const [mediumPriority, setMediumPriority] = useState(false);
-  const [lowPriority, setLowPriority] = useState(false);
-  const [planed, setPlaned] = useState(false);
-  const [all, setAll] = useState(false);
-  const [someDay, setSomeDay] = useState(false);
-  const [event, setEvent] = useState(false);
-  const [done, setDone] = useState(false);
-
+  const [outOfDate, setOutOfDate] = useState(true);
+  const [tomorow, setTomorow] = useState(true);
+  const [thisWeek, setThisWeek] = useState(true);
+  const [next7Day, setnext7Day] = useState(true);
+  const [hightPriority, setHightPriority] = useState(true);
+  const [mediumPriority, setMediumPriority] = useState(true);
+  const [lowPriority, setLowPriority] = useState(true);
+  const [planed, setPlaned] = useState(true);
+  const [all, setAll] = useState(true);
+  const [someDay, setSomeDay] = useState(true);
+  const [event, setEvent] = useState(true);
+  const [done, setDone] = useState(true);
+  const [deleted, setDeleted] = useState(true);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,6 +40,7 @@ function Project({ navigation }) {
           setSomeDay(parsedData.someDay);
           setEvent(parsedData.event);
           setDone(parsedData.done);
+          setDeleted(parsedData.deleted);
         }
       } catch (error) {
         console.log(error);
@@ -64,6 +65,7 @@ function Project({ navigation }) {
         someDay,
         event,
         done,
+        deleted
       };
       await AsyncStorage.setItem("projectData", JSON.stringify(projectData));
       navigation.goBack();
@@ -86,17 +88,15 @@ function Project({ navigation }) {
   };
   return (
     <SafeAreaView>
-      <View
-        style={s` flex-1 bg-white justify-center items-center py-4 border-b-2 border-b-gray-200`}
-      >
-        <FontAwesome
-          style={s`absolute left-1`}
-          name="angle-left"
-          size={24}
-          onPress={() => handleBackBtn()}
-        />
-        <Text style={s`font-medium text-2xl`}>Projects</Text>
-      </View>
+      <View style={s`bg-white justify-center items-center py-4 border-b-2 border-b-gray-200`}>
+      <FontAwesome
+        style={s`absolute left-6`}
+        name="angle-left"
+        size={32}
+        onPress={() => handleBackBtn()}
+      />
+      <Text style={s`font-medium text-2xl`}>Projects</Text>
+    </View>
       <View style={s`flex flex-col bg-white px-3`}>
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
@@ -105,7 +105,7 @@ function Project({ navigation }) {
               size={24}
               color="red"
             />
-            <Text style={s`h-full flex items-center pl-2`}>Overdue</Text>
+            <Text style={s`h-full flex items-center pl-2`}>Out of Date</Text>
           </View>
           <Switch
             trackColor={{ false: "gray", true: "red" }}
@@ -285,10 +285,24 @@ function Project({ navigation }) {
             onValueChange={() => setDone(!done)}
           />
         </View>
+        <View style={s`flex flex-row justify-between py-2`}>
+          <View style={s`flex flex-row`}>
+          <EvilIcons name="trash" size={24} color="red" />
+            <Text style={s`h-full flex items-center pl-2`}>Deleted</Text>
+          </View>
+          <Switch
+            trackColor={{ false: "gray", true: "red" }}
+            thumbColor={"white"}
+            value={deleted}
+            onValueChange={() => setDeleted(!deleted)}
+          />
+        </View>
+
       </View>
     </SafeAreaView>
   );
   
 }
+
 
 export default Project;

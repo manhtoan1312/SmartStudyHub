@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   Switch,
-  TextInput,
-  TouchableOpacity,
   ScrollView,
   Image,
-  SafeAreaView,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import { s } from "react-native-wind";
 import { AntDesign, FontAwesome5, Feather } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import getRole from "../../services/RoleService";
+import { Picker } from "react-native-wheel-pick";
+import { DeleteGuest } from "../../services/GuestService";
 export default function Setting({ navigation }) {
   const [preTime, setPreTime] = useState(0);
   const [workSound, setWorkSound] = useState("Timer");
@@ -32,51 +33,74 @@ export default function Setting({ navigation }) {
   const [group, setGroup] = useState(true);
   const [ratings, setRatings] = useState(true);
   const [plan, setPlan] = useState(true);
-
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const storedSettings = await AsyncStorage.getItem("settings");
-        if (storedSettings) {
-          const parsedSettings = JSON.parse(storedSettings);
-          setPreTime(parsedSettings.preTime);
-          setWorkSound(parsedSettings.workSound);
-          setBreakSound(parsedSettings.breakSound);
-          setFocusSound(parsedSettings.focusSound);
-          setVibrate(parsedSettings.vibrate);
-          setPomodoroTime(parsedSettings.pomodoroTime);
-          setShortBreakTime(parsedSettings.shortBreakTime);
-          setLongBreakTime(parsedSettings.longBreakTime);
-          setBreakAfter(parsedSettings.breakAfter);
-          setAutoStartPo(parsedSettings.autoStartPo);
-          setAutoStartBreak(parsedSettings.autoStartBreak);
-          setDisableBreakTime(parsedSettings.disableBreakTime);
-          setAppNotification(parsedSettings.appNotification);
-          setNotifyEveryday(parsedSettings.notifyEveryday);
-          setGroup(parsedSettings.group);
-          setRatings(parsedSettings.ratings);
-          setPlan(parsedSettings.plan);
+  const [email, setEmail] = useState("");
+  const [img, setImg] = useState(null);
+  const [isPomodoroTimePickerVisible, setIsPomodoroTimePickerVisible] =
+    useState(false);
+  const [isShortBreakTimePickerVisible, setIsShortBreakTimePickerVisible] =
+    useState(false);
+  const [isLongBreakTimePickerVisible, setIsLongBreakTimePickerVisible] =
+    useState(false);
+  const [isBreakAfterPickerVisible, setIsBreakAfterPickerVisible] =
+    useState(false);
+  const data = [];
+  for (let i = 1; i <= 250; i++) {
+    data.push({ label: i.toString(), value: i });
+  }
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchSettings = async () => {
+        try {
+          getRole().then((role) => {
+            if (role) {
+              const shortenedEmail = role.email ? role.email.split("@")[0] : "";
+              setEmail(shortenedEmail);
+            }
+          });
+          const storedImg = await AsyncStorage.getItem("img");
+          setImg(storedImg ? storedImg : null);
+          const storedSettings = await AsyncStorage.getItem("settings");
+          if (storedSettings) {
+            const parsedSettings = JSON.parse(storedSettings);
+            setPreTime(parsedSettings.preTime);
+            setWorkSound(parsedSettings.workSound);
+            setBreakSound(parsedSettings.breakSound);
+            setFocusSound(parsedSettings.focusSound);
+            setVibrate(parsedSettings.vibrate);
+            setPomodoroTime(parsedSettings.pomodoroTime);
+            setShortBreakTime(parsedSettings.shortBreakTime);
+            setLongBreakTime(parsedSettings.longBreakTime);
+            setBreakAfter(parsedSettings.breakAfter);
+            setAutoStartPo(parsedSettings.autoStartPo);
+            setAutoStartBreak(parsedSettings.autoStartBreak);
+            setDisableBreakTime(parsedSettings.disableBreakTime);
+            setAppNotification(parsedSettings.appNotification);
+            setNotifyEveryday(parsedSettings.notifyEveryday);
+            setGroup(parsedSettings.group);
+            setRatings(parsedSettings.ratings);
+            setPlan(parsedSettings.plan);
+          }
+        } catch (error) {
+          console.log(error);
+          Alert.alert(
+            "Smart Study Hub Announcement",
+            "An error occurred while saving the settings",
+            [
+              {
+                text: "Cancel",
+              },
+              {
+                text: "OK",
+              },
+            ],
+            { cancelable: false }
+          );
         }
-      } catch (error) {
-        console.log(error);
-        Alert.alert(
-          "Smart Study Hub Announcement",
-          "An error occurred while saving the settings",
-          [
-            {
-              text: "Cancel",
-            },
-            {
-              text: "OK",
-            },
-          ],
-          { cancelable: false }
-        );
-      }
-    };
+      };
 
-     fetchSettings();
-  }, []);
+      fetchSettings();
+    }, [])
+  );
 
   const updateData = async () => {
     const settings = {
@@ -99,11 +123,11 @@ export default function Setting({ navigation }) {
       plan,
     };
     await AsyncStorage.setItem("settings", JSON.stringify(settings));
-  }
+  };
 
   const navigate = async (to) => {
     try {
-      await updateData()
+      await updateData();
       navigation.navigate(to);
     } catch (e) {
       console.log(e);
@@ -121,19 +145,96 @@ export default function Setting({ navigation }) {
         { cancelable: false }
       );
     }
-  }
+  };
   const toSignIn = () => {
-    navigate('Login')
-  }
+    navigate("Login");
+  };
+  const toInfor = () => {
+    navigate("Infor");
+  };
   const toPrenium = () => {
-    navigate('Prenium')
-  }
+    navigate("Prenium");
+  };
   const toProject = () => {
-    navigate('Project')
-  }
+    navigate("Project");
+  };
+
+  const handlePomodoroTimeChange = (index) => {
+    setIsPomodoroTimePickerVisible(false);
+    setPomodoroTime(index);
+    // getRole().then((role) => {
+    //   if (role && role.role === "PRENIUM") {
+    //     setPomodoroTime(index);
+    //   } else {
+    //     navigation.navigate("Prenium");
+    //   }
+    // });
+  };
+
+  const handleShortBreakTimeChange = (index) => {
+    setIsShortBreakTimePickerVisible(false);
+    setShortBreakTime(index);
+  };
+
+  const handleLongBreakTimeChange = (index) => {
+    setIsLongBreakTimePickerVisible(false);
+    setLongBreakTime(index);
+  };
+
+  const handleBreakAfterChange = (index) => {
+    setIsBreakAfterPickerVisible(false);
+    setBreakAfter(index);
+  };
+
+  const renderPicker = (
+    label,
+    selectedValue,
+    onValueChange,
+    data,
+    isPickerVisible,
+    setPickerVisibility,
+    unit
+  ) => {
+    return (
+      <View style={s`relative bg-lightgray`}>
+        <TouchableOpacity
+          style={s`flex flex-row justify-between py-2`}
+          onPress={() => setPickerVisibility(!isPickerVisible)}
+        >
+          <Text style={s`text-lg font-medium`}>{label}</Text>
+          <View style={s`flex flex-row items-center`}>
+            <Text style={s`text-gray-500 text-lg `}>
+              {selectedValue} {unit}{" "}
+            </Text>
+            <AntDesign
+              style={s`text-lg`}
+              name={isPickerVisible ? "up" : "down"}
+            />
+          </View>
+        </TouchableOpacity>
+        {isPickerVisible && (
+          <Picker
+            selectedValue={selectedValue}
+            style={{ height: 50, width: "100%", color: "black" }}
+            onValueChange={onValueChange}
+            pickerData={data.map((item) => ({
+              label: item.label,
+              value: item.value,
+            }))}
+            selectedItem={selectedValue}
+            onItemSelected={() => {
+              setPickerVisibility(false);
+              onValueChange();
+            }}
+          />
+        )}
+      </View>
+    );
+  };
+
   const handleSaveSettings = async () => {
     try {
-      await updateData()
+      await updateData();
       navigation.goBack();
     } catch (e) {
       console.log(e);
@@ -153,11 +254,47 @@ export default function Setting({ navigation }) {
     }
   };
 
+  const deleteData = () => {
+    Alert.alert(
+      "Smart Study Hub Announcement",
+      "Are you sure to delete this data?",
+      [
+        {
+          text: "Cancel",
+        },
+        {
+          text: "OK",
+          onPress: () => submitDelete(),
+        },
+      ]
+    );
+  };
+  const submitDelete = async () => {
+    const id = await AsyncStorage.getItem("id");
+    console.log(id);
+    const rs = await DeleteGuest(id);
+    if (!rs.success) {
+      Alert.alert("Smart Study Hub Announcement", rs.message);
+      await AsyncStorage.clear();
+    } else {
+      Alert.alert("Smart Study Hub Announcement", "Delete data successfully");
+      await AsyncStorage.clear();
+      navigation.navigate("Home");
+    }
+  };
+
+  const handleHeader = () => {
+    if (email) {
+      toInfor();
+    } else {
+      toSignIn();
+    }
+  };
   return (
     <ScrollView style={s`flex-1 bg-gray`}>
-      <View style={s` flex-1 bg-white justify-center items-center mb-4`}>
+      <View style={s` flex-1 bg-white justify-center items-center mb-4 py-4`}>
         <Feather
-          style={s`absolute left-1`}
+          style={s`absolute left-4`}
           size={24}
           name="x"
           onPress={() => handleSaveSettings()}
@@ -167,19 +304,18 @@ export default function Setting({ navigation }) {
       <View style={s`flex-1 flex-row py-4 pl-4 bg-white`}>
         <View>
           <Image
-            source={require("../../images/avt.jpg")}
+            source={img ? { uri: img } : require("../../images/avt.jpg")}
             style={s`w-12 h-12 rounded-3xl`}
           />
         </View>
         <View style={s`flex flex-col px-2`}>
           <View style={s`flex flex-row items-center`}>
-            <View style={s`mr-2`}>
-              <Text
-                style={s` text-lg font-medium`}
-                onPress={() => toSignIn()}
-              >
-                Sign In | Sign Up
-              </Text>
+            <View style={s`mr-2`} onTouchEnd={() => handleHeader()}>
+              {!email ? (
+                <Text style={s` text-lg font-medium`}>Sign In | Sign Up</Text>
+              ) : (
+                <Text style={s` text-lg font-medium`}>{email}</Text>
+              )}
             </View>
           </View>
 
@@ -189,30 +325,32 @@ export default function Setting({ navigation }) {
         </View>
       </View>
 
-      <View style={s`flex flex-row justify-between px-2 mt-6 bg-white py-4`}>
+      <View
+        style={s`flex flex-row justify-between px-2 mt-6 bg-white py-4`}
+        onTouchEnd={() => toPrenium()}
+      >
         <View style={s`flex flex-row`}>
           <FontAwesome5
             name="crown"
             style={s`text-lg font-medium pr-1 text-yellow-400`}
           />
-          <Text style={s`text-yellow-400 text-lg font-medium`} onPress={() => toPrenium()}>
-            Upgrade to Premium 
+          <Text style={s`text-yellow-400 text-lg font-medium`}>
+            Upgrade to Premium
           </Text>
         </View>
 
         <View style={s`flex flex-row`}>
-          <Text style={s`text-red-500 text-lg`} onPress={() => toPrenium()}>{preTime} Date</Text>
-          <AntDesign style={s`text-lg`} name="right" onPress={() => toPrenium()}/>
+          <Text style={s`text-red-500 text-lg`}>{preTime} Date</Text>
+          <AntDesign style={s`text-lg`} name="right" color="red" />
         </View>
       </View>
 
-      <View style={s`flex flex-row justify-between px-2 mt-6 bg-white py-4`}>
-        <Text style={s` text-lg font-medium`} onPress={() => toProject()}>Project</Text>
-        <AntDesign
-          style={s`text-lg font-medium`}
-          name="right"
-          onPress={() => toProject()}
-        />
+      <View
+        style={s`flex flex-row justify-between px-2 mt-6 bg-white py-4`}
+        onTouchEnd={() => toProject()}
+      >
+        <Text style={s` text-lg font-medium`}>Project</Text>
+        <AntDesign style={s`text-lg font-medium`} name="right" />
       </View>
 
       <View style={s`flex flex-col px-2 mt-6 bg-white py-2`}>
@@ -252,36 +390,42 @@ export default function Setting({ navigation }) {
       </View>
 
       <View style={s`flex flex-col justify-between px-2 mt-6 bg-white py-4`}>
-        <View style={s`flex flex-row justify-between py-2`}>
-          <Text style={s`text-lg font-medium`}>Pomodoro Time</Text>
-          <View style={s`flex flex-row`}>
-            <Text style={s`text-gray-500 text-lg`}>{pomodoroTime} Minutes</Text>
-            <AntDesign style={s`text-lg`} name="right" />
-          </View>
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <Text style={s`text-lg font-medium`}>Short Break Time</Text>
-          <View style={s`flex flex-row`}>
-            <Text style={s`text-gray-500 text-lg`}>{shortBreakTime} Minutes</Text>
-            <AntDesign style={s`text-lg`} name="right" />
-          </View>
-        </View>
-        <View style={s`flex flex-row justify-between py-2`}>
-          <Text style={s`text-lg font-medium`}>Long Break Time</Text>
-          <View style={s`flex flex-row`}>
-            <Text style={s`text-gray-500 text-lg`}>{longBreakTime} Minutes</Text>
-            <AntDesign style={s`text-lg`} name="right" />
-          </View>
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <Text style={s`text-lg font-medium`}>Long break after</Text>
-          <View style={s`flex flex-row`}>
-            <Text style={s`text-gray-500 text-lg`}>{breakAfter} Pomodoro</Text>
-            <AntDesign style={s`text-lg`} name="right" />
-          </View>
-        </View>
+        {renderPicker(
+          "Pomodoro Time",
+          pomodoroTime,
+          handlePomodoroTimeChange,
+          data,
+          isPomodoroTimePickerVisible,
+          setIsPomodoroTimePickerVisible,
+          "Minutes"
+        )}
+        {renderPicker(
+          "Short Break Time",
+          shortBreakTime,
+          handleShortBreakTimeChange,
+          data,
+          isShortBreakTimePickerVisible,
+          setIsShortBreakTimePickerVisible,
+          "Minutes"
+        )}
+        {renderPicker(
+          "Long Break Time",
+          longBreakTime,
+          handleLongBreakTimeChange,
+          data,
+          isLongBreakTimePickerVisible,
+          setIsLongBreakTimePickerVisible,
+          "Minutes"
+        )}
+        {renderPicker(
+          "Long break after",
+          breakAfter,
+          handleBreakAfterChange,
+          data,
+          isBreakAfterPickerVisible,
+          setIsBreakAfterPickerVisible,
+          "Pomodoro"
+        )}
 
         <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>
@@ -390,11 +534,27 @@ export default function Setting({ navigation }) {
       </View>
 
       <View style={s`flex flex-col justify-between px-2 mt-6 bg-white py-4`}>
-        <View style={s`flex flex-row justify-between py-2`}>
-          <Text style={s`text-lg font-medium`}>Sync now</Text>
+        <View
+          style={s`flex flex-row justify-between  py-2`}
+          onTouchEnd={() => toSignIn()}
+        >
+          <Text style={s`text-lg font-medium `}>Sync now</Text>
           <AntDesign style={s`text-lg`} name="right" />
         </View>
       </View>
+
+      {!email && (
+        <View
+          style={s`flex flex-col justify-between px-2 mt-6 bg-white py-2 mb-4`}
+        >
+          <View
+            style={s`flex flex-row justify-center items-center py-2`}
+            onTouchEnd={() => deleteData()}
+          >
+            <Text style={s`text-lg font-medium text-red-500`}>Delete Data</Text>
+          </View>
+        </View>
+      )}
     </ScrollView>
   );
 }

@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 import {
   FontAwesome,
@@ -12,6 +13,7 @@ import {
   Feather,
   EvilIcons,
 } from "@expo/vector-icons";
+import { Checkemail, ResendOTP } from "../../services/AccountService";
 
 function Register({ navigation }) {
   const [email, setEmail] = useState("");
@@ -20,8 +22,33 @@ function Register({ navigation }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
-  const handleRegister = () => {
-    
+  const handleRegister = async () => {
+    if (email && password && firstName && lastName) {
+      const rs = await Checkemail(email)
+      if(rs.success){
+        Alert.alert("Warnning", rs.message);
+      }
+      else{
+        const response = await ResendOTP(email);
+        
+      if (response.success) {
+        navigation.navigate("InputOTP", {
+          otpCode: response.data.otpCode,
+          time: response.data.otpTimeExpiration,
+          email: email,
+          password: password,
+          firstName: firstName,
+          lastName: lastName,
+        });
+      } else {
+        Alert.alert("Register failed", response.message);
+      }
+      }
+    } else {
+      {
+        Alert.alert("Warnning", "You must enter all field");
+      }
+    }
   };
 
   return (
@@ -83,10 +110,9 @@ function Register({ navigation }) {
             onChangeText={(text) => setFirstName(text)}
             style={styles.input}
           />
-          
         </View>
         <View style={styles.inputContainer}>
-        <TextInput
+          <TextInput
             placeholder="Last Name"
             value={lastName}
             onChangeText={(text) => setLastName(text)}
@@ -157,7 +183,7 @@ const styles = StyleSheet.create({
     marginTop: 40,
     padding: 15,
     borderRadius: 25,
-    width:300,
+    width: 300,
     alignItems: "center",
   },
   buttonText: {
@@ -170,15 +196,14 @@ const styles = StyleSheet.create({
     color: "gray",
   },
   registerBtn: {
-    marginTop: 20, 
+    marginTop: 20,
     borderColor: "#FFA500",
     borderWidth: 2,
     padding: 15,
     borderRadius: 25,
-    width:300,
+    width: 300,
     alignItems: "center",
   },
 });
-
 
 export default Register;

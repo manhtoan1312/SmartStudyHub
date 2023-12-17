@@ -1,42 +1,25 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import jwt_decode from "jwt-decode";
-function getRole() {
-  const token = localStorage.getItem("token")
-    ? JSON.parse(localStorage.getItem("token"))
-    : null;
-  const remember = localStorage.getItem("rememberme")
-    ? JSON.parse(localStorage.getItem("rememberme"))
-    : false;
-  const role = {
-    isLogin: sessionStorage.getItem("isLogin") || false,
-    rememberme: remember,
-    token: token,
-    role: null,
-    name: null,
-    email: null,
-  };
 
-  if ((!role.isLogin && !role.rememberme) || !role.token) {
-    role.token = "";
-    role.role = null;
-    role.rememberme = false;
-    role.name = null;
-    role.email = null;
-  }
-  if (role.token) {
-    function getCurrentUser() {
-      const token = localStorage.getItem("token") || "";
-      try {
-        const decode = jwt_decode(token);
-        role.role = decode.role;
-        role.name = decode.name;
-        role.email = decode.email;
-      } catch (error) {
-        return null;
-      }
+async function getRole() {
+  try {
+    const token = await AsyncStorage.getItem("token");
+    if (token) {
+      const decodedToken = jwt_decode(token);
+      const subArray = decodedToken.sub.split("-");
+      const id = subArray[0];
+      const email = subArray[1];
+      const name = subArray[3];
+      const { Role: role } = decodedToken;
+      const userInfo = { token, id, email, name, role };
+      return userInfo;
     }
-    getCurrentUser();
+    else {
+      return null
+    }
+  } catch (error) {
+    return null;
   }
-  return role;
 }
 
 export default getRole;

@@ -8,6 +8,10 @@
     "ios": "expo start --ios",
     "web": "expo start --web"
   },
+  "expo": {
+    "name": "smart-study-hub",
+    "slug": "smart-study-hub"
+  },
   "dependencies": {
     "@expo/vector-icons": "^13.0.0",
     "@expo/webpack-config": "^19.0.0",
@@ -15,6 +19,7 @@
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/stack": "^6.3.20",
     "expo": "~49.0.8",
+    "expo-av": "~13.4.1",
     "expo-status-bar": "~1.6.0",
     "jwt-decode": "^3.1.2",
     "react": "18.2.0",
@@ -22,8 +27,12 @@
     "react-native": "0.72.6",
     "react-native-circular-progress": "^1.3.9",
     "react-native-elements": "^3.4.3",
+    "react-native-gesture-handler": "^2.14.0",
     "react-native-modal-datetime-picker": "^17.1.0",
+    "react-native-reanimated": "^3.6.1",
+    "react-native-sound": "^0.11.2",
     "react-native-web": "~0.19.6",
+    "react-native-wheel-pick": "^1.2.2",
     "react-native-wind": "^1.2.0",
     "react-navigation": "^5.0.0"
   },

@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "Client",
+    "name": "Smart Study Hub",
     "slug": "Client",
+    "privacy":"public",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -31,10 +32,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "your.bundle.identifier"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c6e2723e-03b4-41a3-8a1b-2b29f050dd74"
+      }
     }
   }
 }

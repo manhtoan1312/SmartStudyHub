@@ -1,13 +1,11 @@
-// ImageFocus.js
 import React from "react";
-import { View, Text, StyleSheet, ImageBackground } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
+import { View, Text, StyleSheet, ImageBackground, Dimensions } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import useTimerService from "../hooks/useTimerService";
-
-const ImageFocus = ({ navigation }) => {
+const { width: screenWidth } = Dimensions.get('window');
+const ImageFocus = () => {
+  const navigation = useNavigation();
   const timerService = useTimerService();
-
-  
 
   const toPomodoro = () => {
     timerService.stopTimer();
@@ -16,32 +14,42 @@ const ImageFocus = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require("../images/bg_focus_1.jpg")}
-        resizeMode="center"
-        style={styles.image}
-      >
-        <Text
-          style={{ color: "white", fontSize: 24 }}
-          onPress={() => toPomodoro()}
+      <View style={styles.imageContainer}>
+        <ImageBackground
+          source={require("../images/bg_focus_1.jpg")}
+          resizeMode="center"
+          style={styles.image}
         >
-          {timerService.minutesLeft}
-        </Text>
-      </ImageBackground>
+          <Text
+            style={{ color: "white", fontSize: 24 }}
+            onPress={() => toPomodoro()}
+          >
+            {timerService.minutesLeft}
+          </Text>
+        </ImageBackground>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
+    position: "absolute",
+    bottom: 0,
+    right: screenWidth/2-30,
     justifyContent: "center",
     alignItems: "center",
+    flex:1,
+    width: 60
+  },
+  imageContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    overflow: "hidden",
   },
   image: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },

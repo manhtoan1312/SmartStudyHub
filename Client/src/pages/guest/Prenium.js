@@ -12,13 +12,13 @@ function Prenium({ navigation }) {
   return (
     <SafeAreaView>
       <View
-        style={s`flex-1 bg-white justify-center items-center py-4 border-b-2 border-b-gray-200`}
+        style={s`bg-white justify-center items-center py-4 border-b-2 border-b-gray-200`}
       >
         <FontAwesome
-          style={s`absolute left-1`}
+          style={s`absolute left-6`}
           name="angle-left"
-          size={24}
-          color="#000" // Thay đổi màu cho icon angle-left
+          size={30}
+          color="#000000" // Thay đổi màu cho icon angle-left
           onPress={() => navigation.goBack()}
         />
         <Text style={s`font-medium text-2xl text-yellow-400`}>Upgrade to Premium</Text>
@@ -81,7 +81,7 @@ function Prenium({ navigation }) {
             <MaterialCommunityIcons
               name="label-outline"
               size={24}
-              color="##FF6347" // Thay đổi màu cho icon label-outline
+              color="#FF6347" // Thay đổi màu cho icon label-outline
             />
             <Text style={s`h-full flex items-center pl-2`}>
               Create labels for tasks.
@@ -159,7 +159,7 @@ function Prenium({ navigation }) {
             <MaterialCommunityIcons
               name="sync"
               size={24}
-              color="#778899" // Thay đổi màu cho icon sync
+              color="#778899" 
             />
             <Text style={s`h-full flex items-center pl-2`}>
               Sync data across all devices.
