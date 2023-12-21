@@ -24,4 +24,45 @@ const CreatePomodoro = async (userId, workId, extraWorkId, timeOfPomodoro,  star
     }
   };
 
-  export {CreatePomodoro}
+  const GetPomodoro = async (id) => {
+    try {
+      const response = await fetch(`${uri}/get?userId=${id}`, {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      const data = await response.json();
+      if (response.status === 200) {
+        return { success: true, data: data.data };
+      } else {
+        return { success: false, message: data.meta.message };
+      }
+    } catch (err) {
+      console.log(err);
+      return { success: false, message: "Client Error" };
+    }
+  };
+
+  const DeletePomodoro = async (id) => {
+    try {
+      const response = await fetch(`${uri}/delete/${id}`, {
+        method: "delete",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      if (response.status === 200) {
+        return { success: true, data: data.data };
+      } else {
+        return { success: false, message: data.meta.message };
+      }
+    } catch (err) {
+      console.log(err);
+      return { success: false, message: "Client Error" };
+    }
+  };
+
+  export {CreatePomodoro, GetPomodoro, DeletePomodoro}

@@ -45,7 +45,7 @@ const FolderComponent = ({
   };
 
   const handleEditFolder = () => {
-    console.log(id);
+    navigation.navigate("EditFolder", { id: id });
   };
 
   const handleDeleteFolder = async () => {
@@ -69,7 +69,10 @@ const FolderComponent = ({
 
   return (
     <Swipeable renderRightActions={renderRightActions}>
-      <View style={styles.container}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("FolderDetail", { id: id })}
+        style={styles.container}
+      >
         <View style={styles.folderContainer}>
           <TouchableOpacity onPress={handleToggleProjects}>
             <FontAwesome name="folder" size={20} color={colorCode} />
@@ -78,10 +81,11 @@ const FolderComponent = ({
         </View>
 
         {showProjects && (
-          <View style={styles.projectsContainer}>
+          <View>
             {listProjects.map((project) => (
-              <View key={project.id} style={styles.projectContainer}>
+              <View key={project.id} style={{ marginLeft: 20 }}>
                 <ProjectComponent
+                  id={project.id}
                   projectName={project.projectName}
                   colorCode={project.colorCode}
                   totalTimeWork={project.totalTimeWork}
@@ -102,7 +106,7 @@ const FolderComponent = ({
             color="black"
           />
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     </Swipeable>
   );
 };
@@ -132,13 +136,12 @@ const styles = StyleSheet.create({
   },
   projectContainer: {
     marginBottom: 5,
-    flex: 1,
+    flexDirection: "row",
   },
   dropdownButton: {
     position: "absolute",
     top: 15,
     right: 10,
-
   },
   rightActions: {
     flexDirection: "row",

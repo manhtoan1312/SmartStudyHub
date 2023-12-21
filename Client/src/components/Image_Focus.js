@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, ImageBackground, Dimensions } from "react-native";
+import { View, Text, StyleSheet, ImageBackground, Dimensions, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import useTimerService from "../hooks/useTimerService";
 const { width: screenWidth } = Dimensions.get('window');
@@ -14,7 +14,7 @@ const ImageFocus = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.imageContainer}>
+      <TouchableOpacity onPress={() => toPomodoro()} style={styles.imageContainer}>
         <ImageBackground
           source={require("../images/bg_focus_1.jpg")}
           resizeMode="center"
@@ -27,7 +27,7 @@ const ImageFocus = () => {
             {timerService.minutesLeft}
           </Text>
         </ImageBackground>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };

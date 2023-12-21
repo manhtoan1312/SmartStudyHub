@@ -59,7 +59,7 @@ const UpdateProject = async (id, folderId, name, color, iconUrl, status) => {
   }
 };
 
-const DeleteProject = async () => {
+const DeleteProject = async (id) => {
   try {
     const response = await fetch(`${uri}/delete/${id}`, {
       method: "delete",
@@ -263,7 +263,7 @@ const DeleteCompletelyProject = async (id) => {
 const RecoverProject = async (id) => {
   try {
     const response = await fetch(`${uri}/recover/${id}`, {
-      method: "delete",
+      method: "put",
       headers: {
         "Content-Type": "application/json",
       },

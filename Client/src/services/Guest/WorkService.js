@@ -4,12 +4,13 @@ const uri =
 const CreateWork = async (
   userId,
   projectId,
-  tagId,
+  tags,
   workName,
   priority,
   dueDate,
-  numberOfPomodoro,
-  timeofPomodoro
+  numberOfPomodoros,
+  timeOfPomodoro,
+  timeWillStart
 ) => {
   try {
     const response = await fetch(`${uri}/create`, {
@@ -20,12 +21,13 @@ const CreateWork = async (
       body: JSON.stringify({
         userId,
         projectId,
-        tagId,
+        tags,
         workName,
         priority,
         dueDate,
-        numberOfPomodoro,
-        timeofPomodoro,
+        numberOfPomodoros,
+        timeOfPomodoro,
+        timeWillStart,
       }),
     });
 
@@ -50,7 +52,7 @@ const UpdateWork = async (
   priority,
   dueDate,
   numberOfPomodoro,
-  timeofPomodoro,
+  timeOfPomodoro,
   isRemindered,
   isRepeated,
   timePassed,
@@ -76,7 +78,7 @@ const UpdateWork = async (
         priority,
         dueDate,
         numberOfPomodoro,
-        timeofPomodoro,
+        timeOfPomodoro,
         isRemindered,
         isRepeated,
         timePassed,
@@ -330,19 +332,39 @@ const GetWorkByDate = async (date, id) => {
   }
 };
 
-const GetWorkCompleted = async (date, id) => {
+const GetWorkCompleted = async (id) => {
   try {
     const response = await fetch(
-      `${uri}/get-by-date?date=${date}&userId=${id}`,
+      `${uri}/get-work-completed?userId=${id}`,
       {
         method: "get",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          integerType,
-          stringType,
-        }),
+      }
+    );
+
+    const data = await response.json();
+    if (response.status === 200) {
+      return { success: true, data: data.data };
+    } else {
+      return { success: false, message: data.meta.message };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
+const GetWorkDeleted = async (id) => {
+  try {
+    const response = await fetch(
+      `${uri}/get-work-deleted?userId=${id}`,
+      {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
     );
 
@@ -372,4 +394,5 @@ export {
   GetWorkByPriority,
   GetWorkByType,
   GetWorkCompleted,
+  GetWorkDeleted
 };

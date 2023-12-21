@@ -6,7 +6,7 @@ import {
   ScrollView,
   Image,
   Alert,
-  TouchableOpacity,
+  TouchableOpacity,StyleSheet
 } from "react-native";
 import { s } from "react-native-wind";
 import { AntDesign, FontAwesome5, Feather } from "@expo/vector-icons";
@@ -196,18 +196,18 @@ export default function Setting({ navigation }) {
     unit
   ) => {
     return (
-      <View style={s`relative bg-lightgray`}>
+      <View style={styles.container}>
         <TouchableOpacity
-          style={s`flex flex-row justify-between py-2`}
+          style={styles.pickerButton}
           onPress={() => setPickerVisibility(!isPickerVisible)}
         >
-          <Text style={s`text-lg font-medium`}>{label}</Text>
-          <View style={s`flex flex-row items-center`}>
-            <Text style={s`text-gray-500 text-lg `}>
-              {selectedValue} {unit}{" "}
+          <Text style={styles.labelText}>{label}</Text>
+          <View style={styles.pickerButton}>
+            <Text style={styles.selectedValueText}>
+              {selectedValue} {unit}
             </Text>
             <AntDesign
-              style={s`text-lg`}
+              style={styles.pickerIcon}
               name={isPickerVisible ? "up" : "down"}
             />
           </View>
@@ -215,7 +215,7 @@ export default function Setting({ navigation }) {
         {isPickerVisible && (
           <Picker
             selectedValue={selectedValue}
-            style={{ height: 50, width: "100%", color: "black" }}
+            style={styles.picker}
             onValueChange={onValueChange}
             pickerData={data.map((item) => ({
               label: item.label,
@@ -271,10 +271,9 @@ export default function Setting({ navigation }) {
   };
   const submitDelete = async () => {
     const id = await AsyncStorage.getItem("id");
-    console.log(id);
     const rs = await DeleteGuest(id);
     if (!rs.success) {
-      Alert.alert("Smart Study Hub Announcement", rs.message);
+      navigation.navigate("Home");
       await AsyncStorage.clear();
     } else {
       Alert.alert("Smart Study Hub Announcement", "Delete data successfully");
@@ -558,3 +557,32 @@ export default function Setting({ navigation }) {
     </ScrollView>
   );
 }
+
+
+const styles = StyleSheet.create({
+  container: {
+    paddingVertical:10
+  },
+  pickerButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 2,
+  },
+  labelText: {
+    fontSize: 18,
+    fontWeight: 900,
+  },
+  selectedValueText: {
+    color: 'gray',
+    fontSize: 18,
+  },
+  pickerIcon: {
+    fontSize: 18,
+  },
+  picker: {
+    height: 200,
+    width: '100%',
+    color: 'black',
+    backgroundColor:"white"
+  },
+});

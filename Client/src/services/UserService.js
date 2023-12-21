@@ -79,8 +79,8 @@ const deleteAccount = async () => {
 
     if (role) {
       const { token } = role;
-      console.log(token)
-      const response = await fetch(`${uri}/change-password`, {
+      console.log(token);
+      const response = await fetch(`${uri}/delete`, {
         method: "delete",
         headers: {
           "Content-Type": "application/json",
@@ -103,4 +103,153 @@ const deleteAccount = async () => {
   }
 };
 
-export { SendOTPChangePassword, changePassword, deleteAccount };
+const CheckPasswordCorrect = async (password) => {
+  try {
+    const role = await getRole();
+
+    if (role) {
+      const { token } = role;
+
+      const response = await fetch(`${uri}/check-password-correct`, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          password,
+        }),
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        return { success: true, message: data.meta.message };
+      } else {
+        const data = await response.json();
+        return { success: false, message: data.meta.message };
+      }
+    } else {
+      return { success: false, message: "Token not found" };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
+const updateInformation = async (
+  phoneNumber,
+  firstName,
+  lastName,
+  address,
+  dateOfBirth,
+  country,
+  imageUrl,
+  roles
+) => {
+  try {
+    const role = await getRole();
+
+    if (role) {
+      const { token } = role;
+
+      const response = await fetch(`${uri}/update-info`, {
+        method: "put",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          phoneNumber,
+          firstName,
+          lastName,
+          address,
+          dateOfBirth,
+          country,
+          imageUrl,
+          roles,
+        }),
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        return { success: true, message: data.meta.message };
+      } else {
+        const data = await response.json();
+        return { success: false, message: data.meta.message };
+      }
+    } else {
+      return { success: false, message: "Token not found" };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
+const ChangeEmailUser = async (email, otpCode) => {
+  try {
+    const role = await getRole();
+
+    if (role) {
+      const { token } = role;
+
+      const response = await fetch(`${uri}/change-email`, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          email,
+          otpCode,
+        }),
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        return { success: true, message: data.meta.message };
+      } else {
+        const data = await response.json();
+        return { success: false, message: data.meta.message };
+      }
+    } else {
+      return { success: false, message: "Token not found" };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
+const getUserInfor = async () => {
+  try {
+    const role = await getRole();
+
+    if (role) {
+      const { token } = role;
+
+      const response = await fetch(`${uri}/get-info`, {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        return { success: true, data: data.data };
+      } else {
+        const data = await response.json();
+        return { success: false, message: data.meta.message };
+      }
+    } else {
+      return { success: false, message: "Token not found" };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+export { SendOTPChangePassword, changePassword, deleteAccount,CheckPasswordCorrect, updateInformation, ChangeEmailUser, getUserInfor };

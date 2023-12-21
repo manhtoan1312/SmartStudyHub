@@ -61,7 +61,6 @@ const ProjectComponent = ({
   };
 
   const toDetail = () => {
-    console.log("to detail");
     navigation.navigate("ProjectDetail", { id: id });
   };
   const convertMinutesToHoursAndMinutes = (totalMinutes) => {

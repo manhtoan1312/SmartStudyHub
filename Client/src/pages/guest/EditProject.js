@@ -145,7 +145,7 @@ const EditProjectPage = ({ route, navigation }) => {
       </View>
       <View style={styles.actionsContainer}>
         <TouchableOpacity style={styles.doneButton} onPress={handleDone}>
-          <Text style={[styles.buttonText, styles.doneButtonText]}>complete</Text>
+          <Text style={[styles.buttonText, styles.doneButtonText]}>Complete</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.actionsContainer}>
@@ -223,9 +223,9 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "flex-start",
     paddingHorizontal: 20,
-    marginTop: 10,
+    marginTop: 15,
     backgroundColor: "white",
-    paddingVertical: 2,
+    paddingVertical: 5,
     marginBottom: 4,
   },
   doneButton: {
@@ -245,6 +245,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     color: "white",
+    fontWeight:600
   },
   doneButtonText: {
     color: "blue",

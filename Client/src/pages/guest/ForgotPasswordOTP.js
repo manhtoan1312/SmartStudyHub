@@ -66,7 +66,7 @@ function ForgotPasswordOTP({ route, navigation }) {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={styles.backButton}
+        style={{paddingLeft:15, paddingTop:10}}
         onPress={() => navigation.goBack()}
       >
         <FontAwesome name="angle-left" size={24} color="black" />

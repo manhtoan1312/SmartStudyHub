@@ -1,13 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { Switch, View, SafeAreaView, Text,Alert } from "react-native";
+import {
+  Switch,
+  View,
+  SafeAreaView,
+  Text,
+  Alert,
+  FlatList,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import {
   FontAwesome,
   MaterialCommunityIcons,
   Feather,
-  MaterialIcons,EvilIcons
+  MaterialIcons,
+  EvilIcons,
 } from "@expo/vector-icons";
 import { s } from "react-native-wind";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  DeleteProject,
+  GetProjectActiveAndCompleted,
+  MarkCompleteProject,
+  RecoverProject,
+} from "../../services/Guest/ProjectService";
 function Project({ navigation }) {
   const [outOfDate, setOutOfDate] = useState(true);
   const [tomorow, setTomorow] = useState(true);
@@ -22,10 +39,12 @@ function Project({ navigation }) {
   const [event, setEvent] = useState(true);
   const [done, setDone] = useState(true);
   const [deleted, setDeleted] = useState(true);
+  const [listProject, setListProject] = useState(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
         const storedData = await AsyncStorage.getItem("projectData");
+
         if (storedData) {
           const parsedData = JSON.parse(storedData);
           setOutOfDate(parsedData.outOfDate);
@@ -48,8 +67,17 @@ function Project({ navigation }) {
     };
 
     fetchData();
+    fetchProject();
   }, []);
 
+  const fetchProject = async () => {
+    const id = await AsyncStorage.getItem("id");
+    const response = await GetProjectActiveAndCompleted(id);
+    if (response.success) {
+      setListProject(response.data);
+      console.log();
+    }
+  };
   const handleBackBtn = async () => {
     try {
       const projectData = {
@@ -65,7 +93,7 @@ function Project({ navigation }) {
         someDay,
         event,
         done,
-        deleted
+        deleted,
       };
       await AsyncStorage.setItem("projectData", JSON.stringify(projectData));
       navigation.goBack();
@@ -86,17 +114,59 @@ function Project({ navigation }) {
       );
     }
   };
+  function confirmDeleteProject(id) {
+    Alert.alert(
+      "Confirm Delete?",
+      "Do you want to delete this project?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: () => deleteProject(id),
+        },
+      ],
+      { cancelable: true }
+    );
+  }
+
+  async function deleteProject(id) {
+    const response = await DeleteProject(id);
+    if (response.success) {
+      fetchProject();
+    }
+  }
+
+  const handleChange = async (item) => {
+    let response= null
+    if(item.status==='ACTIVE'){
+      response = await MarkCompleteProject(item.id)
+    }
+    else{
+      response = await RecoverProject(item.id)
+    }
+    if(response.success){
+      fetchProject()
+    }
+    else{
+      Alert.alert('Change error', response.message)
+    }
+  }
   return (
-    <SafeAreaView>
-      <View style={s`bg-white justify-center items-center py-4 border-b-2 border-b-gray-200`}>
-      <FontAwesome
-        style={s`absolute left-6`}
-        name="angle-left"
-        size={32}
-        onPress={() => handleBackBtn()}
-      />
-      <Text style={s`font-medium text-2xl`}>Projects</Text>
-    </View>
+    <ScrollView>
+      <View
+        style={s`bg-white justify-center items-center py-4 border-b-2 border-b-gray-200`}
+      >
+        <FontAwesome
+          style={s`absolute left-6`}
+          name="angle-left"
+          size={32}
+          onPress={() => handleBackBtn()}
+        />
+        <Text style={s`font-medium text-2xl`}>Projects</Text>
+      </View>
       <View style={s`flex flex-col bg-white px-3`}>
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
@@ -114,7 +184,7 @@ function Project({ navigation }) {
             onValueChange={() => setOutOfDate(!outOfDate)}
           />
         </View>
-  
+
         <View style={s`flex flex-row justify-between py-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
@@ -131,7 +201,7 @@ function Project({ navigation }) {
             onValueChange={() => setTomorow(!tomorow)}
           />
         </View>
-  
+
         <View style={s`flex flex-row justify-between py-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
@@ -148,7 +218,7 @@ function Project({ navigation }) {
             onValueChange={() => setThisWeek(!thisWeek)}
           />
         </View>
-  
+
         <View style={s`flex flex-row justify-between py-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
@@ -165,7 +235,7 @@ function Project({ navigation }) {
             onValueChange={() => setnext7Day(!next7Day)}
           />
         </View>
-  
+
         <View style={s`flex flex-row justify-between py-2`}>
           <View style={s`flex flex-row`}>
             <Feather name="flag" size={24} color="red" />
@@ -178,11 +248,13 @@ function Project({ navigation }) {
             onValueChange={() => setHightPriority(!hightPriority)}
           />
         </View>
-  
+
         <View style={s`flex flex-row justify-between py-2`}>
           <View style={s`flex flex-row`}>
             <Feather name="flag" size={24} color="yellow" />
-            <Text style={s`h-full flex items-center pl-2`}>Medium Priority</Text>
+            <Text style={s`h-full flex items-center pl-2`}>
+              Medium Priority
+            </Text>
           </View>
           <Switch
             trackColor={{ false: "gray", true: "red" }}
@@ -191,7 +263,7 @@ function Project({ navigation }) {
             onValueChange={() => setMediumPriority(!mediumPriority)}
           />
         </View>
-  
+
         <View style={s`flex flex-row justify-between py-2`}>
           <View style={s`flex flex-row`}>
             <Feather name="flag" size={24} color="green" />
@@ -204,7 +276,7 @@ function Project({ navigation }) {
             onValueChange={() => setLowPriority(!lowPriority)}
           />
         </View>
-  
+
         <View style={s`flex flex-row justify-between py-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
@@ -221,7 +293,7 @@ function Project({ navigation }) {
             onValueChange={() => setPlaned(!planed)}
           />
         </View>
-  
+
         <View style={s`flex flex-row justify-between py-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
@@ -238,7 +310,7 @@ function Project({ navigation }) {
             onValueChange={() => setAll(!all)}
           />
         </View>
-  
+
         <View style={s`flex flex-row justify-between py-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
@@ -255,7 +327,7 @@ function Project({ navigation }) {
             onValueChange={() => setSomeDay(!someDay)}
           />
         </View>
-  
+
         <View style={s`flex flex-row justify-between py-2`}>
           <View style={s`flex flex-row`}>
             <MaterialIcons name="event" size={24} color="#00FF7F" />
@@ -268,7 +340,7 @@ function Project({ navigation }) {
             onValueChange={() => setEvent(!event)}
           />
         </View>
-  
+
         <View style={s`flex flex-row justify-between py-2`}>
           <View style={s`flex flex-row`}>
             <MaterialCommunityIcons
@@ -287,7 +359,7 @@ function Project({ navigation }) {
         </View>
         <View style={s`flex flex-row justify-between py-2`}>
           <View style={s`flex flex-row`}>
-          <EvilIcons name="trash" size={24} color="red" />
+            <EvilIcons name="trash" size={24} color="red" />
             <Text style={s`h-full flex items-center pl-2`}>Deleted</Text>
           </View>
           <Switch
@@ -297,12 +369,113 @@ function Project({ navigation }) {
             onValueChange={() => setDeleted(!deleted)}
           />
         </View>
+        {listProject && (
+          <View style={styles.projectList}>
+            <Text style={styles.projectListTitle}>Projects</Text>
+            {listProject.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.projectItemContainer}
+                onPress={() => handleChange(item)}
+              >
+                {/* Circle with colorCode */}
+                <View
+                  style={[
+                    styles.colorCircle,
+                    { backgroundColor: item.colorCode },
+                  ]}
+                />
 
+                {/* Project Name */}
+                <View style={styles.projectNameContainer}>
+                  <Text
+                    style={[
+                      styles.projectName,
+                      item.status === "COMPLETED" && styles.completedProject,
+                    ]}
+                  >
+                    {item.projectName}
+                  </Text>
+                </View>
+
+                {/* Status Buttons */}
+                <View style={styles.statusButtonsContainer}>
+                  <TouchableOpacity onPress={() => handleChange(item)}
+                    style={[
+                      styles.statusCircle,
+                      {
+                        backgroundColor:
+                          item.status === "ACTIVE" ? "transparent" : "green",
+                      },
+                    ]}
+                  />
+                  <TouchableOpacity
+                    onPress={() => confirmDeleteProject(item.id)}
+                  >
+                    <MaterialIcons name="delete" size={24} color="gray" />
+                  </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </View>
-    </SafeAreaView>
+    </ScrollView>
   );
-  
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  projectList: {
+    flex: 1,
+    marginTop: 10,
+  },
+  projectListTitle: {
+    fontWeight: "bold",
+    fontSize: 18,
+    marginBottom: 10,
+  },
+  projectItemContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderBottomColor: "#ddd",
+  },
+  colorCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    marginRight: 10,
+  },
+  projectNameContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  projectName: {
+    flex: 1,
+    paddingLeft: 10,
+  },
+  completedProject: {
+    textDecorationLine: "line-through",
+  },
+  statusButtonsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  statusCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    marginRight: 10,
+    backgroundColor: "transparent",
+    borderColor: "green",
+  },
+});
 
 export default Project;

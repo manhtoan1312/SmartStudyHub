@@ -8,7 +8,11 @@ import {
   TextInput,
 } from "react-native";
 import { AntDesign, Fontisto } from "@expo/vector-icons";
-import { DeleteTag, GetTagDetail, UpdateTag } from "../../services/Guest/TagService";
+import {
+  DeleteTag,
+  GetTagDetail,
+  UpdateTag,
+} from "../../services/Guest/TagService";
 
 const EditTag = ({ route, navigation }) => {
   const { tagId } = route.params;
@@ -61,14 +65,14 @@ const EditTag = ({ route, navigation }) => {
       Alert.alert("Error!", response.message);
     }
   };
-  const handleDone = async () => {
-    const response = await UpdateTag(id, name, color, 'COMPLETED');
-    if (response.success) {
-      navigation.navigate("Home");
-    } else {
-      Alert.alert("Error!", response.message);
-    }
-  };
+  // const handleDone = async () => {
+  //   const response = await UpdateTag(id, name, color, 'COMPLETED');
+  //   if (response.success) {
+  //     navigation.navigate("Home");
+  //   } else {
+  //     Alert.alert("Error!", response.message);
+  //   }
+  // };
 
   const handleDelete = async () => {
     const response = await DeleteTag(tagId);
@@ -126,11 +130,6 @@ const EditTag = ({ route, navigation }) => {
             ))}
           </View>
         ))}
-      </View>
-      <View style={styles.actionsContainer}>
-        <TouchableOpacity style={styles.doneButton} onPress={handleDone}>
-          <Text style={[styles.buttonText, styles.doneButtonText]}>Done</Text>
-        </TouchableOpacity>
       </View>
       <View style={styles.actionsContainer}>
         <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>

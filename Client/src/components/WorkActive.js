@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   FlatList,
+  Alert,
 } from "react-native";
 import {
   MaterialCommunityIcons,
@@ -13,31 +14,36 @@ import {
   AntDesign,
 } from "@expo/vector-icons";
 import { useState } from "react";
-const WorkActive = ({ workItem }) => {
+import { DeleteWork, MarkCompleted } from "../services/Guest/WorkService";
+import { Audio } from "expo-av";
+import { ExtraMarkCompleted } from "../services/Guest/ExtraWork";
+import { Swipeable } from "react-native-gesture-handler";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const WorkActive = ({ workItem, reload, navigation }) => {
   const [extraVisible, setExtraVisible] = useState(false);
+
   async function playSound() {
     const { sound } = await Audio.Sound.createAsync(
-      require("../sound/DefaultBell.mp3")
+      require("../sound/Done.mp3")
     );
     await sound.playAsync();
   }
 
   const renderDay = () => {
-    const currentDate = new Date();
-    const dueDate = new Date(workItem.dueDate);
+    const dueDate = workItem.statusWork;
     const options = { weekday: "short", month: "numeric", day: "numeric" };
     let color = "gray";
-    let date = dueDate.toLocaleDateString("en-US", options);
+    let dateStart = new Date(workItem.dueDate);
+    let date = dateStart.toLocaleDateString("en-US", options);
 
-    if (dueDate.toDateString() === currentDate.toDateString()) {
+    if (dueDate === "TODAY") {
       color = "green";
       date = "Today";
-    } else if (dueDate > currentDate) {
-      if (dueDate.getDate() === currentDate.getDate() + 1) {
-        color = "orange";
-        date = "Tomorrow";
-      }
-    } else {
+    } else if (dueDate === "TOMORROW") {
+      color = "orange";
+      date = "Tomorrow";
+    } else if (dueDate === "OUTOFDATE") {
       color = "red";
     }
 
@@ -49,143 +55,273 @@ const WorkActive = ({ workItem }) => {
     );
   };
 
+  const CompletedWork = async () => {
+    const response = await MarkCompleted(workItem.id);
+    if (response.success) {
+      playSound();
+      reload();
+    } else {
+      Alert.alert("Mark complete work Error!", response.message);
+    }
+  };
+  const CompletedExtraWork = async (id, status) => {
+    if (status === "ACTIVE") {
+      const response = await ExtraMarkCompleted(id);
+      if (response.success) {
+        playSound();
+        reload();
+      } else {
+        Alert.alert("Mark complete work Error!", response.message);
+      }
+    } else {
+      const response = await RecoverExtraWork(id);
+      if (response.success) {
+        reload();
+      } else {
+        Alert.alert("Recover Extrawork Error!", response.message);
+      }
+    }
+  };
   const renderCirle = () => {
     let circleColor = "gray";
-    if (workItem.priority === "HIGHT") circleColor = "red";
+    if (workItem.priority === "HIGH") circleColor = "red";
     else if (workItem.priority === "MEDIUM") circleColor = "yellow";
     else if (workItem.priority === "LOW") circleColor = "green";
-    return <View style={[styles.circle, { borderColor: circleColor }]} />;
+    return (
+      <TouchableOpacity
+        onPress={() => CompletedWork()}
+        style={[styles.circle, { borderColor: circleColor }]}
+      />
+    );
   };
 
   const hasExtraWorks = workItem.extraWorks && workItem.extraWorks.length > 0;
 
+  const updateWork = () => {
+    navigation.navigate("UpdateWork", { id: workItem.id });
+  };
+  const renderRightActions = (progress, dragX) => {
+    const trans = dragX.interpolate({
+      inputRange: [0, 50, 100, 101],
+      outputRange: [0, 0, 0, 1],
+    });
+    return (
+      <TouchableOpacity
+        style={styles.rightActions}
+        onPress={() => handleDelete()}
+      >
+        <TouchableOpacity onPress={() => handleDelete()}>
+          <AntDesign name="delete" size={24} color="black" />
+        </TouchableOpacity>
+      </TouchableOpacity>
+    );
+  };
+
+  const handlePlay = async () => {
+    try {
+      await AsyncStorage.setItem("work", JSON.stringify(workItem));
+      await AsyncStorage.setItem("workType", "WORK");
+      await AsyncStorage.setItem("stop", "true");
+      navigation.navigate("Focus");
+    } catch (e) {
+      Alert.alert("Error when save work", e);
+    }
+  };
+  const playExtra = async (item) => {
+    if (item.status === "ACTIVE") {
+      try {
+        await AsyncStorage.setItem("work", JSON.stringify(item));
+        await AsyncStorage.setItem("workType", "EXTRA");
+        await AsyncStorage.setItem("stop", "true");
+        navigation.navigate("Focus");
+      } catch (e) {
+        Alert.alert("Error when save work", e);
+      }
+    }
+  };
+  const handleDelete = async () => {
+    const response = await DeleteWork(workItem.id);
+    if (response.success) {
+      reload();
+    } else {
+      Alert("Error when delele work", response.message);
+    }
+  };
   return (
-    <TouchableOpacity style={{ flexDirection: "column", marginVertical: 5 }}>
-      <View style={styles.container}>
-        {renderCirle()}
-        <View style={styles.content}>
-          <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-            <Text style={styles.workName}>{workItem.workName} </Text>
-            {workItem.tags?.map((item, index) => (
-              <Text key={index} style={{ color: item.colorCode }}>
-                #{item.tagName}
-              </Text>
-            ))}
-          </View>
-          <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-            {workItem.numberOfPomodoros !== 0 && (
-              <View style={styles.pomodoroContainer}>
-                <MaterialCommunityIcons
-                  name="clock-check"
-                  size={14}
-                  color="#ff3232"
-                />
-                <Text style={styles.pomodoroText}>
-                  {workItem.numberOfPomodorosDone}/
-                </Text>
-                <MaterialCommunityIcons
-                  name="clock"
-                  size={14}
-                  color="#ff9999"
-                />
-                <Text style={[styles.pomodoroText, { marginRight: 5 }]}>
-                  {workItem.numberOfPomodoros}
-                </Text>
-              </View>
-            )}
-            {workItem.statusWork !== "SOMEDAY" && renderDay()}
+    <Swipeable renderRightActions={renderRightActions}>
+      <TouchableOpacity
+        onPress={() => updateWork()}
+        style={{ flexDirection: "column", marginVertical: 5 }}
+      >
+        <View style={styles.container}>
+          {renderCirle()}
+          <View style={styles.content}>
             <View
-              style={{
-                flex: 1,
-                flexDirection: "row",
-                alignItems: "center",
-                paddingLeft: 5,
-              }}
+              style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
             >
-              {hasExtraWorks && (
-                <>
-                  <Ionicons
-                    name="md-git-branch-outline"
-                    style={{ transform: [{ rotate: "90deg" }] }}
-                    size={14}
-                    color="gray"
-                  />
-                  <Text style={{ marginLeft: 5, fontSize: 12, color: "gray" }}>
-                    {`${
-                      workItem.extraWorks.filter(
-                        (extraWork) => extraWork.status === "COMPLETED"
-                      ).length
-                    }/${workItem.extraWorks.length}`}
-                  </Text>
-                </>
-              )}
+              <Text style={styles.workName}>{workItem.workName} </Text>
+              {workItem.tags?.map((item, index) => (
+                <Text key={index} style={{ color: item.colorCode }}>
+                  #{item.tagName}
+                </Text>
+              ))}
             </View>
-          </View>
-        </View>
-        <View
-          style={{ flex: 1, flexDirection: "row", justifyContent: "flex-end" }}
-        >
-          <TouchableOpacity onPress={playSound} style={styles.playButton}>
-            <Ionicons name="ios-play-circle-sharp" size={26} color="#ff3232" />
-          </TouchableOpacity>
-          {hasExtraWorks && (
-            <TouchableWithoutFeedback
-              onPress={() => setExtraVisible(!extraVisible)}
+            <View
+              style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
             >
-              <AntDesign
-                name={extraVisible ? "up" : "down"}
-                size={20}
-                color="gray"
-                style={{ marginLeft: 5, paddingTop: 3 }}
-              />
-            </TouchableWithoutFeedback>
-          )}
-        </View>
-      </View>
-      {extraVisible && (
-        <View
-          style={{ backgroundColor: "white", borderRadius: 10, marginTop: 10 }}
-        >
-          <View style={styles.extraContainer}>
-            {workItem.extraWorks.map((item) => (
-              <View style={styles.extraWorkItem} key={item.id}>
-                <View style={{ flexDirection: "row" }}>
-                  {item.status === "ACTIVE" ? (
-                    <View style={[styles.circle, { borderColor: "gray" }]} />
-                  ) : (
-                    <AntDesign name="checkcircle" size={20} color="green" />
-                  )}
-                  <View style={{ alignItems:'center'}}>
-                    <Text>{item.extraWorkName}</Text>
-                    {item.numberOfPomodoros > 0 && (
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
-                      >
-                        {[...Array(item.numberOfPomodoros)].map((_, index) => (
-                          <MaterialCommunityIcons
-                            key={index}
-                            name="clock"
-                            size={14}
-                            color="#ff9999"
-                          />
-                        ))}
-                      </View>
-                    )}
-                  </View>
-                </View>
-                <TouchableOpacity onPress={playSound} style={styles.playButton}>
-                  <Ionicons
-                    name="ios-play-circle-sharp"
-                    size={26}
+              {workItem.numberOfPomodoros !== 0 && (
+                <View style={styles.pomodoroContainer}>
+                  <MaterialCommunityIcons
+                    name="clock-check"
+                    size={14}
                     color="#ff3232"
                   />
-                </TouchableOpacity>
+                  <Text style={styles.pomodoroText}>
+                    {workItem.numberOfPomodorosDone}/
+                  </Text>
+                  <MaterialCommunityIcons
+                    name="clock"
+                    size={14}
+                    color="#ff9999"
+                  />
+                  <Text style={[styles.pomodoroText, { marginRight: 5 }]}>
+                    {workItem.numberOfPomodoros}
+                  </Text>
+                </View>
+              )}
+              {workItem.statusWork !== "SOMEDAY" && renderDay()}
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingLeft: 5,
+                }}
+              >
+                {hasExtraWorks && (
+                  <>
+                    <Ionicons
+                      name="md-git-branch-outline"
+                      style={{ transform: [{ rotate: "90deg" }] }}
+                      size={14}
+                      color="gray"
+                    />
+                    <Text
+                      style={{ marginLeft: 5, fontSize: 12, color: "gray" }}
+                    >
+                      {`${
+                        workItem.extraWorks.filter(
+                          (extraWork) => extraWork.status === "COMPLETED"
+                        ).length
+                      }/${workItem.extraWorks.length}`}
+                    </Text>
+                  </>
+                )}
               </View>
-            ))}
+            </View>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "flex-end",
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => handlePlay()}
+              style={styles.playButton}
+            >
+              <Ionicons
+                name="ios-play-circle-sharp"
+                size={26}
+                color="#ff3232"
+              />
+            </TouchableOpacity>
+            {hasExtraWorks && (
+              <TouchableWithoutFeedback
+                onPress={() => setExtraVisible(!extraVisible)}
+              >
+                <AntDesign
+                  name={extraVisible ? "up" : "down"}
+                  size={20}
+                  color="gray"
+                  style={{ marginLeft: 5, paddingTop: 3 }}
+                />
+              </TouchableWithoutFeedback>
+            )}
           </View>
         </View>
-      )}
-    </TouchableOpacity>
+        {extraVisible && (
+          <View
+            style={{
+              backgroundColor: "white",
+              borderRadius: 10,
+              marginTop: 10,
+            }}
+          >
+            <View style={styles.extraContainer}>
+              {workItem.extraWorks.map((item) => (
+                <View style={styles.extraWorkItem} key={item.id}>
+                  <View style={{ flexDirection: "row" }}>
+                    <TouchableOpacity
+                      onPress={() => CompletedExtraWork(item.id, item.status)}
+                    >
+                      {item.status === "COMPLETED" ? (
+                        <AntDesign
+                          style={{ marginRight: 5 }}
+                          name="checkcircle"
+                          size={20}
+                          color="#00cc00"
+                        />
+                      ) : (
+                        <View
+                          style={[styles.circle, { borderColor: "gray" }]}
+                        />
+                      )}
+                    </TouchableOpacity>
+                    <View style={{ alignItems: "center" }}>
+                      <Text>{item.extraWorkName}</Text>
+                      {item.numberOfPomodoros > 0 && (
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          {[...Array(item.numberOfPomodoros)].map(
+                            (_, index) => (
+                              <MaterialCommunityIcons
+                                key={index}
+                                name="clock"
+                                size={14}
+                                color="#ff9999"
+                              />
+                            )
+                          )}
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                  {item.status === "ACTIVE" ? (
+                    <TouchableOpacity
+                      onPress={() => playExtra(item)}
+                      style={styles.playButton}
+                    >
+                      <Ionicons
+                        name="ios-play-circle-sharp"
+                        size={26}
+                        color="#ff3232"
+                      />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity style={styles.playButton}>
+                      <AntDesign name="checkcircle" size={26} color="#00cc00" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+      </TouchableOpacity>
+    </Swipeable>
   );
 };
 
@@ -205,10 +341,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "#ff3232",
     borderWidth: 2,
-    marginRight: 15,
+    marginRight: 5,
   },
   content: {
     flex: 1,
+    justifyContent: "center",
   },
   workName: {
     fontSize: 14,
@@ -238,6 +375,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginVertical: 10,
     marginRight: 10,
+  },
+  rightActions: {
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

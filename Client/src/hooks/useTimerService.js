@@ -9,7 +9,7 @@ const useTimerService = () => {
     useCallback(() => {
     timerService.toggleTimer();
     return () => {
-      timerService.toggleTimer();
+      timerService.stopTimer();
     };
   }, [timerService]))
 

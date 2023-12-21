@@ -21,13 +21,13 @@ import {
   FontAwesome,
   MaterialIcons,
 } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ImageFocus from "../../components/Image_Focus";
 import getRole from "../../services/RoleService";
 import {
   CheckMaxProject,
-  GetProjectForAddFolder,
+  GetProjectByStatus,
 } from "../../services/Guest/ProjectService";
 import { CreateGuest } from "../../services/GuestService";
 import {
@@ -68,7 +68,7 @@ export default function Home({ navigation }) {
   const [todayTime, setTodayTime] = useState({ time: "0h 0m", pomodoro: "0" });
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [scrollY, setScrollY] = useState(new Animated.Value(0));
-
+  const isFocused = useIsFocused();
   const [outOfDateData, setOutOfDateData] = useState({
     time: "0h 0m",
     pomodoro: "0",
@@ -148,12 +148,9 @@ export default function Home({ navigation }) {
           } else {
             getRole().then((role) => {
               if (role) {
-                const shortenedEmail = role.email
-                  ? role.email.split("@")[0]
-                  : "";
-                setEmail(shortenedEmail);
+                setEmail(role.name);
                 const setName = async () => {
-                  await AsyncStorage.setItem("accountName", shortenedEmail);
+                  await AsyncStorage.setItem("accountName", role.name);
                 };
                 setName();
               }
@@ -163,12 +160,12 @@ export default function Home({ navigation }) {
             const fetchDataId = async () => {
               const rs = await CreateGuest();
               if (!rs.success) {
-                Alert.alert("Error!!!", rs.message);
+                Alert.alert("Creating id error", rs.message);
               }
             };
             fetchDataId();
           } else {
-            fetchDataFPT();
+            console.log(id);
           }
         } catch (error) {
           console.log(error);
@@ -183,6 +180,14 @@ export default function Home({ navigation }) {
     }, [])
   );
 
+  useEffect(() => {
+    const fetchDataOnFocus = async () => {
+      if (isFocused) {
+        await fetchDataFPT();
+      }
+    }
+    fetchDataOnFocus();
+  }, [isFocused]);
   const convertMinutesToHoursAndMinutes = (totalMinutes) => {
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
@@ -191,138 +196,151 @@ export default function Home({ navigation }) {
 
   const fetchDataFPT = async () => {
     const id = await AsyncStorage.getItem("id");
-
-    try {
-      const [
-        rsFolder,
-        rsProject,
-        rsTag,
-        rsToday,
-        rsOutOfDate,
-        rsTomorrow,
-        rsThisWeek,
-        rsNext7Day,
-        rsSomeDay,
-        rsAll,
-        rsTaskDefault,
-        rsPlanned,
-        rsLowPriority,
-        rsMediumPriority,
-        rsHighPriority,
-      ] = await Promise.all([
-        GetAllFolder(id),
-        GetProjectForAddFolder(id),
-        GetAllTagOfUser(id),
-        GetWorkByType("TODAY", id),
-        outOfDate && GetWorkByType("OUTOFDATE", id),
-        tomorow && GetWorkByType("TOMORROW", id),
-        thisWeek && GetWorkByType("THISWEEK", id),
-        next7Day && GetWorkByType("NEXT7DAY", id),
-        someDay && GetWorkByType("SOMEDAY", id),
-        all && GetWorkByType("ALL", id),
-        GetWorkByType("TASK_DEFAULT", id),
-        planed && GetWorkByType("PLANNED", id),
-        lowPriority && GetWorkByPriority("LOW", id),
-        mediumPriority && GetWorkByPriority("MEDIUM", id),
-        hightPriority && GetWorkByPriority("HIGH", id),
-      ]);
-      if (rsToday.success) {
-        setTodayTime({
-          time: convertMinutesToHoursAndMinutes(rsToday.data.totalTimeWork),
-          pomodoro: rsToday.data.totalWorkActive,
-        });
-      }
-
-      if (rsOutOfDate.success) {
-        setOutOfDateData({
-          time: convertMinutesToHoursAndMinutes(rsOutOfDate.data.totalTimeWork),
-          pomodoro: rsOutOfDate.data.totalWorkActive,
-        });
-      }
-
-      if (rsTomorrow.success) {
-        setTomorrowTime({
-          time: convertMinutesToHoursAndMinutes(rsTomorrow.data.totalTimeWork),
-          pomodoro: rsTomorrow.data.totalWorkActive,
-        });
-      }
-      if (rsThisWeek.success) {
-        setThisWeekData({
-          time: convertMinutesToHoursAndMinutes(rsThisWeek.data.totalTimeWork),
-          pomodoro: rsThisWeek.data.totalWorkActive,
-        });
-      }
-      if (rsNext7Day.success) {
-        setNext7DayData({
-          time: convertMinutesToHoursAndMinutes(rsNext7Day.data.totalTimeWork),
-          pomodoro: rsNext7Day.data.totalWorkActive,
-        });
-      }
-
-      if (rsSomeDay.success) {
-        setSomeDayData({
-          time: convertMinutesToHoursAndMinutes(rsSomeDay.data.totalTimeWork),
-          pomodoro: rsSomeDay.data.totalWorkActive,
-        });
-      }
-
-      if (rsAll.success) {
-        setAllData({
-          time: convertMinutesToHoursAndMinutes(rsAll.data.totalTimeWork),
-          pomodoro: rsAll.data.totalWorkActive,
-        });
-      }
-      if (rsTaskDefault.success) {
-        setTaskDefaultData({
-          time: convertMinutesToHoursAndMinutes(
-            rsTaskDefault.data.totalTimeWork
-          ),
-          pomodoro: rsTaskDefault.data.totalWorkActive,
-        });
-        if (rsPlanned.success) {
-          setPlannedData({
-            time: convertMinutesToHoursAndMinutes(rsPlanned.data.totalTimeWork),
-            pomodoro: rsPlanned.data.totalWorkActive,
+    if (id) {
+      try {
+        const [
+          rsFolder,
+          rsProject,
+          rsTag,
+          rsToday,
+          rsOutOfDate,
+          rsTomorrow,
+          rsThisWeek,
+          rsNext7Day,
+          rsSomeDay,
+          rsAll,
+          rsTaskDefault,
+          rsPlanned,
+          rsLowPriority,
+          rsMediumPriority,
+          rsHighPriority,
+        ] = await Promise.all([
+          GetAllFolder(id),
+          GetProjectByStatus(id, "ACTIVE"),
+          GetAllTagOfUser(id),
+          GetWorkByType("TODAY", id),
+          outOfDate && GetWorkByType("OUTOFDATE", id),
+          tomorow && GetWorkByType("TOMORROW", id),
+          thisWeek && GetWorkByType("THISWEEK", id),
+          next7Day && GetWorkByType("NEXT7DAY", id),
+          someDay && GetWorkByType("SOMEDAY", id),
+          all && GetWorkByType("ALL", id),
+          GetWorkByType("TASK_DEFAULT", id),
+          planed && GetWorkByType("PLANNED", id),
+          lowPriority && GetWorkByPriority("LOW", id),
+          mediumPriority && GetWorkByPriority("MEDIUM", id),
+          hightPriority && GetWorkByPriority("HIGH", id),
+        ]);
+        if (rsToday.success) {
+          setTodayTime({
+            time: convertMinutesToHoursAndMinutes(rsToday.data.totalTimeWork),
+            pomodoro: rsToday.data.totalWorkActive,
           });
         }
-        if (rsLowPriority.success) {
-          setLowPriorityData({
+
+        if (rsOutOfDate.success) {
+          setOutOfDateData({
             time: convertMinutesToHoursAndMinutes(
-              rsLowPriority.data.totalTimeWork
+              rsOutOfDate.data.totalTimeWork
             ),
-            pomodoro: rsLowPriority.data.totalWorkActive,
+            pomodoro: rsOutOfDate.data.totalWorkActive,
           });
         }
-        if (rsMediumPriority.success) {
-          setMediumPriorityData({
+
+        if (rsTomorrow.success) {
+          setTomorrowTime({
             time: convertMinutesToHoursAndMinutes(
-              rsMediumPriority.data.totalTimeWork
+              rsTomorrow.data.totalTimeWork
             ),
-            pomodoro: rsMediumPriority.data.totalWorkActive,
+            pomodoro: rsTomorrow.data.totalWorkActive,
           });
         }
-        if (rsHighPriority.success) {
-          setHighPriorityData({
+        if (rsThisWeek.success) {
+          setThisWeekData({
             time: convertMinutesToHoursAndMinutes(
-              rsHighPriority.data.totalTimeWork
+              rsThisWeek.data.totalTimeWork
             ),
-            pomodoro: rsHighPriority.data.totalWorkActive,
+            pomodoro: rsThisWeek.data.totalWorkActive,
           });
         }
-        if (!rsFolder.success) {
-          Alert.alert("Error!!", rsFolder.message);
-        } else {
-          setFolder(rsFolder.data);
+        if (rsNext7Day.success) {
+          setNext7DayData({
+            time: convertMinutesToHoursAndMinutes(
+              rsNext7Day.data.totalTimeWork
+            ),
+            pomodoro: rsNext7Day.data.totalWorkActive,
+          });
         }
-        if (rsProject.success) {
-          setProject(rsProject.data);
+
+        if (rsSomeDay.success) {
+          setSomeDayData({
+            time: convertMinutesToHoursAndMinutes(rsSomeDay.data.totalTimeWork),
+            pomodoro: rsSomeDay.data.totalWorkActive,
+          });
         }
-        if (rsTag.success) {
-          setTag(rsTag.data);
+
+        if (rsAll.success) {
+          setAllData({
+            time: convertMinutesToHoursAndMinutes(rsAll.data.totalTimeWork),
+            pomodoro: rsAll.data.totalWorkActive,
+          });
         }
+        if (rsTaskDefault.success) {
+          setTaskDefaultData({
+            time: convertMinutesToHoursAndMinutes(
+              rsTaskDefault.data.totalTimeWork
+            ),
+            pomodoro: rsTaskDefault.data.totalWorkActive,
+          });
+          if (rsPlanned.success) {
+            setPlannedData({
+              time: convertMinutesToHoursAndMinutes(
+                rsPlanned.data.totalTimeWork
+              ),
+              pomodoro: rsPlanned.data.totalWorkActive,
+            });
+          }
+          if (rsLowPriority.success) {
+            setLowPriorityData({
+              time: convertMinutesToHoursAndMinutes(
+                rsLowPriority.data.totalTimeWork
+              ),
+              pomodoro: rsLowPriority.data.totalWorkActive,
+            });
+          }
+          if (rsMediumPriority.success) {
+            setMediumPriorityData({
+              time: convertMinutesToHoursAndMinutes(
+                rsMediumPriority.data.totalTimeWork
+              ),
+              pomodoro: rsMediumPriority.data.totalWorkActive,
+            });
+          }
+          if (rsHighPriority.success) {
+            setHighPriorityData({
+              time: convertMinutesToHoursAndMinutes(
+                rsHighPriority.data.totalTimeWork
+              ),
+              pomodoro: rsHighPriority.data.totalWorkActive,
+            });
+          }
+          if (!rsFolder.success) {
+            Alert.alert("Geting user's folder error", rsFolder.message);
+          } else {
+            setFolder(rsFolder.data);
+          }
+          if (rsProject.success) {
+            setProject(rsProject.data);
+          } else {
+            Alert.alert("Error when get project", rsProject.message);
+          }
+          if (rsTag.success) {
+            setTag(rsTag.data);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
     }
   };
 
@@ -361,7 +379,6 @@ export default function Home({ navigation }) {
   useEffect(() => {
     const handleScroll = () => {
       if (scrollY._value <= -50) {
-        console.log('toi noc')
         reload();
         setShowSearchBar(true);
       }
@@ -440,18 +457,19 @@ export default function Home({ navigation }) {
         </View>
         <View style={styles.searchContainer}>
           {showSearchBar && (
-            <TouchableOpacity
-              onPress={() => navigation.navigate("SearchComponent")}
-            >
+            <TouchableOpacity onPress={() => navigation.navigate("SearchWork")}>
               <View style={styles.searchBar}>
-              <FontAwesome name="search" size={20} color="#666666" />
+                <FontAwesome name="search" size={20} color="#666666" />
                 <Text style={styles.searchText}>Search...</Text>
               </View>
             </TouchableOpacity>
           )}
         </View>
         <View style={styles.body}>
-          <View style={styles.headers}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Today")}
+            style={styles.headers}
+          >
             <View style={styles.row}>
               <Feather
                 name="sun"
@@ -465,9 +483,12 @@ export default function Home({ navigation }) {
               <Text style={styles.itemRow}>{todayTime.time}</Text>
               <Text>{todayTime.pomodoro}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
           {outOfDate && (
-            <View style={styles.headers}>
+            <TouchableOpacity
+              style={styles.headers}
+              onPress={() => navigation.navigate("OutOfDate")}
+            >
               <View style={styles.row}>
                 <MaterialIcons
                   style={styles.itemRow}
@@ -481,10 +502,13 @@ export default function Home({ navigation }) {
                 <Text style={styles.itemRow}>{outOfDateData.time}</Text>
                 <Text>{outOfDateData.pomodoro}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
           {tomorow && (
-            <View style={styles.headers}>
+            <TouchableOpacity
+              style={styles.headers}
+              onPress={() => navigation.navigate("Tomorror")}
+            >
               <View style={styles.row}>
                 <MaterialCommunityIcons
                   name="weather-sunset"
@@ -498,10 +522,13 @@ export default function Home({ navigation }) {
                 <Text style={styles.itemRow}>{tomorowData.time}</Text>
                 <Text>{tomorowData.pomodoro}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
           {thisWeek && (
-            <View style={styles.headers}>
+            <TouchableOpacity
+              style={styles.headers}
+              onPress={() => navigation.navigate("ThisWeek")}
+            >
               <View style={styles.row}>
                 <MaterialCommunityIcons
                   name="calendar-range-outline"
@@ -515,10 +542,13 @@ export default function Home({ navigation }) {
                 <Text style={styles.itemRow}>{thisWeekData.time}</Text>
                 <Text>{thisWeekData.pomodoro}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
           {next7Day && (
-            <View style={styles.headers}>
+            <TouchableOpacity
+              style={styles.headers}
+              onPress={() => navigation.navigate("Next7Day")}
+            >
               <View style={styles.row}>
                 <MaterialCommunityIcons
                   name="calendar-arrow-right"
@@ -532,10 +562,13 @@ export default function Home({ navigation }) {
                 <Text style={styles.itemRow}>{next7DayData.time}</Text>
                 <Text>{next7DayData.pomodoro}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
           {hightPriority && (
-            <View style={styles.headers}>
+            <TouchableOpacity
+              style={styles.headers}
+              onPress={() => navigation.navigate("High")}
+            >
               <View style={styles.row}>
                 <Fontisto
                   name="flag"
@@ -549,10 +582,13 @@ export default function Home({ navigation }) {
                 <Text style={styles.itemRow}>{highPriorityData.time}</Text>
                 <Text>{highPriorityData.pomodoro}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
           {mediumPriority && (
-            <View style={styles.headers}>
+            <TouchableOpacity
+              style={styles.headers}
+              onPress={() => navigation.navigate("Medium")}
+            >
               <View style={styles.row}>
                 <Fontisto
                   name="flag"
@@ -566,10 +602,13 @@ export default function Home({ navigation }) {
                 <Text style={styles.itemRow}>{mediumPriorityData.time}</Text>
                 <Text>{mediumPriorityData.pomodoro}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
           {lowPriority && (
-            <View style={styles.headers}>
+            <TouchableOpacity
+              style={styles.headers}
+              onPress={() => navigation.navigate("Low")}
+            >
               <View style={styles.row}>
                 <Fontisto
                   name="flag"
@@ -583,10 +622,13 @@ export default function Home({ navigation }) {
                 <Text style={styles.itemRow}>{lowPriorityData.time}</Text>
                 <Text>{lowPriorityData.pomodoro}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
           {planed && (
-            <View style={styles.headers}>
+            <TouchableOpacity
+              style={styles.headers}
+              onPress={() => navigation.navigate("Planned")}
+            >
               <View style={styles.row}>
                 <MaterialCommunityIcons
                   name="calendar-check-outline"
@@ -594,16 +636,19 @@ export default function Home({ navigation }) {
                   size={20}
                   color="#87CEFA"
                 />
-                <Text>Planed</Text>
+                <Text>Planned</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.itemRow}>{plannedData.time}</Text>
                 <Text>{plannedData.pomodoro}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
           {all && (
-            <View style={styles.headers}>
+            <TouchableOpacity
+              style={styles.headers}
+              onPress={() => navigation.navigate("All")}
+            >
               <View style={styles.row}>
                 <MaterialCommunityIcons
                   name="select-all"
@@ -617,10 +662,13 @@ export default function Home({ navigation }) {
                 <Text style={styles.itemRow}>{allData.time}</Text>
                 <Text>{allData.pomodoro}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
           {someDay && (
-            <View style={styles.headers}>
+            <TouchableOpacity
+              style={styles.headers}
+              onPress={() => navigation.navigate("SomeDay")}
+            >
               <View style={styles.row}>
                 <MaterialCommunityIcons
                   name="calendar-text-outline"
@@ -634,9 +682,12 @@ export default function Home({ navigation }) {
                 <Text style={styles.itemRow}>{someDayData.time}</Text>
                 <Text>{someDayData.pomodoro}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
-          <View style={styles.headers}>
+          <TouchableOpacity
+            style={styles.headers}
+            onPress={() => navigation.navigate("Task")}
+          >
             <View style={styles.row}>
               <FontAwesome
                 name="tasks"
@@ -650,8 +701,8 @@ export default function Home({ navigation }) {
               <Text style={styles.itemRow}>{taskDefaultData.time}</Text>
               <Text>{taskDefaultData.pomodoro}</Text>
             </View>
-          </View>
-          {event && (
+          </TouchableOpacity>
+          {/* {event && (
             <View style={styles.headers}>
               <View style={styles.row}>
                 <MaterialIcons
@@ -663,22 +714,25 @@ export default function Home({ navigation }) {
                 <Text>Event</Text>
               </View>
             </View>
-          )}
+          )} */}
           {done && (
-            <View style={styles.headers}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Done")}
+              style={styles.headers}
+            >
               <View style={styles.row}>
                 <AntDesign name="checkcircleo" size={20} color="gray" />
                 <Text> Done</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
           {deleted && (
-            <View style={styles.headers}>
+            <TouchableOpacity onPress={() => navigation.navigate("Deleted")} style={styles.headers}>
               <View style={styles.row}>
                 <EvilIcons name="trash" size={24} color="red" />
                 <Text>Deleted</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
 
           {folder &&
@@ -800,12 +854,11 @@ const styles = StyleSheet.create({
     padding: 15,
     marginVertical: 10,
     marginHorizontal: 30,
-    flexDirection:'row',
-    alignItems:'center'
+    flexDirection: "row",
+    alignItems: "center",
   },
   searchText: {
     color: "#666666",
-    paddingLeft:10
-    
+    paddingLeft: 10,
   },
 });

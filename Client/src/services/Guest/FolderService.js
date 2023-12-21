@@ -41,7 +41,7 @@ const UpdateFolder = async (id, name, color, listProject, iconUrl) => {
         id: id,
         folderName: name,
         colorCode: color,
-        listProject: listProject,
+        listProjectActive: listProject,
         iconUrl: iconUrl,
       }),
     });
@@ -130,7 +130,7 @@ const GetAllFolderDelete = async (id) => {
 
 const GetDetailFolder = async (id) => {
   try {
-    const response = await fetch(`${uri}/get-detail?userId=${id}`, {
+    const response = await fetch(`${uri}/get-detail?folderId=${id}`, {
       method: "get",
       headers: {
         "Content-Type": "application/json",
@@ -173,6 +173,72 @@ const CheckMaxFolder = async (id) => {
   }
 }
 
+const DeleteCompletelyFolder = async (id) => {
+  try {
+    const response = await fetch(`${uri}/delete-completely/${id}`, {
+      method: "delete",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    if (response.status === 200) {
+      return { success: true, data:data.data };
+    } else {
+      return { success: false, message: data.meta.message };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+}
+
+const RecoverFolder = async (id) => {
+  try {
+    const response = await fetch(`${uri}/recover/${id}`, {
+      method: "put",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    if (response.status === 200) {
+      return { success: true, data:data.data };
+    } else {
+      return { success: false, message: data.meta.message };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+}
+
+const SearchFolder = async (integerType, stringType) => {
+  try {
+    const response = await fetch(`${uri}/search-by-name`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body:JSON.stringify({
+        integerType, stringType
+      })
+    });
+
+    const data = await response.json();
+    if (response.status === 200) {
+      return { success: true, data:data.data };
+    } else {
+      return { success: false, message: data.meta.message };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+}
+
 
 export {
   CreateFolder,
@@ -181,5 +247,8 @@ export {
   GetAllFolderDelete,
   GetDetailFolder,
   GetAllFolder,
-  CheckMaxFolder
+  CheckMaxFolder,
+  DeleteCompletelyFolder,
+  RecoverFolder,
+  SearchFolder
 };

@@ -22,6 +22,25 @@ import ProjectDetail from "../pages/guest/ProjectDetail";
 import AddTag from "../pages/guest/AddTag";
 import EditTag from "../pages/guest/EditTag";
 import EditFolder from "../pages/guest/EditFolder";
+import SearchWork from "../pages/guest/SearchWork";
+import { UpdateWork } from "../services/Guest/WorkService";
+import Today from "../pages/guest/Today";
+import Tomorror from "../pages/guest/Tomorrow";
+import ThisWeek from "../pages/guest/ThisWeek";
+import Next7Day from "../pages/guest/Next7Day";
+import High from "../pages/guest/High";
+import Medium from "../pages/guest/Medium";
+import Low from "../pages/guest/Low";
+import Planed from "../pages/guest/Planed";
+import All from "../pages/guest/All";
+import SomeDay from "../pages/guest/SomeDay";
+import TaskDefault from "../pages/guest/TaskDefault";
+import FolderDetail from "../pages/guest/FolderDetail";
+import Out from "../pages/guest/Out";
+import TagDetail from "../pages/guest/TagDetail";
+import WorkDetai from "../pages/guest/WorkDetai";
+import DoneDetail from "../pages/guest/DoneDetail";
+import DeletedDetail from "../pages/guest/Deleted";
 
 const Stack = createStackNavigator();
 
@@ -48,6 +67,24 @@ const Navigator = () => (
     <Stack.Screen name="AddTag" component={AddTag} />
     <Stack.Screen name="EditTag" component={EditTag} />
     <Stack.Screen name="EditFolder" component={EditFolder} />
+    <Stack.Screen name="SearchWork" component={SearchWork} />
+    <Stack.Screen name="Today" component={Today} />
+    <Stack.Screen name="Tomorror" component={Tomorror} />
+    <Stack.Screen name="ThisWeek" component={ThisWeek} />
+    <Stack.Screen name="Next7Day" component={Next7Day} />
+    <Stack.Screen name="High" component={High} />
+    <Stack.Screen name="Medium" component={Medium} />
+    <Stack.Screen name="Low" component={Low} />
+    <Stack.Screen name="Planned" component={Planed} />
+    <Stack.Screen name="All" component={All} />
+    <Stack.Screen name="SomeDay" component={SomeDay} />
+    <Stack.Screen name="Task" component={TaskDefault} />
+    <Stack.Screen name="FolderDetail" component={FolderDetail} />
+    <Stack.Screen name="OutOfDate" component={Out} />
+    <Stack.Screen name="TagDetail" component={TagDetail} />
+    <Stack.Screen name="UpdateWork" component={ComingSoonScreen} />
+    <Stack.Screen name="Done" component={DoneDetail} />
+    <Stack.Screen name="Deleted" component={DeletedDetail} />
   </Stack.Navigator>
 );
 

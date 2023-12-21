@@ -14,7 +14,7 @@ const HeaderDetail = ({
     <View style={styles.container}>
       <ItemTime time={totalTimeWork} text="Estimated time" />
       <ItemWork work={totalWorkActive} text="Works need to do" />
-      <ItemTime time={totalTimePassed} text="Estimated time" />
+      <ItemTime time={totalTimePassed} text="Time gathered" />
       <ItemWork work={totalWorkCompleted} text="Works completed" />
     </View>
   );
@@ -26,8 +26,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     justifyContent: "space-between",
     backgroundColor: "white",
-    paddingHorizontal: 10, // Increase padding for better spacing
-    marginHorizontal: 10, // Add margin for separation
+    paddingHorizontal: 10, 
+    marginHorizontal: 10, 
   },
 });
 
