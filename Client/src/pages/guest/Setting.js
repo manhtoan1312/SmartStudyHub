@@ -124,7 +124,7 @@ export default function Setting({ navigation }) {
   const navigate = async (to) => {
     try {
       await updateData();
-      navigation.navigate(to);
+      
     } catch (e) {
       console.log(e);
       Alert.alert(
@@ -141,6 +141,7 @@ export default function Setting({ navigation }) {
         { cancelable: false }
       );
     }
+    navigation.navigate(to);
   };
   const toSignIn = () => {
     navigate("Login");

@@ -96,10 +96,7 @@ const WorkDeleted = ({ workItem, reload, navigation }) => {
 
   const handlePlay = async () => {
     try {
-      await AsyncStorage.setItem("work", JSON.stringify(workItem));
-      await AsyncStorage.setItem("workType", "WORK");
-      await AsyncStorage.setItem("stop", "true");
-      navigation.navigate("Focus");
+      navigation.navigate("UpdateWork", {id:workItem.id});
     } catch (e) {
       Alert.alert("Error when save work", e);
     }

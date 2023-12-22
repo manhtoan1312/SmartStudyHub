@@ -15,37 +15,30 @@ import { MaterialIcons } from "@expo/vector-icons";
 import getRole from "../../services/RoleService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
-import { deleteAccount } from "../../services/UserService";
+import { deleteAccount, getUserInfor } from "../../services/UserService";
 import { DeleteGuest } from "../../services/GuestService";
 
 const InforUser = ({ navigation }) => {
-  const [avt, setAvt] = useState("");
-  const [name, setName] = useState("");
+  const [infor, setInfor] = useState(null);
   const [accountName, setAccountName] = useState("");
   const [editNameModalVisible, setEditNameModalVisible] = useState(false);
-  const [newName, setNewName] = useState("");
+  const [newFirstName, setNewFirstName] = useState("");
+  const [newLastName, setNewLastName] = useState("");
   const [moreOptionsModalVisible, setMoreOptionsModalVisible] = useState(false);
-
   useEffect(() => {
     const fetchData = async () => {
-      getRole().then((role) => {
-        if (role) {
-          setName(role.email);
-        }
-      });
-      const img = await AsyncStorage.getItem("img");
-      const accName = await AsyncStorage.getItem("accountName");
-      if (img) {
-        setAvt(img);
-      }
-      if (accName) {
-        setAccountName(accName);
+      const response = await getUserInfor();
+      if (response.success) {
+        setInfor(response.data);
+        setNewFirstName(response.data.firstName);
+        setNewLastName(response.data.lastName);
+        console.log(response.data);
+      } else {
+        console.log("fetch data error!: ", response.message);
       }
     };
     fetchData();
   }, []);
-
-
   const openEditNameModal = () => {
     setEditNameModalVisible(true);
   };
@@ -63,7 +56,7 @@ const InforUser = ({ navigation }) => {
   };
 
   const handleDeleteAccount = async () => {
-    console.log('call delte acc')
+    console.log("call delte acc");
     closeMoreOptionsModal();
     const rs = await deleteAccount();
     Alert.alert("Announcement", rs.message);
@@ -96,8 +89,6 @@ const InforUser = ({ navigation }) => {
 
   const handleBack = async () => {
     try {
-      await AsyncStorage.setItem("img", avt);
-      await AsyncStorage.setItem("accountName", accountName);
       navigation.goBack();
     } catch (e) {
       Alert.alert("Error!", e);
@@ -105,191 +96,217 @@ const InforUser = ({ navigation }) => {
   };
 
   const handleNameChange = () => {
-    if (newName) {
-      setAccountName(newName);
+    if (newFirstName && newLastName) {
+      setInfor({
+        ...infor,
+        firstName: newFirstName,
+        lastName: newLastName,
+      });
     }
+    closeEditNameModal();
   };
 
   return (
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <ScrollView style={{ flex: 1, backgroundColor: "#eeeeee" }}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => handleBack()}>
-            <MaterialIcons name="arrow-back" size={24} color="black" />
-          </TouchableOpacity>
-          <Text style={styles.headerText}>Account Detail</Text>
-          <TouchableOpacity onPress={openMoreOptionsModal}>
-            <MaterialIcons name="more-vert" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Body */}
-        <View style={styles.body}>
-          <View style={styles.infoContainer}>
-            <TouchableOpacity
-              onPress={() => openEditNameModal()}
-              style={styles.infoItem}
-            >
-              <Text style={styles.infoLabel}>User Name</Text>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text style={styles.infoValue}>{accountName}</Text>
-                <MaterialIcons name="navigate-next" size={24} color="black" />
-              </View>
+    <View>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <ScrollView style={{ flex: 1, backgroundColor: "#eeeeee" }}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => handleBack()}>
+              <MaterialIcons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>Avatar</Text>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Image
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    marginRight: 10,
-                  }}
-                  source={avt ? { uri: avt } : require("../../images/avt.jpg")}
-                />
+            <Text style={styles.headerText}>Account Detail</Text>
+            <TouchableOpacity onPress={openMoreOptionsModal}>
+              <MaterialIcons name="more-vert" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Body */}
+          <View style={styles.body}>
+            <View style={styles.infoContainer}>
+              <TouchableOpacity
+                onPress={() => openEditNameModal()}
+                style={styles.infoItem}
+              >
+                <Text style={styles.infoLabel}>User Name</Text>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Text
+                    style={styles.infoValue}
+                  >{`${infor?.firstName} ${infor?.lastName}`}</Text>
+                  <MaterialIcons name="navigate-next" size={24} color="black" />
+                </View>
+              </TouchableOpacity>
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>Avatar</Text>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      marginRight: 10,
+                    }}
+                    source={
+                      infor?.imageUrl
+                        ? { uri: infor?.imageUrl }
+                        : require("../../images/avt.jpg")
+                    }
+                  />
+                  <MaterialIcons name="navigate-next" size={24} color="black" />
+                </View>
+              </View>
+              <View style={styles.infoItem}>
+                <Text style={styles.infoLabel}>Account</Text>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Text style={styles.infoValue}>{infor?.email}</Text>
+                  <MaterialIcons name="navigate-next" size={24} color="black" />
+                </View>
+              </View>
+              <View
+                style={styles.infoItem}
+                onTouchEnd={() =>
+                  navigation.navigate("ChangePassword", { email: infor.email })
+                }
+              >
+                <Text style={styles.infoLabel}>Change Password</Text>
                 <MaterialIcons name="navigate-next" size={24} color="black" />
               </View>
-            </View>
-            <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>Account</Text>
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text style={styles.infoValue}>{name}</Text>
-                <MaterialIcons name="navigate-next" size={24} color="black" />
-              </View>
-            </View>
-            <View
-              style={styles.infoItem}
-              onTouchEnd={() =>
-                navigation.navigate("ChangePassword", { email: name })
-              }
-            >
-              <Text style={styles.infoLabel}>Change Password</Text>
-              <MaterialIcons name="navigate-next" size={24} color="black" />
             </View>
           </View>
-        </View>
 
-        {/* Logout Button */}
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={() => handleLogout()}
-        >
-          <Text style={styles.logoutText}>Log Out</Text>
-        </TouchableOpacity>
+          {/* Logout Button */}
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={() => handleLogout()}
+          >
+            <Text style={styles.logoutText}>Log Out</Text>
+          </TouchableOpacity>
 
-        {/* Edit Name Modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={editNameModalVisible}
-          onRequestClose={closeEditNameModal}
-        >
-          <TouchableWithoutFeedback onPress={closeEditNameModal}>
-            <View style={styles.editNameModalContainer}>
-              <TouchableWithoutFeedback>
-                <View style={styles.editNameContent}>
-                  <Text style={styles.editNameLabel}>Enter New Name</Text>
-                  <TextInput
-                    style={styles.editNameInput}
-                    placeholder={accountName}
-                    value={newName}
-                    onChangeText={(text) => setNewName(text)}
-                  />
-                  <View style={styles.button}>
-                    <TouchableOpacity
-                      style={styles.editNameButton}
-                      onPress={() => {
-                        handleNameChange();
-                        closeEditNameModal();
+          {/* Edit Name Modal */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={editNameModalVisible}
+            onRequestClose={closeEditNameModal}
+          >
+            <TouchableWithoutFeedback onPress={closeEditNameModal}>
+              <View style={styles.editNameModalContainer}>
+                <TouchableWithoutFeedback>
+                  <View style={styles.editNameContent}>
+                    <Text style={styles.editNameLabel}>Enter New Name</Text>
+                    {/* First Name Input */}
+                    <TextInput
+                      style={styles.editNameInput}
+                      placeholder="Enter first name"
+                      value={newFirstName}
+                      onChangeText={(text) => setNewFirstName(text)}
+                    />
+                    {/* Last Name Input */}
+                    <TextInput
+                      style={styles.editNameInput}
+                      placeholder="Enter last name"
+                      value={newLastName}
+                      onChangeText={(text) => setNewLastName(text)}
+                    />
+                    <View style={styles.button}>
+                      <TouchableOpacity
+                        style={styles.editNameButton}
+                        onPress={() => {
+                          handleNameChange();
+                          closeEditNameModal();
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontWeight: "bold",
+                            color: "green",
+                            fontSize: 16,
+                          }}
+                        >
+                          Save
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.editNameButton}
+                        onPress={closeEditNameModal}
+                      >
+                        <Text
+                          style={{
+                            fontWeight: "bold",
+                            color: "red",
+                            fontSize: 16,
+                          }}
+                        >
+                          Cancel
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+
+          {/* More Options Modal */}
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={moreOptionsModalVisible}
+            onRequestClose={closeMoreOptionsModal}
+          >
+            <TouchableWithoutFeedback onPress={closeMoreOptionsModal}>
+              <View style={styles.moreOptionsModalContainer}>
+                <View style={styles.moreOptionsButton}>
+                  <TouchableOpacity
+                    onPress={() => handleDeleteData()}
+                    style={{
+                      borderBottomWidth: 1,
+                      width: "100%",
+                      alignItems: "center",
+                      borderBottomColor: "#dddddd",
+                      paddingBottom: 20,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "red",
+                        fontWeight: "600",
+                        fontSize: 16,
                       }}
                     >
-                      <Text
-                        style={{
-                          fontWeight: "bold",
-                          color: "green",
-                          fontSize: 16,
-                        }}
-                      >
-                        Save
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.editNameButton}
-                      onPress={closeEditNameModal}
+                      Delete Data
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleDeleteAccount()}
+                    style={{ paddingTop: 20 }}
+                  >
+                    <Text
+                      style={{
+                        color: "red",
+                        fontWeight: "600",
+                        fontSize: 16,
+                      }}
                     >
-                      <Text
-                        style={{
-                          fontWeight: "bold",
-                          color: "red",
-                          fontSize: 16,
-                        }}
-                      >
-                        Cancel
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
+                      Delete Account
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-              </TouchableWithoutFeedback>
-            </View>
-          </TouchableWithoutFeedback>
-        </Modal>
-
-        {/* More Options Modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={moreOptionsModalVisible}
-          onRequestClose={closeMoreOptionsModal}
-        >
-          <TouchableWithoutFeedback onPress={closeMoreOptionsModal}>
-            <View style={styles.moreOptionsModalContainer}>
-              <View style={styles.moreOptionsButton}>
-                <TouchableOpacity
-                  onPress={() => handleDeleteData()}
-                  style={{
-                    borderBottomWidth: 1,
-                    width: "100%",
-                    alignItems: "center",
-                    borderBottomColor: "#dddddd",
-                    paddingBottom: 20,
-                  }}
-                >
-                  <Text
-                    style={{ color: "red", fontWeight: "600", fontSize: 16 }}
+                <View>
+                  <TouchableOpacity
+                    style={styles.moreOptionsButton}
+                    onPress={() => {
+                      closeMoreOptionsModal();
+                    }}
                   >
-                    Delete Data
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() =>
-                    handleDeleteAccount()
-                  }
-                  style={{ paddingTop: 20 }}
-                >
-                  <Text
-                    style={{ color: "red", fontWeight: "600", fontSize: 16 }}
-                   
-                  >
-                    Delete Account
-                  </Text>
-                </TouchableOpacity>
+                    <Text style={{ color: "red", fontSize: 16 }}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View>
-                <TouchableOpacity
-                  style={styles.moreOptionsButton}
-                  onPress={() => {
-                    closeMoreOptionsModal();
-                  }}
-                >
-                  <Text style={{ color: "red", fontSize: 16 }}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
-        </Modal>
-      </ScrollView>
-    </TouchableWithoutFeedback>
+            </TouchableWithoutFeedback>
+          </Modal>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </View>
   );
 };
 

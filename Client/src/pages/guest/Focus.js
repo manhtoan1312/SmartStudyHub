@@ -166,7 +166,6 @@ const Focus = () => {
       }
       if (storedSettings) {
         const parsedSettings = JSON.parse(storedSettings);
-        console.log(parsedSettings)
         setShortBreakTime(parsedSettings.shortBreakTime);
         setLongBreakTime(parsedSettings.longBreakTime);
         setBreakAfter(parsedSettings.breakAfter);
@@ -178,8 +177,8 @@ const Focus = () => {
           {
             key: "-",
             label: `Count down from ${
-              (pomodoroTimeString).padStart(2, "0")
-                ? (pomodoroTimeString).padStart(2, "0")
+              pomodoroTimeString.padStart(2, "0")
+                ? pomodoroTimeString.padStart(2, "0")
                 : "25"
             }:00 to 00:00`,
           },
@@ -232,18 +231,18 @@ const Focus = () => {
   const fetchWork = async () => {
     const work = await AsyncStorage.getItem("work");
     const typeWork = await AsyncStorage.getItem("workType");
-    const stop = await AsyncStorage.getItem("stop");
-
+    const stoped = await AsyncStorage.getItem("stop");
     if (work && typeWork) {
       const parse = JSON.parse(work);
       setTypeWork(typeWork);
       if (typeWork === "WORK") {
         setSelectedTask(parse);
         setSecondsLeftDefault(parseInt(parse.timeOfPomodoro) * 60);
-        setMinutes(parseInt(parse.timeOfPomodoro));
-        setSecondsLeft(parseInt(parse.timeOfPomodoro) * 60);
-        if (stop === "true") {
+        if (stoped === "true") {
           setSecondsLeft(parseInt(parse.timeOfPomodoro) * 60);
+          setMinutes(parseInt(parse.timeOfPomodoro));
+        } else {
+          setStop(false);
         }
       } else {
         setSelectedExtra(parse);
@@ -352,7 +351,6 @@ const Focus = () => {
         setMinutes(0);
         setSecondsLeft(0);
       } else {
-        console.log(parsedSettings.pomodoroTime * 60);
         setSecondsLeft(parsedSettings.pomodoroTime * 60);
       }
     }
@@ -484,18 +482,14 @@ const Focus = () => {
       await AsyncStorage.removeItem("work");
       await AsyncStorage.removeItem("workType");
       await AsyncStorage.setItem("stop", "true");
-      fetchSettings();
-      setSecondsLeft(secondLeftDefault);
-      setMinutes(secondLeftDefault / 60);
-      setSelectedExtra(null);
-      setSeconds(0);
-      setPercentage(100);
+      setIsPaused(true);
+      setStop(true);
+      resetData();
     } else {
       Alert.alert("Error when complete extra work", response.message);
     }
   };
   const handleDoneWork = async (id) => {
-    console.log(typeWorkSelect);
     if (typeWorkSelect === "WORK") {
       const response = await MarkCompleted(id);
       console.log(response);
@@ -503,6 +497,9 @@ const Focus = () => {
         await AsyncStorage.removeItem("work");
         await AsyncStorage.removeItem("workType");
         setSelectedTask(null);
+        setIsPaused(true);
+        setStop(true);
+        resetData();
       } else {
         Alert.alert("Error when complete work", response.message);
       }
@@ -512,6 +509,9 @@ const Focus = () => {
       if (response.success) {
         await AsyncStorage.removeItem("work");
         await AsyncStorage.removeItem("workType");
+        resetData();
+        setIsPaused(true);
+        setStop(true);
         setSelectedTask(null);
       } else {
         Alert.alert("Error when complete extra work", response.message);
@@ -531,7 +531,6 @@ const Focus = () => {
     setPercentage(100);
   };
   useEffect(() => {
-    setIsPaused(true);
     if (stop && selectedTask && type === "-") {
       setSecondsLeftDefault(selectedTask.timeOfPomodoro * 60);
       setSecondsLeft(selectedTask.timeOfPomodoro * 60);
