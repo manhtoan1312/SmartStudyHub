@@ -92,7 +92,7 @@ const CreateExtraWork = async (workId, extraWorkName) => {
 
   const MarkDelete = async (id) => {
     try {
-      const response = await fetch(`${uri}/delete/${id}`, {
+      const response = await fetch(`${uri}/mark-deleted/${id}`, {
         method: "delete",
         headers: {
           "Content-Type": "application/json",

@@ -696,7 +696,9 @@ const WorkDetail = ({ route, navigation }) => {
               {work.extraWorks.length > 0 &&
                 work.extraWorks.map((item) => (
                   <View style={styles.content} key={item.id}>
-                    <View style={{ flexDirection: "row", alignItems:'center' }}>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
                       <TouchableOpacity
                         onPress={() => CompletedExtraWork(item.id, item.status)}
                       >
@@ -761,17 +763,19 @@ const WorkDetail = ({ route, navigation }) => {
                     )}
                   </View>
                 ))}
-              <View style={styles.addExtraWorkContainer}>
-                <AntDesign name="plus" size={24} color="gray" />
-                <TextInput
-                  style={styles.extraWorkInput}
-                  placeholder="Add Extra Work"
-                  value={extraWorkName}
-                  onChangeText={(text) => setExtraWorkName(text)}
-                  returnKeyType="done"
-                  onSubmitEditing={addExtraWork}
-                />
-              </View>
+              {work.status === "ACTIVE" && (
+                <View style={styles.addExtraWorkContainer}>
+                  <AntDesign name="plus" size={24} color="gray" />
+                  <TextInput
+                    style={styles.extraWorkInput}
+                    placeholder="Add Extra Work"
+                    value={extraWorkName}
+                    onChangeText={(text) => setExtraWorkName(text)}
+                    returnKeyType="done"
+                    onSubmitEditing={addExtraWork}
+                  />
+                </View>
+              )}
             </View>
           </View>
           <View style={styles.namecontainer}>

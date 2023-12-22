@@ -166,24 +166,26 @@ const Focus = () => {
       }
       if (storedSettings) {
         const parsedSettings = JSON.parse(storedSettings);
+        console.log(parsedSettings)
         setShortBreakTime(parsedSettings.shortBreakTime);
         setLongBreakTime(parsedSettings.longBreakTime);
         setBreakAfter(parsedSettings.breakAfter);
         setAutoStartPo(parsedSettings.autoStartPo);
         setAutoStartBreak(parsedSettings.autoStartBreak);
         setDisableBreakTime(parsedSettings.disableBreakTime);
+        const pomodoroTimeString = String(parsedSettings.pomodoroTime);
         setTimerModeOptions([
           {
             key: "-",
             label: `Count down from ${
-              parsedSettings.pomodoroTime.padStart(2, "0")
-                ? parsedSettings.pomodoroTime.padStart(2, "0")
+              (pomodoroTimeString).padStart(2, "0")
+                ? (pomodoroTimeString).padStart(2, "0")
                 : "25"
             }:00 to 00:00`,
           },
           { key: "+", label: "Start the timer until I turn it off" },
         ]);
-        if (storedStop === "true") {
+        if (storedStop === "true" && parsedSettings) {
           setSecondsLeftDefault(parsedSettings.pomodoroTime * 60);
           setSecondsLeft(parsedSettings.pomodoroTime * 60);
           setMinutes(parsedSettings.pomodoroTime);
@@ -220,10 +222,13 @@ const Focus = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-      fetchSettings();
-      fetchWork();
+      fetchAll();
     }, [])
   );
+  const fetchAll = async () => {
+    await fetchSettings();
+    fetchWork();
+  };
   const fetchWork = async () => {
     const work = await AsyncStorage.getItem("work");
     const typeWork = await AsyncStorage.getItem("workType");
@@ -237,6 +242,9 @@ const Focus = () => {
         setSecondsLeftDefault(parseInt(parse.timeOfPomodoro) * 60);
         setMinutes(parseInt(parse.timeOfPomodoro));
         setSecondsLeft(parseInt(parse.timeOfPomodoro) * 60);
+        if (stop === "true") {
+          setSecondsLeft(parseInt(parse.timeOfPomodoro) * 60);
+        }
       } else {
         setSelectedExtra(parse);
       }

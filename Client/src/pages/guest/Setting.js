@@ -51,12 +51,8 @@ export default function Setting({ navigation }) {
     React.useCallback(() => {
       const fetchSettings = async () => {
         try {
-          getRole().then((role) => {
-            if (role) {
-              const shortenedEmail = role.email ? role.email.split("@")[0] : "";
-              setEmail(shortenedEmail);
-            }
-          });
+          const nameAcc = await AsyncStorage.getItem('accountName')
+          setEmail(nameAcc ? nameAcc : '')
           const storedImg = await AsyncStorage.getItem("img");
           setImg(storedImg ? storedImg : null);
           const storedSettings = await AsyncStorage.getItem("settings");
@@ -282,7 +278,7 @@ export default function Setting({ navigation }) {
     }
   };
 
-  const handleHeader = () => {
+  const   handleHeader = () => {
     if (email) {
       toInfor();
     } else {
@@ -307,21 +303,21 @@ export default function Setting({ navigation }) {
             style={s`w-12 h-12 rounded-3xl`}
           />
         </View>
-        <View style={s`flex flex-col px-2`}>
-          <View style={s`flex flex-row items-center`}>
-            <View style={s`mr-2`} onTouchEnd={() => handleHeader()}>
+        <TouchableOpacity onPress={() => handleHeader()} style={s`flex flex-col px-2`}>
+          <TouchableOpacity onPress={() => handleHeader()} style={s`flex flex-row items-center`}>
+            <View style={s`mr-2`} >
               {!email ? (
                 <Text style={s` text-lg font-medium`}>Sign In | Sign Up</Text>
               ) : (
                 <Text style={s` text-lg font-medium`}>{email}</Text>
               )}
             </View>
-          </View>
+          </TouchableOpacity>
 
           <View style={s`mt-1`}>
             <Text>Sync all devices</Text>
           </View>
-        </View>
+        </TouchableOpacity>
       </View>
 
       <View
