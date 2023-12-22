@@ -51,17 +51,14 @@ const UpdateWork = async (
   workName,
   priority,
   dueDate,
-  numberOfPomodoro,
-  timeOfPomodoro,
+  timeWillStart,
+  timeWillAnnounce,
+  numberOfPomodoros,
   isRemindered,
   isRepeated,
-  timePassed,
   note,
-  startTime,
-  endTime,
-  numberOfPomodorosDone,
   status,
-  assigneeId
+  tags
 ) => {
   try {
     const response = await fetch(`${uri}/update`, {
@@ -77,17 +74,14 @@ const UpdateWork = async (
         workName,
         priority,
         dueDate,
-        numberOfPomodoro,
-        timeOfPomodoro,
+        timeWillStart,
+        timeWillAnnounce,
+        numberOfPomodoros,
         isRemindered,
         isRepeated,
-        timePassed,
         note,
-        startTime,
-        endTime,
-        numberOfPomodorosDone,
         status,
-        assigneeId,
+        tags,
       }),
     });
 
@@ -334,15 +328,12 @@ const GetWorkByDate = async (date, id) => {
 
 const GetWorkCompleted = async (id) => {
   try {
-    const response = await fetch(
-      `${uri}/get-work-completed?userId=${id}`,
-      {
-        method: "get",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${uri}/get-work-completed?userId=${id}`, {
+      method: "get",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     const data = await response.json();
     if (response.status === 200) {
@@ -358,15 +349,12 @@ const GetWorkCompleted = async (id) => {
 
 const GetWorkDeleted = async (id) => {
   try {
-    const response = await fetch(
-      `${uri}/get-work-deleted?userId=${id}`,
-      {
-        method: "get",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${uri}/get-work-deleted?userId=${id}`, {
+      method: "get",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     const data = await response.json();
     if (response.status === 200) {
@@ -394,5 +382,5 @@ export {
   GetWorkByPriority,
   GetWorkByType,
   GetWorkCompleted,
-  GetWorkDeleted
+  GetWorkDeleted,
 };

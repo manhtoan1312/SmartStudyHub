@@ -13,6 +13,7 @@ import { GetProjectForAddFolder } from "../../services/Guest/ProjectService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect } from "react";
 import { CreateFolder } from "../../services/Guest/FolderService";
+import ImageFocus from "../../components/Image_Focus";
 
 const AddFolder = ({ navigation }) => {
   const [color, setColor] = useState("#FF1493");
@@ -164,6 +165,7 @@ const AddFolder = ({ navigation }) => {
           </View>
         ))}
       </View>
+      <ImageFocus />
     </View>
   );
 };

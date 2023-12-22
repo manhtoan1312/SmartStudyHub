@@ -1,8 +1,15 @@
-import React from "react";
-import { View, Text, StyleSheet, ImageBackground, Dimensions, TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { useCallback, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ImageBackground,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import useTimerService from "../hooks/useTimerService";
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get("window");
 const ImageFocus = () => {
   const navigation = useNavigation();
   const timerService = useTimerService();
@@ -11,10 +18,12 @@ const ImageFocus = () => {
     timerService.stopTimer();
     navigation.navigate("Focus");
   };
-
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => toPomodoro()} style={styles.imageContainer}>
+      <TouchableOpacity
+        onPress={() => toPomodoro()}
+        style={styles.imageContainer}
+      >
         <ImageBackground
           source={require("../images/bg_focus_1.jpg")}
           resizeMode="center"
@@ -36,11 +45,11 @@ const styles = StyleSheet.create({
   container: {
     position: "absolute",
     bottom: 0,
-    right: screenWidth/2-30,
+    right: screenWidth / 2 - 30,
     justifyContent: "center",
     alignItems: "center",
-    flex:1,
-    width: 60
+    flex: 1,
+    width: 60,
   },
   imageContainer: {
     width: 60,

@@ -77,7 +77,6 @@ const TagDetail = ({ route, navigation }) => {
       const parsedData = JSON.parse(settings);
       time = parsedData.pomodoroTime;
     }
-    console.log(numberOfPomodoros)
     if (workName) {
       const tagslist = tags.map((id) => ({ "id": id }))
       console.log(id,
@@ -196,7 +195,7 @@ const TagDetail = ({ route, navigation }) => {
           closeKeyboard={closeKeyboard}
           keyboardHeight={keyboardHeight}
           handlecloseKeyboard={handleClosekeyboard}
-          tagId={tag.id}
+          tagId={tag}
         />
       )}
       <ImageFocus />

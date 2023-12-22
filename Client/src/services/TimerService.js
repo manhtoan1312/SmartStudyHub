@@ -74,6 +74,7 @@ class TimerService {
         extraId = parseWork.workId;
       }
     }
+    console.log(timePo);
     const response = await CreatePomodoro(
       id,
       workid,
@@ -85,8 +86,8 @@ class TimerService {
     if (!response.success) {
       Alert.alert("Error!!", response.message);
     } else {
-      this.playSound()
-      console.log(response.data)
+      this.playSound();
+      console.log(response.data);
       await AsyncStorage.setItem("startTime", new Date().getTime().toString());
     }
   }
@@ -129,6 +130,11 @@ class TimerService {
       const minutesLeft = await AsyncStorage.getItem("minutesLeft");
       const countPomodoro = await AsyncStorage.getItem("countPomodoro");
       const mode = await AsyncStorage.getItem("mode");
+      const storedSettings = await AsyncStorage.getItem("settings");
+      if (storedSettings) {
+        const setting = JSON.parse(storedSettings);
+        this.timeOfPomodoro = setting.pomodoroTime;
+      }
       if (minutesLeft) {
         this.minutesLeft = parseInt(minutesLeft);
         this.secondLeftRef = this.minutesLeft * 60;

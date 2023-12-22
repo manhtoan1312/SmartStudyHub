@@ -104,17 +104,18 @@ const Focus = () => {
     const sTime = await AsyncStorage.getItem("startTime");
     console.log(sTime)
     let workid = null;
+    let extraId = null
     if (selectedTask) {
       workid = selectedTask.id;
     }
     if (selectedExtra) {
-      workid = selectedExtra.workId;
+      extraId = selectedExtra.id;
     }
     const response = await CreatePomodoro(
       id,
       workid,
-      selectedExtra?.id ? selectedExtra?.id : null,
-      selectedTask ? selectedTask.timeOfPomodoro : initialPomodoroTime,
+      extraId,
+      selectedTask ? selectedTask.timeOfPomodoro : secondLeftDefault/60,
       parseInt(sTime),
       endTime
     );
@@ -297,10 +298,14 @@ const Focus = () => {
 
   const startFocus = () => {
     if (stop && secondsLeft === secondLeftDefault) {
-      setInitialPomodoroTime(minutes);
+      if(selectedTask){
+        saveToAsyncStorage("initialPomodoroTime", selectedTask.timeOfPomodoro);
+      }
+      else{
+        saveToAsyncStorage("initialPomodoroTime", secondLeftDefault/60);
+      }
       setStartTime(new Date().getTime());
       setStop(!stop);
-      saveToAsyncStorage("initialPomodoroTime", minutes);
       saveToAsyncStorage("startTime", new Date().getTime().toString());
     }
     setIsPaused(!isPaused);
@@ -449,7 +454,7 @@ const Focus = () => {
       await AsyncStorage.setItem("mode", type);
       saveToAsyncStorage("stop", stop);
 
-      navigation.navigate("Home");
+      navigation.goBack()
     } catch (error) {
       console.log(error);
       Alert.alert(
@@ -485,14 +490,28 @@ const Focus = () => {
     }
   };
   const handleDoneWork = async (id) => {
-    const response = await MarkCompleted(id);
-    console.log(response);
-    if (response.success) {
-      await AsyncStorage.removeItem("work");
-      await AsyncStorage.removeItem("workType");
-      setSelectedTask(null);
-    } else {
-      Alert.alert("Error when complete work", response.message);
+    console.log(typeWorkSelect)
+    if(typeWorkSelect ==='WORK'){
+      const response = await MarkCompleted(id);
+      console.log(response);
+      if (response.success) {
+        await AsyncStorage.removeItem("work");
+        await AsyncStorage.removeItem("workType");
+        setSelectedTask(null);
+      } else {
+        Alert.alert("Error when complete work", response.message);
+      }
+    }
+    else{
+      const response = await ExtraMarkCompleted(id);
+      console.log(response);
+      if (response.success) {
+        await AsyncStorage.removeItem("work");
+        await AsyncStorage.removeItem("workType");
+        setSelectedTask(null);
+      } else {
+        Alert.alert("Error when complete extra work", response.message);
+      }
     }
   };
   const handleClose = async () => {
@@ -511,6 +530,7 @@ const Focus = () => {
     setIsPaused(true);
     if (stop && selectedTask && type === "-") {
       setSecondsLeftDefault(selectedTask.timeOfPomodoro * 60);
+      setSecondsLeft(selectedTask.timeOfPomodoro * 60)
       setPercentage(100);
     }
     if (type === "+") {

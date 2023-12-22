@@ -37,7 +37,7 @@ const AddWorkModal = ({
   const [listproject, setListProject] = useState([]);
   const [tag, setListTag] = useState(null);
   const [isPriorityModalVisible, setIsPriorityModalVisible] = useState(false);
-  const [prioritSelect, setPriority] = useState(priority ? priority : null);
+  const [prioritSelect, setPriority] = useState(priority ? priority : 'NONE');
   const [isProjectListModalVisible, setIsProjectListModalVisible] =
     useState(false);
   const [selectedProject, setSelectedProject] = useState(
@@ -104,7 +104,9 @@ const AddWorkModal = ({
       selectedDate.getMonth(),
       selectedDate.getDate() + 1
     );
-
+      if(!prioritSelect){
+        setPriority('NONE')
+      }
     onDone(
       selectedProject.id,
       prioritSelect,

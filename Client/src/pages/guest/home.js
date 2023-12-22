@@ -149,6 +149,7 @@ export default function Home({ navigation }) {
             getRole().then((role) => {
               if (role) {
                 setEmail(role.name);
+                console.log(role.token)
                 const setName = async () => {
                   await AsyncStorage.setItem("accountName", role.name);
                 };

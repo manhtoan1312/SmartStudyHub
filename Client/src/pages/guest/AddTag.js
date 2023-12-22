@@ -4,6 +4,7 @@ import { Text, TextInput, View, TouchableOpacity, StyleSheet, Alert } from "reac
 import { AntDesign, Fontisto } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CreateTag } from "../../services/Guest/TagService";
+import ImageFocus from "../../components/Image_Focus";
 
 const AddTag = ({ navigation }) => {
   const [color, setColor] = useState("#FF1493");
@@ -75,6 +76,7 @@ const AddTag = ({ navigation }) => {
           </View>
         ))}
       </View>
+      <ImageFocus />
     </View>
   );
 };

@@ -4,6 +4,7 @@ import { Text, TextInput, View, TouchableOpacity, StyleSheet, Alert } from "reac
 import { Fontisto } from "@expo/vector-icons";
 import { CreateProject } from "../../services/Guest/ProjectService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import ImageFocus from "../../components/Image_Focus";
 
 const AddProject = ({ navigation }) => {
   const [color, setColor] = useState("#FF1493");
@@ -75,6 +76,7 @@ const AddProject = ({ navigation }) => {
           </View>
         ))}
       </View>
+      <ImageFocus />
     </View>
   );
 };

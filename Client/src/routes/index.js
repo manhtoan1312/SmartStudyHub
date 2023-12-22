@@ -38,9 +38,9 @@ import TaskDefault from "../pages/guest/TaskDefault";
 import FolderDetail from "../pages/guest/FolderDetail";
 import Out from "../pages/guest/Out";
 import TagDetail from "../pages/guest/TagDetail";
-import WorkDetai from "../pages/guest/WorkDetai";
 import DoneDetail from "../pages/guest/DoneDetail";
 import DeletedDetail from "../pages/guest/Deleted";
+import WorkDetail from "../pages/guest/WorkDetail";
 
 const Stack = createStackNavigator();
 
@@ -82,7 +82,7 @@ const Navigator = () => (
     <Stack.Screen name="FolderDetail" component={FolderDetail} />
     <Stack.Screen name="OutOfDate" component={Out} />
     <Stack.Screen name="TagDetail" component={TagDetail} />
-    <Stack.Screen name="UpdateWork" component={ComingSoonScreen} />
+    <Stack.Screen name="UpdateWork" component={WorkDetail} />
     <Stack.Screen name="Done" component={DoneDetail} />
     <Stack.Screen name="Deleted" component={DeletedDetail} />
   </Stack.Navigator>

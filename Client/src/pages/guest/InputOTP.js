@@ -16,8 +16,8 @@ function InputOTP({ route, navigation }) {
   const [otpInput, setOtpInput] = useState("");
   const [resendDisabled, setResendDisabled] = useState(true);
   const [countdown, setCountdown] = useState(60);
-  let expiredTime = time
-  let otp = otpCode
+  let expiredTime = time;
+  let otp = otpCode;
   useEffect(() => {
     let interval;
     if (countdown > 0 && resendDisabled) {
@@ -45,12 +45,12 @@ function InputOTP({ route, navigation }) {
           id
         );
         Alert.alert("Announce", response.message);
-        navigation.navigate('Login')
+        navigation.navigate("Login");
       } else {
         Alert.alert("Invalid OTP", "Please enter the correct OTP.");
       }
     } else {
-      console.log(currentTime, expiredTime)
+      console.log(currentTime, expiredTime);
       Alert.alert("OTP Expired", "The OTP has expired. Please resend OTP.");
     }
   };
@@ -59,8 +59,8 @@ function InputOTP({ route, navigation }) {
     if (!resendDisabled) {
       const newResponse = await ResendOTP(email);
       if (newResponse.success) {
-        otp= newResponse.data.otpCode
-        expiredTime = newResponse.data.otpTimeExpiration
+        otp = newResponse.data.otpCode;
+        expiredTime = newResponse.data.otpTimeExpiration;
         setCountdown(60);
         setResendDisabled(true);
       } else {

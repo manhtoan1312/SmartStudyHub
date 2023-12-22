@@ -7,12 +7,12 @@ const useTimerService = () => {
 
   useFocusEffect(
     useCallback(() => {
-    timerService.toggleTimer();
-    return () => {
-      timerService.stopTimer();
-    };
-  }, [timerService]))
-
+      timerService.toggleTimer();
+      return () => {
+        timerService.stopTimer();
+      };
+    }, [timerService])
+  );
   return timerService;
 };
 
