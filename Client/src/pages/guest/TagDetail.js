@@ -22,6 +22,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CreateWork } from "../../services/Guest/WorkService";
 import { GetTagDetail } from "../../services/Guest/TagService";
 import ImageFocus from "../../components/Image_Focus";
+import { useIsFocused } from "@react-navigation/native";
 const TagDetail = ({ route, navigation }) => {
   const id = route.params.id;
   const [tag, setTag] = useState(null);
@@ -30,6 +31,15 @@ const TagDetail = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [closeKeyboard, setCloseKeyboard] = useState(false);
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    const fetchDataOnFocus = async () => {
+      if (isFocused) {
+        await fetchData();
+      }
+    };
+    fetchDataOnFocus();
+  }, [isFocused]);
   useEffect(() => {
     fetchData();
     const keyboardDidShowListener = Keyboard.addListener(

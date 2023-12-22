@@ -90,6 +90,7 @@ const FolderComponent = ({
                   colorCode={project.colorCode}
                   totalTimeWork={project.totalTimeWork}
                   TotalWorkActive={project.totalWorkActive}
+                  reload={reload}
                 />
               </View>
             ))}

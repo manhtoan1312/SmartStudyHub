@@ -16,7 +16,7 @@ import {
 import { useState } from "react";
 import { DeleteWork, MarkCompleted } from "../services/Guest/WorkService";
 import { Audio } from "expo-av";
-import { ExtraMarkCompleted } from "../services/Guest/ExtraWork";
+import { ExtraMarkCompleted, RecoverExtraWork } from "../services/Guest/ExtraWork";
 import { Swipeable } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 

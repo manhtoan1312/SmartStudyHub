@@ -37,7 +37,7 @@ const AddWorkModal = ({
   const [listproject, setListProject] = useState([]);
   const [tag, setListTag] = useState(null);
   const [isPriorityModalVisible, setIsPriorityModalVisible] = useState(false);
-  const [prioritSelect, setPriority] = useState(priority ? priority : 'NONE');
+  const [prioritSelect, setPriority] = useState(priority ? priority : "NONE");
   const [isProjectListModalVisible, setIsProjectListModalVisible] =
     useState(false);
   const [selectedProject, setSelectedProject] = useState(
@@ -56,12 +56,10 @@ const AddWorkModal = ({
     if (response.success) {
       setListTag(response.data);
     } else {
-      Alert.alert("get list tag error", response.message);
     }
     if (rs.success) {
       setListProject(rs.data);
     } else {
-      Alert.alert("get list project error", rs.message);
     }
   };
   useEffect(() => {
@@ -104,17 +102,28 @@ const AddWorkModal = ({
       selectedDate.getMonth(),
       selectedDate.getDate() + 1
     );
-      if(!prioritSelect){
-        setPriority('NONE')
-      }
-    onDone(
-      selectedProject.id,
-      prioritSelect,
-      selectedDateWithoutTime.getTime() - 1,
-      selectedDate.getTime(),
-      selectedClockIndex == -1 ? 0 : selectedClockIndex,
-      selectedTag.map((tag) => tag.id)
-    );
+    if (!prioritSelect) {
+      setPriority("NONE");
+    }
+    if (type === "SOMEDAY") {
+      onDone(
+        selectedProject.id,
+        prioritSelect,
+        null,
+        selectedDate.getTime(),
+        selectedClockIndex == -1 ? 0 : selectedClockIndex,
+        selectedTag.map((tag) => tag.id)
+      );
+    } else {
+      onDone(
+        selectedProject.id,
+        prioritSelect,
+        selectedDateWithoutTime.getTime() - 1,
+        selectedDate.getTime(),
+        selectedClockIndex == -1 ? 0 : selectedClockIndex,
+        selectedTag.map((tag) => tag.id)
+      );
+    }
   };
 
   const handleTouchablePress = () => {

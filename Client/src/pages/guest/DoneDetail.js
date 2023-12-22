@@ -17,12 +17,22 @@ import WorkCompleted from "../../components/WorkCompleted";
 import ImageFocus from "../../components/Image_Focus";
 import PomodoroCompleted from "../../components/PomodoroCompleted";
 import ProjectDone from "../../components/ProjectDone";
+import { useIsFocused } from "@react-navigation/native";
 const DoneDetail = ({ navigation }) => {
   const [listwork, setListWork] = useState();
   const [listPomodoro, setListPomodoro] = useState();
   const [listProject, setListProject] = useState();
   const [selectedCategory, setSelectedCategory] = useState("Work");
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    const fetchDataOnFocus = async () => {
+      if (isFocused) {
+        await fetchData();
+      }
+    };
+    fetchDataOnFocus();
+  }, [isFocused]);
   const fetchData = async () => {
     fetchWork();
     fetchPomodoro();

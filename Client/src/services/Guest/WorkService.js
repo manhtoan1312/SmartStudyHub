@@ -54,11 +54,13 @@ const UpdateWork = async (
   timeWillStart,
   timeWillAnnounce,
   numberOfPomodoros,
+  timeOfPomodoro,
   isRemindered,
   isRepeated,
   note,
   status,
-  tags
+  tags,
+  extraWorks
 ) => {
   try {
     const response = await fetch(`${uri}/update`, {
@@ -77,11 +79,13 @@ const UpdateWork = async (
         timeWillStart,
         timeWillAnnounce,
         numberOfPomodoros,
+        timeOfPomodoro,
         isRemindered,
         isRepeated,
         note,
         status,
         tags,
+        extraWorks
       }),
     });
 

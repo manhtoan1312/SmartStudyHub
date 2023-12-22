@@ -102,9 +102,9 @@ const Focus = () => {
     const endTime = new Date().getTime();
     const id = await AsyncStorage.getItem("id");
     const sTime = await AsyncStorage.getItem("startTime");
-    console.log(sTime)
+    console.log(sTime);
     let workid = null;
-    let extraId = null
+    let extraId = null;
     if (selectedTask) {
       workid = selectedTask.id;
     }
@@ -115,7 +115,7 @@ const Focus = () => {
       id,
       workid,
       extraId,
-      selectedTask ? selectedTask.timeOfPomodoro : secondLeftDefault/60,
+      selectedTask ? selectedTask.timeOfPomodoro : secondLeftDefault / 60,
       parseInt(sTime),
       endTime
     );
@@ -236,11 +236,9 @@ const Focus = () => {
         setSelectedTask(parse);
         setSecondsLeftDefault(parseInt(parse.timeOfPomodoro) * 60);
         setMinutes(parseInt(parse.timeOfPomodoro));
+        setSecondsLeft(parseInt(parse.timeOfPomodoro) * 60);
       } else {
         setSelectedExtra(parse);
-      }
-      if (stop === "true") {
-        setSecondsLeft(parseInt(parse.timeOfPomodoro) * 60);
       }
     }
   };
@@ -298,11 +296,10 @@ const Focus = () => {
 
   const startFocus = () => {
     if (stop && secondsLeft === secondLeftDefault) {
-      if(selectedTask){
+      if (selectedTask) {
         saveToAsyncStorage("initialPomodoroTime", selectedTask.timeOfPomodoro);
-      }
-      else{
-        saveToAsyncStorage("initialPomodoroTime", secondLeftDefault/60);
+      } else {
+        saveToAsyncStorage("initialPomodoroTime", secondLeftDefault / 60);
       }
       setStartTime(new Date().getTime());
       setStop(!stop);
@@ -454,7 +451,7 @@ const Focus = () => {
       await AsyncStorage.setItem("mode", type);
       saveToAsyncStorage("stop", stop);
 
-      navigation.goBack()
+      navigation.goBack();
     } catch (error) {
       console.log(error);
       Alert.alert(
@@ -490,8 +487,8 @@ const Focus = () => {
     }
   };
   const handleDoneWork = async (id) => {
-    console.log(typeWorkSelect)
-    if(typeWorkSelect ==='WORK'){
+    console.log(typeWorkSelect);
+    if (typeWorkSelect === "WORK") {
       const response = await MarkCompleted(id);
       console.log(response);
       if (response.success) {
@@ -501,8 +498,7 @@ const Focus = () => {
       } else {
         Alert.alert("Error when complete work", response.message);
       }
-    }
-    else{
+    } else {
       const response = await ExtraMarkCompleted(id);
       console.log(response);
       if (response.success) {
@@ -530,7 +526,7 @@ const Focus = () => {
     setIsPaused(true);
     if (stop && selectedTask && type === "-") {
       setSecondsLeftDefault(selectedTask.timeOfPomodoro * 60);
-      setSecondsLeft(selectedTask.timeOfPomodoro * 60)
+      setSecondsLeft(selectedTask.timeOfPomodoro * 60);
       setPercentage(100);
     }
     if (type === "+") {
@@ -620,7 +616,7 @@ const Focus = () => {
               <View style={styles.taskDetailsContainer}>
                 <View style={styles.taskDetails}>
                   <Text style={styles.workName}>
-                    {selectedTask.extraWorkName}
+                    {selectedExtra.extraWorkName}
                   </Text>
                 </View>
               </View>

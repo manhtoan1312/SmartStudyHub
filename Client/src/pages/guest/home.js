@@ -9,6 +9,7 @@ import {
   Alert,
   Animated,
   TouchableOpacity,
+  Linking,
 } from "react-native";
 import { s } from "react-native-wind";
 import {
@@ -28,6 +29,7 @@ import getRole from "../../services/RoleService";
 import {
   CheckMaxProject,
   GetProjectByStatus,
+  GetProjectForAddFolder,
 } from "../../services/Guest/ProjectService";
 import { CreateGuest } from "../../services/GuestService";
 import {
@@ -149,7 +151,7 @@ export default function Home({ navigation }) {
             getRole().then((role) => {
               if (role) {
                 setEmail(role.name);
-                console.log(role.token)
+                console.log(role.token);
                 const setName = async () => {
                   await AsyncStorage.setItem("accountName", role.name);
                 };
@@ -186,7 +188,7 @@ export default function Home({ navigation }) {
       if (isFocused) {
         await fetchDataFPT();
       }
-    }
+    };
     fetchDataOnFocus();
   }, [isFocused]);
   const convertMinutesToHoursAndMinutes = (totalMinutes) => {
@@ -217,7 +219,7 @@ export default function Home({ navigation }) {
           rsHighPriority,
         ] = await Promise.all([
           GetAllFolder(id),
-          GetProjectByStatus(id, "ACTIVE"),
+          GetProjectForAddFolder(id),
           GetAllTagOfUser(id),
           GetWorkByType("TODAY", id),
           outOfDate && GetWorkByType("OUTOFDATE", id),
@@ -326,14 +328,12 @@ export default function Home({ navigation }) {
             });
           }
           if (!rsFolder.success) {
-            Alert.alert("Geting user's folder error", rsFolder.message);
+            
           } else {
             setFolder(rsFolder.data);
           }
           if (rsProject.success) {
             setProject(rsProject.data);
-          } else {
-            Alert.alert("Error when get project", rsProject.message);
           }
           if (rsTag.success) {
             setTag(rsTag.data);
@@ -728,7 +728,10 @@ export default function Home({ navigation }) {
             </TouchableOpacity>
           )}
           {deleted && (
-            <TouchableOpacity onPress={() => navigation.navigate("Deleted")} style={styles.headers}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Deleted")}
+              style={styles.headers}
+            >
               <View style={styles.row}>
                 <EvilIcons name="trash" size={24} color="red" />
                 <Text>Deleted</Text>

@@ -68,6 +68,8 @@ const WorkDetail = ({ route, navigation }) => {
 
   const fetchData = async () => {
     try {
+      setNote("");
+      setExtraWorkName("");
       const Userid = await AsyncStorage.getItem("id");
       const [workResponse, listProjectResponse] = await Promise.all([
         GetDetailWork(id),
@@ -96,7 +98,7 @@ const WorkDetail = ({ route, navigation }) => {
   };
 
   const handleDelete = async () => {
-    await updateWork()
+    await updateWork();
     const response = await DeleteWork(id);
     if (response.success) {
       navigation.goBack();
@@ -252,6 +254,7 @@ const WorkDetail = ({ route, navigation }) => {
   };
   const changePomodoro = (time, pomo) => {
     const updateWork = { ...work };
+    console.log(time, pomo);
     updateWork.numberOfPomodoros = time;
     updateWork.timeOfPomodoro = pomo;
     setWork(updateWork);
@@ -312,28 +315,56 @@ const WorkDetail = ({ route, navigation }) => {
   }
   const updateWork = async () => {
     try {
-      const updatedWork = { ...work };
-      updatedWork.note = note;
-      updatedWork.tags = listTagSelected.map((tag) => ({ id: tag.id }));
+      const updatedWorkdata = { ...work };
+      updatedWorkdata.note = note;
+      updatedWorkdata.tags = listTagSelected.map((tag) => ({ id: tag.id }));
+      updatedWorkdata.extraWorks = updatedWorkdata.extraWorks.map((extra) => ({
+        id: extra.id,
+      }));
       const response = await UpdateWork(
-        updatedWork.id,
-        updateWork.userId,
-        updateWork.projectId,
+        updatedWorkdata.id,
+        updatedWorkdata.userId,
+        updatedWorkdata.projectId ? updatedWorkdata.projectId : null,
         null,
-        updateWork.workName,
-        updateWork.priority,
-        updateWork.dueDate,
-        updateWork.timeWillStart,
-        updateWork.timeWillAnnounce,
-        updateWork.numberOfPomodoros,
-        updateWork.isRemindered ? updateWork.isRemindered : false,
+        updatedWorkdata.workName,
+        updatedWorkdata.priority,
+        updatedWorkdata.dueDate,
+        updatedWorkdata.timeWillStart,
+        updatedWorkdata.timeWillAnnounce
+          ? updatedWorkdata.timeWillAnnounce
+          : null,
+        updatedWorkdata.numberOfPomodoros,
+        updatedWorkdata.timeOfPomodoro,
+        updatedWorkdata.isRemindered ? updatedWorkdata.isRemindered : false,
         false,
-        updateWork.note ? updateWork.note : "",
-        updateWork.status,
-        updateWork.tags
+        note,
+        updatedWorkdata.status,
+        updatedWorkdata.tags,
+        updatedWorkdata.extraWorks
+      );
+      console.log(
+        updatedWorkdata.id,
+        updatedWorkdata.userId,
+        updatedWorkdata.projectId ? updatedWorkdata.projectId : null,
+        null,
+        updatedWorkdata.workName,
+        updatedWorkdata.priority,
+        updatedWorkdata.dueDate,
+        updatedWorkdata.timeWillStart,
+        updatedWorkdata.timeWillAnnounce
+          ? updatedWorkdata.timeWillAnnounce
+          : null,
+        updatedWorkdata.numberOfPomodoros,
+        updatedWorkdata.timeOfPomodoro,
+        updatedWorkdata.isRemindered ? updatedWorkdata.isRemindered : false,
+        false,
+        updatedWorkdata.note ? updatedWorkdata.note : "",
+        updatedWorkdata.status,
+        updatedWorkdata.tags,
+        updatedWorkdata.extraWorks
       );
       if (response.success) {
-        console.log('thanh cong')
+        console.log(response.data);
       } else {
         Alert.alert("Update Work Error", response.message);
       }
@@ -664,8 +695,8 @@ const WorkDetail = ({ route, navigation }) => {
             <View>
               {work.extraWorks.length > 0 &&
                 work.extraWorks.map((item) => (
-                  <View style={styles.extraWorkItem} key={item.id}>
-                    <View style={{ flexDirection: "row" }}>
+                  <View style={styles.content} key={item.id}>
+                    <View style={{ flexDirection: "row", alignItems:'center' }}>
                       <TouchableOpacity
                         onPress={() => CompletedExtraWork(item.id, item.status)}
                       >
@@ -673,7 +704,7 @@ const WorkDetail = ({ route, navigation }) => {
                           <AntDesign
                             style={{ marginRight: 5 }}
                             name="checkcircle"
-                            size={20}
+                            size={24}
                             color="#00cc00"
                           />
                         ) : (
@@ -682,8 +713,14 @@ const WorkDetail = ({ route, navigation }) => {
                           />
                         )}
                       </TouchableOpacity>
-                      <View style={{ alignItems: "center" }}>
-                        <Text>{item.extraWorkName}</Text>
+                      <View style={{ paddingLeft: 10 }}>
+                        <View
+                          style={{
+                            alignItems: "center",
+                          }}
+                        >
+                          <Text>{item.extraWorkName}</Text>
+                        </View>
                         {item.numberOfPomodoros > 0 && (
                           <View
                             style={{
@@ -706,21 +743,18 @@ const WorkDetail = ({ route, navigation }) => {
                       </View>
                     </View>
                     {item.status === "ACTIVE" ? (
-                      <TouchableOpacity
-                        onPress={() => playExtra(item)}
-                        style={styles.playButton}
-                      >
+                      <TouchableOpacity onPress={() => playExtra(item)}>
                         <Ionicons
                           name="ios-play-circle-sharp"
-                          size={26}
+                          size={28}
                           color="#ff3232"
                         />
                       </TouchableOpacity>
                     ) : (
-                      <TouchableOpacity style={styles.playButton}>
+                      <TouchableOpacity>
                         <AntDesign
                           name="checkcircle"
-                          size={26}
+                          size={24}
                           color="#00cc00"
                         />
                       </TouchableOpacity>
@@ -903,11 +937,9 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   extraWorkItem: {
-    paddingLeft: 5,
+    width: "auto",
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 10,
-    marginRight: 10,
   },
   rightActions: {
     padding: 10,

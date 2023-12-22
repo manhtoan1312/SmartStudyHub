@@ -23,6 +23,7 @@ import { CreateWork } from "../../services/Guest/WorkService";
 import { GetDetailFolder } from "../../services/Guest/FolderService";
 import Focus from "./Focus";
 import ImageFocus from "../../components/Image_Focus";
+import { useIsFocused } from "@react-navigation/native";
 const FolderDetail = ({ route, navigation }) => {
   const id = route.params.id;
   const [project, setProject] = useState(null);
@@ -31,6 +32,15 @@ const FolderDetail = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [closeKeyboard, setCloseKeyboard] = useState(false);
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    const fetchDataOnFocus = async () => {
+      if (isFocused) {
+        await fetchData();
+      }
+    };
+    fetchDataOnFocus();
+  }, [isFocused]);
   useEffect(() => {
     fetchData();
     const keyboardDidShowListener = Keyboard.addListener(
@@ -78,7 +88,6 @@ const FolderDetail = ({ route, navigation }) => {
       const parsedData = JSON.parse(settings);
       time = parsedData.pomodoroTime;
     }
-    console.log(numberOfPomodoros);
     if (workName) {
       const tagslist = tags.map((id) => ({ id: id }));
       console.log(

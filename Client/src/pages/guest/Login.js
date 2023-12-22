@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -24,6 +24,47 @@ function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [hide, setHide] = useState(true);
+  const unsubscribeRef = useRef(null);
+
+  useEffect(() => {
+    const handleUrlChange = async ({ url }) => {
+      const tokenIndex = url.indexOf("token=");
+      if (tokenIndex !== -1) {
+        const token = url.slice(tokenIndex + 6);
+        const decodedToken = jwt_decode(token);
+        const subArray = decodedToken.sub.split("-");
+        const id = subArray[0];
+        await AsyncStorage.setItem('token', tokenIndex)
+        await AsyncStorage.setItem("id", id);
+        const firstName = subArray[subArray.length - 1].trim().split(" ")[0];
+        const lastName = subArray[subArray.length - 1].trim().split(" ")[1];
+        console.log(id, token, firstName, lastName)
+        await AsyncStorage.setItem("accountName", `${lastName} ${firstName}`);
+        navigation.navigate("Home");
+      } else if (url.includes("account-deleted")) {
+        Alert.alert(
+          "Your account has been deleted",
+          "Do you want to recover your account?",
+          [
+            { text: "No", style: "cancel" },
+            { text: "Yes", onPress: () => navigation.navigate("Recover") },
+          ]
+        );
+      } else if (url.includes("account-banned")) {
+        Alert.alert(
+          "Your account has been banned",
+          "Please create a new account."
+        );
+      }
+    };
+
+    unsubscribeRef.current = Linking.addEventListener("url", handleUrlChange);
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current.remove();
+      }
+    };
+  }, [navigation]);
   const handleLogin = async (e) => {
     e.preventDefault();
     const response = await login(email, password);
@@ -124,18 +165,23 @@ function Login({ navigation }) {
           />
         </View>
         <View style={styles.forgot}>
-          <Text style={styles.textMin} onPress={() => navigation.navigate("ForgotPasswordEmail")}>Forgot password?</Text>
+          <Text
+            style={styles.textMin}
+            onPress={() => navigation.navigate("ForgotPasswordEmail")}
+          >
+            Forgot password?
+          </Text>
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
             <Text style={styles.buttonText}>Log in</Text>
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.buttonContainer}>
           <Text style={styles.textMin}>Or</Text>
         </View>
-        {/* <View style={styles.buttonContainer}>
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.googleButton}
             onPress={handleGoogleLogin}
@@ -163,7 +209,7 @@ function Login({ navigation }) {
             <Entypo name="facebook-with-circle" size={24} color="white" />
             <Text style={styles.buttonTextSecondary}>Login With Facebook</Text>
           </TouchableOpacity>
-        </View> */}
+        </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.registerBtn}
@@ -290,9 +336,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
   },
-  forgot:{
-    alignItems:'flex-end'
-  }
+  forgot: {
+    alignItems: "flex-end",
+  },
 });
 
 export default Login;

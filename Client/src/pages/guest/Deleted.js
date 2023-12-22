@@ -20,6 +20,7 @@ import { GetAllFolderDelete } from "../../services/Guest/FolderService";
 import ProjectDeleted from "../../components/ProjectDeleted";
 import WorkDeleted from "../../components/WorkDeleted";
 import FolderDeleted from "../../components/FolderDeleted";
+import { useIsFocused } from "@react-navigation/native";
 
 const DeletedDetail = ({ navigation }) => {
   const [listWork, setListWork] = useState();
@@ -27,7 +28,15 @@ const DeletedDetail = ({ navigation }) => {
   const [listProject, setListProject] = useState();
   const [selectedCategory, setSelectedCategory] = useState("Work");
   const [isModalVisible, setIsModalVisible] = useState(false);
-
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    const fetchDataOnFocus = async () => {
+      if (isFocused) {
+        await fetchData();
+      }
+    };
+    fetchDataOnFocus();
+  }, [isFocused]);
   const fetchData = async () => {
     fetchWork();
     fetchFolder();

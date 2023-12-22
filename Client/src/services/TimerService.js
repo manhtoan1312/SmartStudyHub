@@ -71,10 +71,9 @@ class TimerService {
         workid = parseWork.id;
         timePo = parseWork.timeOfPomodoro;
       } else {
-        extraId = parseWork.workId;
+        extraId = parseWork.id;
       }
     }
-    console.log(timePo);
     const response = await CreatePomodoro(
       id,
       workid,
@@ -83,6 +82,7 @@ class TimerService {
       parseInt(startTime),
       endTime
     );
+    console.log(id, workid, extraId, timePo, parseInt(startTime), endTime);
     if (!response.success) {
       Alert.alert("Error!!", response.message);
     } else {

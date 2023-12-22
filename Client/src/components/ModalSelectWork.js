@@ -43,7 +43,7 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
 
   useEffect(() => {
     fetchDataFPT(selectedType);
-  }, [selectedType]);
+  }, [selectedType, isVisible]);
   const fetchDataFPT = async (type) => {
     const id = await AsyncStorage.getItem("id");
     try {
