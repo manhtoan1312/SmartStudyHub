@@ -94,12 +94,8 @@ const WorkDeleted = ({ workItem, reload, navigation }) => {
     }
   };
 
-  const handlePlay = async () => {
-    try {
-      navigation.navigate("UpdateWork", {id:workItem.id});
-    } catch (e) {
-      Alert.alert("Error when save work", e);
-    }
+  const handlePlay = async () => {  
+    navigation.navigate("WorkDeletedDetail", {id:workItem.id});
   };
 
   return (

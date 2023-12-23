@@ -41,6 +41,7 @@ import TagDetail from "../pages/guest/TagDetail";
 import DoneDetail from "../pages/guest/DoneDetail";
 import DeletedDetail from "../pages/guest/Deleted";
 import WorkDetail from "../pages/guest/WorkDetail";
+import WorkDeletedDetail from "../pages/guest/WorkDeletedDetail";
 
 const Stack = createStackNavigator();
 
@@ -85,6 +86,7 @@ const Navigator = () => (
     <Stack.Screen name="UpdateWork" component={WorkDetail} />
     <Stack.Screen name="Done" component={DoneDetail} />
     <Stack.Screen name="Deleted" component={DeletedDetail} />
+    <Stack.Screen name="WorkDeletedDetail" component={WorkDeletedDetail} />
   </Stack.Navigator>
 );
 

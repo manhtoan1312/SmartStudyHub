@@ -358,7 +358,7 @@ const WorkDetail = ({ route, navigation }) => {
         updatedWorkdata.timeOfPomodoro,
         updatedWorkdata.isRemindered ? updatedWorkdata.isRemindered : false,
         false,
-        updatedWorkdata.note ? updatedWorkdata.note : "",
+        updatedWorkdata.note ? updatedWorkdata.note : null,
         updatedWorkdata.status,
         updatedWorkdata.tags,
         updatedWorkdata.extraWorks
@@ -435,362 +435,365 @@ const WorkDetail = ({ route, navigation }) => {
   };
 
   return (
-    <ScrollView style={{ flex: 1 }}>
-      <ImageFocus />
-      {/* WorkHeader Component */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => handleBack()}>
-          <MaterialIcons name="arrow-back" size={24} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{ flexDirection: "row" }}
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={styles.projectName}>
-            {work?.projectName || "Mission"}
-          </Text>
-          <AntDesign name="down" size={15} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={showMoreOptions}>
-          <MaterialIcons name="more-vert" size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
-      {/* Project Selection Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View>
-            <View style={styles.projectHeader}>
-              <Text style={{ fontSize: 16, fontWeight: 600, color: "white" }}>
-                Choose Project
-              </Text>
-            </View>
-
-            <TouchableOpacity
-              style={[
-                styles.projectItem,
-                work?.projectId === null && styles.selectedProject,
-              ]}
-              onPress={() => handleUpdateProject(null)}
-            >
-              <MaterialIcons name="home-work" size={24} color="#7f7fff" />
-              <Text>Mission</Text>
-            </TouchableOpacity>
-            <FlatList
-              data={listProject}
-              renderItem={renderProjectItem}
-              keyExtractor={(item) => item.id?.toString()}
-            />
-          </View>
-          <TouchableOpacity onPress={() => setModalVisible(false)}>
-            <Text style={styles.cancelButton}>Cancel</Text>
+    <View  style={{ flex: 1 }}>
+      <ScrollView>
+        
+        {/* WorkHeader Component */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => handleBack()}>
+            <MaterialIcons name="arrow-back" size={24} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ flexDirection: "row" }}
+            onPress={() => setModalVisible(true)}
+          >
+            <Text style={styles.projectName}>
+              {work?.projectName || "Mission"}
+            </Text>
+            <AntDesign name="down" size={15} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={showMoreOptions}>
+            <MaterialIcons name="more-vert" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
-      </Modal>
-      {tagSelectionModalVisible && (
-        <TagSelectionModal
-          isVisible={tagSelectionModalVisible}
-          onSelectTag={handleSelectTag}
-          onClose={hideTagSelectionModal}
-          selectedTags={listTagSelected}
-          navigation={navigation}
-        />
-      )}
-      <PriorityModal
-        visible={priorityModalVisible}
-        onSelectPriority={handleSelectPriority}
-        onClose={hidePriorityModal}
-      />
-      {work && (
-        <ChangePomodoro
-          visible={pomodoroVisible}
-          initPomo={work.numberOfPomodoros}
-          initTime={work.timeOfPomodoro}
-          onClose={() => setPomodoroVisible(false)}
-          onSubmit={changePomodoro}
-        />
-      )}
-      {work && (
-        <CalendarPicker
-          isVisible={calendarVisible}
-          onSelectDate={handleSelectDueDate}
-          onClose={() => setCalendarVisible(false)}
-        />
-      )}
-      <DateTimePicker
-        visible={dateTimePickerVisible}
-        onSelectTime={handleDateTimePicked}
-        onClose={hideDateTimePicker}
-      />
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={moreOptionsModalVisible}
-        onRequestClose={hideMoreOptions}
-      >
-        <View style={styles.moreOptionsModalContainer}>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.buttonMore}
-              onPress={handleDeleteWork}
-            >
-              <Text style={styles.moreOption}>Delete</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.buttonMore}
-              onPress={hideMoreOptions}
-            >
-              <Text style={styles.moreOption}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-      {work && (
-        <View>
-          <View style={styles.namecontainer}>
+        {/* Project Selection Modal */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
             <View>
-              <View style={styles.name}>
-                <TouchableOpacity
-                  style={{ justifyContent: "center" }}
-                  onPress={() => changeWorkState()}
-                >
-                  {work.status === "ACTIVE" ? (
-                    <View style={styles.cirle}></View>
-                  ) : (
-                    <Ionicons name="checkmark-circle" size={24} color="green" />
-                  )}
-                </TouchableOpacity>
-                <View>
-                  <TextInput
-                    style={{
-                      textDecorationLine:
-                        work.status === "COMPLETED" ? "line-through" : "none",
-                      fontSize: 15,
-                      paddingLeft: 10,
-                    }}
-                    value={work.workName}
-                    placeholder="enter Work name"
-                    onChange={(text) => handleChangeName(text)}
-                  />
-                  <View style={styles.tagsContainer}>
-                    {listTagSelected?.map((tag) => (
+              <View style={styles.projectHeader}>
+                <Text style={{ fontSize: 16, fontWeight: 600, color: "white" }}>
+                  Choose Project
+                </Text>
+              </View>
+  
+              <TouchableOpacity
+                style={[
+                  styles.projectItem,
+                  work?.projectId === null && styles.selectedProject,
+                ]}
+                onPress={() => handleUpdateProject(null)}
+              >
+                <MaterialIcons name="home-work" size={24} color="#7f7fff" />
+                <Text>Mission</Text>
+              </TouchableOpacity>
+              <FlatList
+                data={listProject}
+                renderItem={renderProjectItem}
+                keyExtractor={(item) => item.id?.toString()}
+              />
+            </View>
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text style={styles.cancelButton}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+        {tagSelectionModalVisible && (
+          <TagSelectionModal
+            isVisible={tagSelectionModalVisible}
+            onSelectTag={handleSelectTag}
+            onClose={hideTagSelectionModal}
+            selectedTags={listTagSelected}
+            navigation={navigation}
+          />
+        )}
+        <PriorityModal
+          visible={priorityModalVisible}
+          onSelectPriority={handleSelectPriority}
+          onClose={hidePriorityModal}
+        />
+        {work && (
+          <ChangePomodoro
+            visible={pomodoroVisible}
+            initPomo={work.numberOfPomodoros}
+            initTime={work.timeOfPomodoro}
+            onClose={() => setPomodoroVisible(false)}
+            onSubmit={changePomodoro}
+          />
+        )}
+        {work && (
+          <CalendarPicker
+            isVisible={calendarVisible}
+            onSelectDate={handleSelectDueDate}
+            onClose={() => setCalendarVisible(false)}
+          />
+        )}
+        <DateTimePicker
+          visible={dateTimePickerVisible}
+          onSelectTime={handleDateTimePicked}
+          onClose={hideDateTimePicker}
+        />
+  
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={moreOptionsModalVisible}
+          onRequestClose={hideMoreOptions}
+        >
+          <View style={styles.moreOptionsModalContainer}>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.buttonMore}
+                onPress={handleDeleteWork}
+              >
+                <Text style={styles.moreOption}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.buttonMore}
+                onPress={hideMoreOptions}
+              >
+                <Text style={styles.moreOption}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+        {work && (
+          <View>
+            <View style={styles.namecontainer}>
+              <View>
+                <View style={styles.name}>
+                  <TouchableOpacity
+                    style={{ justifyContent: "center" }}
+                    onPress={() => changeWorkState()}
+                  >
+                    {work.status === "ACTIVE" ? (
+                      <View style={styles.cirle}></View>
+                    ) : (
+                      <Ionicons name="checkmark-circle" size={24} color="green" />
+                    )}
+                  </TouchableOpacity>
+                  <View>
+                    <TextInput
+                      style={{
+                        textDecorationLine:
+                          work.status === "COMPLETED" ? "line-through" : "none",
+                        fontSize: 15,
+                        paddingLeft: 10,
+                      }}
+                      value={work.workName}
+                      placeholder="enter Work name"
+                      onChange={(text) => handleChangeName(text)}
+                    />
+                    <View style={styles.tagsContainer}>
+                      {listTagSelected?.map((tag) => (
+                        <TouchableOpacity
+                          onPress={() => DeleteTag(tag.id)}
+                          key={tag.id}
+                          style={[styles.tag, { backgroundColor: tag.colorCode }]}
+                        >
+                          <Text style={styles.tagText}>{tag.tagName} </Text>
+  
+                          <View style={{ justifyContent: "center" }}>
+                            <Ionicons name="close" size={12} color="#fff" />
+                          </View>
+                        </TouchableOpacity>
+                      ))}
                       <TouchableOpacity
-                        onPress={() => DeleteTag(tag.id)}
-                        key={tag.id}
-                        style={[styles.tag, { backgroundColor: tag.colorCode }]}
+                        onPress={() => showTagSelectionModal()}
+                        style={[styles.tag, { backgroundColor: "green" }]}
                       >
-                        <Text style={styles.tagText}>{tag.tagName} </Text>
-
-                        <View style={{ justifyContent: "center" }}>
-                          <Ionicons name="close" size={12} color="#fff" />
-                        </View>
+                        <Text style={styles.tagText}>+ Add Tag</Text>
                       </TouchableOpacity>
-                    ))}
-                    <TouchableOpacity
-                      onPress={() => showTagSelectionModal()}
-                      style={[styles.tag, { backgroundColor: "green" }]}
-                    >
-                      <Text style={styles.tagText}>+ Add Tag</Text>
-                    </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
               </View>
+              <TouchableOpacity onPress={() => showPriorityModal()}>
+                <Ionicons name="ios-flag" size={24} color={colorflag()} />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity onPress={() => showPriorityModal()}>
-              <Ionicons name="ios-flag" size={24} color={colorflag()} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.bodycontainer}>
-            <View>
+  
+            <View style={styles.bodycontainer}>
+              <View>
+                <TouchableOpacity
+                  onPress={() => setPomodoroVisible(true)}
+                  style={styles.content}
+                >
+                  <View>
+                    <View style={styles.name}>
+                      <AntDesign name="clockcircle" size={24} color="gray" />
+                      <View style={{ justifyContent: "center" }}>
+                        <Text style={{ paddingLeft: 15 }}>Pomodoro</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View>
+                    <View style={styles.pomodoroContainer}>
+                      <MaterialCommunityIcons
+                        name="clock-check"
+                        size={14}
+                        color="#ff3232"
+                      />
+                      <Text style={styles.pomodoroText}>
+                        {work.numberOfPomodorosDone}/
+                      </Text>
+                      <MaterialCommunityIcons
+                        name="clock"
+                        size={14}
+                        color="#ff9999"
+                      />
+                      <Text style={[styles.pomodoroText, { marginRight: 5 }]}>
+                        {work.numberOfPomodoros}
+                      </Text>
+                    </View>
+                    <View style={styles.pomodoroContainer}>
+                      <MaterialCommunityIcons
+                        name="clock"
+                        size={14}
+                        color="#ff9999"
+                      />
+                      <Text style={{ color: "gray" }}>
+                        ={work.timeOfPomodoro}M
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
               <TouchableOpacity
-                onPress={() => setPomodoroVisible(true)}
+                onPress={() => openSelectDueDate()}
                 style={styles.content}
               >
                 <View>
                   <View style={styles.name}>
-                    <AntDesign name="clockcircle" size={24} color="gray" />
+                    <AntDesign name="calendar" size={24} color="gray" />
                     <View style={{ justifyContent: "center" }}>
-                      <Text style={{ paddingLeft: 15 }}>Pomodoro</Text>
+                      <Text style={{ paddingLeft: 15 }}>Due Date</Text>
                     </View>
                   </View>
                 </View>
                 <View>
-                  <View style={styles.pomodoroContainer}>
-                    <MaterialCommunityIcons
-                      name="clock-check"
-                      size={14}
-                      color="#ff3232"
-                    />
-                    <Text style={styles.pomodoroText}>
-                      {work.numberOfPomodorosDone}/
-                    </Text>
-                    <MaterialCommunityIcons
-                      name="clock"
-                      size={14}
-                      color="#ff9999"
-                    />
-                    <Text style={[styles.pomodoroText, { marginRight: 5 }]}>
-                      {work.numberOfPomodoros}
-                    </Text>
+                  {work.statusWork !== "SOMEDAY" ? (
+                    renderDay()
+                  ) : (
+                    <Text>None</Text>
+                  )}
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => showDateTimePicker()}
+                style={styles.content}
+              >
+                <View>
+                  <View style={styles.name}>
+                    <Entypo name="bell" size={24} color="gray" />
+                    <View style={{ justifyContent: "center" }}>
+                      <Text style={{ paddingLeft: 15 }}>Remindered</Text>
+                    </View>
                   </View>
-                  <View style={styles.pomodoroContainer}>
-                    <MaterialCommunityIcons
-                      name="clock"
-                      size={14}
-                      color="#ff9999"
-                    />
-                    <Text style={{ color: "gray" }}>
-                      ={work.timeOfPomodoro}M
-                    </Text>
-                  </View>
+                </View>
+                <View>
+                  {work.isRemindered ? renderTime() : <Text>False</Text>}
                 </View>
               </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              onPress={() => openSelectDueDate()}
-              style={styles.content}
-            >
+            <View style={styles.namecontainer}>
               <View>
-                <View style={styles.name}>
-                  <AntDesign name="calendar" size={24} color="gray" />
-                  <View style={{ justifyContent: "center" }}>
-                    <Text style={{ paddingLeft: 15 }}>Due Date</Text>
-                  </View>
-                </View>
-              </View>
-              <View>
-                {work.statusWork !== "SOMEDAY" ? (
-                  renderDay()
-                ) : (
-                  <Text>None</Text>
-                )}
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => showDateTimePicker()}
-              style={styles.content}
-            >
-              <View>
-                <View style={styles.name}>
-                  <Entypo name="bell" size={24} color="gray" />
-                  <View style={{ justifyContent: "center" }}>
-                    <Text style={{ paddingLeft: 15 }}>Remindered</Text>
-                  </View>
-                </View>
-              </View>
-              <View>
-                {work.isRemindered ? renderTime() : <Text>False</Text>}
-              </View>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.namecontainer}>
-            <View>
-              {work.extraWorks.length > 0 &&
-                work.extraWorks.map((item) => (
-                  <View style={styles.content} key={item.id}>
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
-                      <TouchableOpacity
-                        onPress={() => CompletedExtraWork(item.id, item.status)}
+                {work.extraWorks.length > 0 &&
+                  work.extraWorks.map((item) => (
+                    <View style={styles.content} key={item.id}>
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
                       >
-                        {item.status === "COMPLETED" ? (
+                        <TouchableOpacity
+                          onPress={() => CompletedExtraWork(item.id, item.status)}
+                        >
+                          {item.status === "COMPLETED" ? (
+                            <AntDesign
+                              style={{ marginRight: 5 }}
+                              name="checkcircle"
+                              size={24}
+                              color="#00cc00"
+                            />
+                          ) : (
+                            <View
+                              style={[styles.cirle, { borderColor: "gray" }]}
+                            />
+                          )}
+                        </TouchableOpacity>
+                        <View style={{ paddingLeft: 10 }}>
+                          <View
+                            style={{
+                              alignItems: "center",
+                            }}
+                          >
+                            <Text>{item.extraWorkName}</Text>
+                          </View>
+                          {item.numberOfPomodoros > 0 && (
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                alignItems: "center",
+                              }}
+                            >
+                              {[...Array(item.numberOfPomodoros)].map(
+                                (_, index) => (
+                                  <MaterialCommunityIcons
+                                    key={index}
+                                    name="clock"
+                                    size={14}
+                                    color="#ff9999"
+                                  />
+                                )
+                              )}
+                            </View>
+                          )}
+                        </View>
+                      </View>
+                      {item.status === "ACTIVE" ? (
+                        <TouchableOpacity onPress={() => playExtra(item)}>
+                          <Ionicons
+                            name="ios-play-circle-sharp"
+                            size={28}
+                            color="#ff3232"
+                          />
+                        </TouchableOpacity>
+                      ) : (
+                        <TouchableOpacity>
                           <AntDesign
-                            style={{ marginRight: 5 }}
                             name="checkcircle"
                             size={24}
                             color="#00cc00"
                           />
-                        ) : (
-                          <View
-                            style={[styles.cirle, { borderColor: "gray" }]}
-                          />
-                        )}
-                      </TouchableOpacity>
-                      <View style={{ paddingLeft: 10 }}>
-                        <View
-                          style={{
-                            alignItems: "center",
-                          }}
-                        >
-                          <Text>{item.extraWorkName}</Text>
-                        </View>
-                        {item.numberOfPomodoros > 0 && (
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                            }}
-                          >
-                            {[...Array(item.numberOfPomodoros)].map(
-                              (_, index) => (
-                                <MaterialCommunityIcons
-                                  key={index}
-                                  name="clock"
-                                  size={14}
-                                  color="#ff9999"
-                                />
-                              )
-                            )}
-                          </View>
-                        )}
-                      </View>
+                        </TouchableOpacity>
+                      )}
                     </View>
-                    {item.status === "ACTIVE" ? (
-                      <TouchableOpacity onPress={() => playExtra(item)}>
-                        <Ionicons
-                          name="ios-play-circle-sharp"
-                          size={28}
-                          color="#ff3232"
-                        />
-                      </TouchableOpacity>
-                    ) : (
-                      <TouchableOpacity>
-                        <AntDesign
-                          name="checkcircle"
-                          size={24}
-                          color="#00cc00"
-                        />
-                      </TouchableOpacity>
-                    )}
+                  ))}
+                {work.status === "ACTIVE" && (
+                  <View style={styles.addExtraWorkContainer}>
+                    <AntDesign name="plus" size={24} color="gray" />
+                    <TextInput
+                      style={styles.extraWorkInput}
+                      placeholder="Add Extra Work"
+                      value={extraWorkName}
+                      onChangeText={(text) => setExtraWorkName(text)}
+                      returnKeyType="done"
+                      onSubmitEditing={addExtraWork}
+                    />
                   </View>
-                ))}
-              {work.status === "ACTIVE" && (
-                <View style={styles.addExtraWorkContainer}>
-                  <AntDesign name="plus" size={24} color="gray" />
-                  <TextInput
-                    style={styles.extraWorkInput}
-                    placeholder="Add Extra Work"
-                    value={extraWorkName}
-                    onChangeText={(text) => setExtraWorkName(text)}
-                    returnKeyType="done"
-                    onSubmitEditing={addExtraWork}
-                  />
-                </View>
-              )}
+                )}
+              </View>
+            </View>
+            <View style={styles.namecontainer}>
+              <TextInput
+                style={styles.noteInput}
+                placeholder="Add Note"
+                multiline={true}
+                numberOfLines={6}
+                value={note}
+                onChangeText={(text) => setNote(text)}
+              />
             </View>
           </View>
-          <View style={styles.namecontainer}>
-            <TextInput
-              style={styles.noteInput}
-              placeholder="Add Note"
-              multiline={true}
-              numberOfLines={6}
-              value={note}
-              onChangeText={(text) => setNote(text)}
-            />
-          </View>
-        </View>
-      )}
-    </ScrollView>
+        )}
+      </ScrollView>
+      <ImageFocus />
+    </View>
   );
 };
 
@@ -906,6 +909,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     marginTop: 5,
     width: 320,
+    paddingLeft:10
   },
   content: {
     flexDirection: "row",
