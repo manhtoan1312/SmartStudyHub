@@ -79,7 +79,7 @@ class TimerService {
       workid,
       extraId,
       timePo,
-      parseInt(startTime),
+      startTime,
       endTime
     );
     console.log(id, workid, extraId, timePo, parseInt(startTime), endTime);

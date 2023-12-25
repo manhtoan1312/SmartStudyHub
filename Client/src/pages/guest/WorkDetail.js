@@ -58,6 +58,7 @@ const WorkDetail = ({ route, navigation }) => {
   const [dateTimePickerVisible, setDateTimePickerVisible] = useState(false);
   const [extraWorkName, setExtraWorkName] = useState("");
   const [note, setNote] = useState(work?.note || "");
+ 
   useEffect(() => {
     fetchData();
 
@@ -81,6 +82,7 @@ const WorkDetail = ({ route, navigation }) => {
           setWork(workResponse.data);
           setListTagSelected(workResponse.data.tags);
           setNote(workResponse.data?.note || "");
+          
         }
 
         if (listProjectResponse.success) {
@@ -92,8 +94,8 @@ const WorkDetail = ({ route, navigation }) => {
     }
   };
 
-  const handleBack = () => {
-    updateWork();
+  const handleBack = async () => {
+    await updateWork();
     navigation.goBack();
   };
 
@@ -238,7 +240,7 @@ const WorkDetail = ({ route, navigation }) => {
       if (work?.priority === "HIGH") {
         return "red";
       }
-      if (work?.priority === "MEDIUM") {
+      if (work?.priority === "NORMAL") {
         return "#e6e600";
       }
       if (work?.priority === "LOW") {
@@ -314,122 +316,115 @@ const WorkDetail = ({ route, navigation }) => {
     );
   }
   const updateWork = async () => {
-    try {
-      const updatedWorkdata = { ...work };
-      updatedWorkdata.note = note;
-      updatedWorkdata.tags = listTagSelected.map((tag) => ({ id: tag.id }));
-      updatedWorkdata.extraWorks = updatedWorkdata.extraWorks.map((extra) => ({
-        id: extra.id,
-      }));
-      const response = await UpdateWork(
-        updatedWorkdata.id,
-        updatedWorkdata.userId,
-        updatedWorkdata.projectId ? updatedWorkdata.projectId : null,
-        null,
-        updatedWorkdata.workName,
-        updatedWorkdata.priority,
-        updatedWorkdata.dueDate,
-        updatedWorkdata.timeWillStart,
-        updatedWorkdata.timeWillAnnounce
-          ? updatedWorkdata.timeWillAnnounce
-          : null,
-        updatedWorkdata.numberOfPomodoros,
-        updatedWorkdata.timeOfPomodoro,
-        updatedWorkdata.isRemindered ? updatedWorkdata.isRemindered : false,
-        false,
-        note,
-        updatedWorkdata.status,
-        updatedWorkdata.tags,
-        updatedWorkdata.extraWorks
-      );
-      console.log(
-        updatedWorkdata.id,
-        updatedWorkdata.userId,
-        updatedWorkdata.projectId ? updatedWorkdata.projectId : null,
-        null,
-        updatedWorkdata.workName,
-        updatedWorkdata.priority,
-        updatedWorkdata.dueDate,
-        updatedWorkdata.timeWillStart,
-        updatedWorkdata.timeWillAnnounce
-          ? updatedWorkdata.timeWillAnnounce
-          : null,
-        updatedWorkdata.numberOfPomodoros,
-        updatedWorkdata.timeOfPomodoro,
-        updatedWorkdata.isRemindered ? updatedWorkdata.isRemindered : false,
-        false,
-        updatedWorkdata.note ? updatedWorkdata.note : null,
-        updatedWorkdata.status,
-        updatedWorkdata.tags,
-        updatedWorkdata.extraWorks
-      );
-      if (response.success) {
-        console.log(response.data);
-      } else {
-        Alert.alert("Update Work Error", response.message);
+    if(work.workName){
+      try {
+        const updatedWorkdata = { ...work };
+        updatedWorkdata.note = note;
+        updatedWorkdata.tags = listTagSelected.map((tag) => ({ id: tag.id }));
+        updatedWorkdata.extraWorks = updatedWorkdata.extraWorks.map((extra) => ({
+          id: extra.id,
+        }));
+        const response = await UpdateWork(
+          updatedWorkdata.id,
+          updatedWorkdata.userId,
+          updatedWorkdata.projectId ? updatedWorkdata.projectId : null,
+          null,
+          updatedWorkdata.workName,
+          updatedWorkdata.priority,
+          updatedWorkdata.dueDate,
+          updatedWorkdata.timeWillStart,
+          updatedWorkdata.timeWillAnnounce
+            ? updatedWorkdata.timeWillAnnounce
+            : null,
+          updatedWorkdata.numberOfPomodoros,
+          updatedWorkdata.timeOfPomodoro,
+          updatedWorkdata.isRemindered ? updatedWorkdata.isRemindered : false,
+          false,
+          note,
+          updatedWorkdata.status,
+          updatedWorkdata.tags,
+          updatedWorkdata.extraWorks
+        );
+        
+        if (response.success) {
+          console.log(response.data);
+        } else {
+          Alert.alert("Update Work Error", response.message);
+        }
+      } catch (error) {
+        console.error("Error updating work:", error);
       }
-    } catch (error) {
-      console.error("Error updating work:", error);
+    }
+    else{
+      Alert.alert('Warnning','Workname can not be null')
     }
   };
 
   const addExtraWork = async () => {
     await updateWork();
+    if(work.workName){
     const response = await CreateExtraWork(work.id, extraWorkName);
     if (response.success) {
       fetchData();
     } else {
       Alert.alert("Create Extra Work Error", response.message);
     }
+    }
   };
   const changeWorkState = async () => {
     await updateWork();
-    if (work.status === "ACTIVE") {
-      const response = await MarkCompleted(work.id);
-      if (response.success) {
-        fetchData();
+    if(work.workName) {
+      if (work.status === "ACTIVE") {
+        const response = await MarkCompleted(work.id);
+        if (response.success) {
+          fetchData();
+        } else {
+          Alert.alert("Complete Work Error", response.message);
+        }
       } else {
-        Alert.alert("Complete Work Error", response.message);
-      }
-    } else {
-      const response = await RecoverWork(work.id);
-      if (response.success) {
-        fetchData();
-      } else {
-        Alert.alert("Recover Work Error", response.message);
+        const response = await RecoverWork(work.id);
+        if (response.success) {
+          fetchData();
+        } else {
+          Alert.alert("Recover Work Error", response.message);
+        }
       }
     }
   };
 
   const playExtra = async (item) => {
-    if (item.status === "ACTIVE") {
-      try {
-        await updateWork();
-        await AsyncStorage.setItem("work", JSON.stringify(item));
-        await AsyncStorage.setItem("workType", "EXTRA");
-        await AsyncStorage.setItem("stop", "true");
-        navigation.navigate("Focus");
-      } catch (e) {
-        Alert.alert("Error when save work", e);
+    await updateWork();
+    if(work.workName){
+      if (item.status === "ACTIVE") {
+        try {
+          await AsyncStorage.setItem("work", JSON.stringify(item));
+          await AsyncStorage.setItem("workType", "EXTRA");
+          await AsyncStorage.setItem("stop", "true");
+          navigation.navigate("Focus");
+        } catch (e) {
+          Alert.alert("Error when save work", e);
+        }
       }
     }
   };
 
   const CompletedExtraWork = async (id, status) => {
     await updateWork();
-    if (status === "ACTIVE") {
-      const response = await ExtraMarkCompleted(id);
-      if (response.success) {
-        fetchData();
+    if(work.workName){
+      if (status === "ACTIVE") {
+        const response = await ExtraMarkCompleted(id);
+        if (response.success) {
+          fetchData();
+        } else {
+          Alert.alert("Mark complete work Error!", response.message);
+        }
       } else {
-        Alert.alert("Mark complete work Error!", response.message);
-      }
-    } else {
-      const response = await RecoverExtraWork(id);
-      if (response.success) {
-        fetchData();
-      } else {
-        Alert.alert("Recover Extrawork Error!", response.message);
+        const response = await RecoverExtraWork(id);
+        if (response.success) {
+          fetchData();
+        } else {
+          Alert.alert("Recover Extrawork Error!", response.message);
+        }
       }
     }
   };
@@ -692,7 +687,7 @@ const WorkDetail = ({ route, navigation }) => {
                 </View>
               </TouchableOpacity>
             </View>
-            <View style={styles.namecontainer}>
+            <View style={[styles.namecontainer, {flex:1}]}>
               <View>
                 {work.extraWorks.length > 0 &&
                   work.extraWorks.map((item) => (
@@ -745,23 +740,25 @@ const WorkDetail = ({ route, navigation }) => {
                           )}
                         </View>
                       </View>
-                      {item.status === "ACTIVE" ? (
-                        <TouchableOpacity onPress={() => playExtra(item)}>
-                          <Ionicons
-                            name="ios-play-circle-sharp"
-                            size={28}
-                            color="#ff3232"
-                          />
-                        </TouchableOpacity>
-                      ) : (
-                        <TouchableOpacity>
-                          <AntDesign
-                            name="checkcircle"
-                            size={24}
-                            color="#00cc00"
-                          />
-                        </TouchableOpacity>
-                      )}
+                      <View style={{}}>
+                        {item.status === "ACTIVE" ? (
+                          <TouchableOpacity onPress={() => playExtra(item)}>
+                            <Ionicons
+                              name="ios-play-circle-sharp"
+                              size={28}
+                              color="#ff3232"
+                            />
+                          </TouchableOpacity>
+                        ) : (
+                          <TouchableOpacity>
+                            <AntDesign
+                              name="checkcircle"
+                              size={24}
+                              color="#00cc00"
+                            />
+                          </TouchableOpacity>
+                        )}
+                      </View>
                     </View>
                   ))}
                 {work.status === "ACTIVE" && (

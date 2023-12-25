@@ -19,9 +19,10 @@ import AddWorkModal from "../../components/AddWorkModal";
 import HeaderDetail from "../../components/HeaderDetail";
 import { GetDetailProject } from "../../services/Guest/ProjectService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CreateWork, GetWorkByType } from "../../services/Guest/WorkService";
+import { CreateWork, GetWorkByType, SortWork } from "../../services/Guest/WorkService";
 import ImageFocus from "../../components/Image_Focus";
 import { useIsFocused } from "@react-navigation/native";
+import SortWorkModal from "../../components/SortWorkModal";
 const TaskDefault = ({ navigation }) => {
   const [project, setProject] = useState(null);
   const [workName, setWorkName] = useState(null);
@@ -30,6 +31,8 @@ const TaskDefault = ({ navigation }) => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [closeKeyboard, setCloseKeyboard] = useState(false);
   const [preName, setPreName] = useState(null);
+  const [sortModalVisible, setSortModalVisible] = useState(false);
+  const [sortType, setSortType] = useState("");
   const isFocused = useIsFocused();
   useEffect(() => {
     const fetchDataOnFocus = async () => {
@@ -39,6 +42,34 @@ const TaskDefault = ({ navigation }) => {
     };
     fetchDataOnFocus();
   }, [isFocused]);
+  const handleSortWork = async (type) => {
+    setSortModalVisible(false);
+
+    const body1 = JSON.stringify(project?.listWorkActive);
+    const body2 = JSON.stringify(project?.listWorkCompleted);
+    const response = await SortWork(body1, type);
+    const response2 = await SortWork(body2, type);
+
+    if (response.success) {
+      const worksSortedArray = response.data || [];
+      const updatedList = worksSortedArray
+        .map((item) => item.worksSorted)
+        .flat();
+      setProject((prev) => ({ ...prev, listWorkActive: updatedList }));
+    } else {
+      console.log(response.message);
+    }
+    if (response2.success) {
+      const worksSortedArray = response2.data || [];
+      const updatedList = worksSortedArray
+        .map((item) => item.worksSorted)
+        .flat();
+      setProject((prev) => ({ ...prev, listWorkCompleted: updatedList }));
+    } else {
+      console.log(response2.message);
+    }
+    setSortType(type);
+  };
   useEffect(() => {
     fetchData();
     const keyboardDidShowListener = Keyboard.addListener(
@@ -123,8 +154,12 @@ const TaskDefault = ({ navigation }) => {
               <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Ionicons name="chevron-back-outline" size={24} color="gray" />
               </TouchableOpacity>
-              <Text style={{ fontSize: 18, fontWeight: "400" }}>TASK DEFAULT</Text>
-              <AntDesign name="filter" size={24} color="gray" />
+              <Text style={{ fontSize: 18, fontWeight: "400" }}>
+                TASK DEFAULT
+              </Text>
+              <TouchableOpacity onPress={() => setSortModalVisible(true)}>
+                <AntDesign name="filter" size={24} color="gray" />
+              </TouchableOpacity>
             </View>
             <View style={styles.body}>
               <View style={styles.detail}>
@@ -150,11 +185,11 @@ const TaskDefault = ({ navigation }) => {
               </TouchableOpacity>
               {project.listWorkActive?.map((workItem) => (
                 <WorkActive
-                key={workItem.id}
-                workItem={workItem}
-                reload={fetchData}
-                navigation={navigation}
-              />
+                  key={workItem.id}
+                  workItem={workItem}
+                  reload={fetchData}
+                  navigation={navigation}
+                />
               ))}
               <TouchableOpacity
                 style={styles.buttonComplete}
@@ -193,6 +228,16 @@ const TaskDefault = ({ navigation }) => {
           handlecloseKeyboard={handleClosekeyboard}
           project={project}
           type="THISWEEK"
+        />
+      )}
+      {sortModalVisible && (
+        <SortWorkModal
+          isVisible={sortModalVisible}
+          onChoose={(type) => {
+            handleSortWork(type);
+          }}
+          onClose={() => setSortModalVisible(false)}
+          type={sortType}
         />
       )}
       <ImageFocus />

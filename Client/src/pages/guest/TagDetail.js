@@ -23,6 +23,7 @@ import { CreateWork } from "../../services/Guest/WorkService";
 import { GetTagDetail } from "../../services/Guest/TagService";
 import ImageFocus from "../../components/Image_Focus";
 import { useIsFocused } from "@react-navigation/native";
+import SortWorkModal from "../../components/SortWorkModal";
 const TagDetail = ({ route, navigation }) => {
   const id = route.params.id;
   const [tag, setTag] = useState(null);
@@ -31,6 +32,8 @@ const TagDetail = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [closeKeyboard, setCloseKeyboard] = useState(false);
+  const [sortModalVisible, setSortModalVisible] = useState(false);
+  const [sortType, setSortType] = useState("");
   const isFocused = useIsFocused();
   useEffect(() => {
     const fetchDataOnFocus = async () => {
@@ -54,6 +57,29 @@ const TagDetail = ({ route, navigation }) => {
     };
   }, []);
 
+  const handleSortWork = async (type) => {
+    setSortModalVisible(false);
+    const sortAndUpdateList = async (list, type, updateFunc) => {
+      const body = JSON.stringify(list);
+      const response = await SortWork(body, type);
+  
+      if (response.success) {
+        const worksSortedArray = response.data || [];
+        const updatedList = worksSortedArray
+          .map((item) => item.worksSorted)
+          .flat();
+        updateFunc((prev) => ({ ...prev, list: updatedList }));
+        console.log(updatedList);
+      } else {
+        console.log(response.message);
+      }
+    };
+  
+    await sortAndUpdateList(project?.listWorkActive, type, setProject);
+    await sortAndUpdateList(project?.listWorkCompleted, type, setProject);
+  
+    setSortType(type);
+  };
   const fetchData = async () => {
     const response = await GetTagDetail(id);
     if (response.success) {
@@ -138,7 +164,9 @@ const TagDetail = ({ route, navigation }) => {
               <Text style={{ fontSize: 18, fontWeight: "400" }}>
                 {tag.tagName}
               </Text>
-              <AntDesign name="filter" size={24} color="gray" />
+              <TouchableOpacity onPress={() => setSortModalVisible(true)}>
+                <AntDesign name="filter" size={24} color="gray" />
+              </TouchableOpacity>
             </View>
             <View style={styles.body}>
               <View style={styles.detail}>
@@ -206,6 +234,16 @@ const TagDetail = ({ route, navigation }) => {
           keyboardHeight={keyboardHeight}
           handlecloseKeyboard={handleClosekeyboard}
           tagId={tag}
+        />
+      )}
+      {sortModalVisible && (
+        <SortWorkModal
+          isVisible={sortModalVisible}
+          onChoose={(type) => {
+            handleSortWork(type);
+          }}
+          onClose={() => setSortModalVisible(false)}
+          type={sortType}
         />
       )}
       <ImageFocus />

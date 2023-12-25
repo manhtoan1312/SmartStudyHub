@@ -19,9 +19,10 @@ import AddWorkModal from "../../components/AddWorkModal";
 import HeaderDetail from "../../components/HeaderDetail";
 import { GetDetailProject } from "../../services/Guest/ProjectService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CreateWork, GetWorkByType } from "../../services/Guest/WorkService";
+import { CreateWork, GetWorkByType, SortWork } from "../../services/Guest/WorkService";
 import ImageFocus from "../../components/Image_Focus";
 import { useIsFocused } from "@react-navigation/native";
+import SortWorkModal from "../../components/SortWorkModal";
 const Tomorror = ({ navigation }) => {
   const [project, setProject] = useState(null);
   const [workName, setWorkName] = useState(null);
@@ -30,6 +31,8 @@ const Tomorror = ({ navigation }) => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [closeKeyboard, setCloseKeyboard] = useState(false);
   const [preName, setPreName] = useState(null);
+  const [sortModalVisible, setSortModalVisible] = useState(false);
+  const [sortType, setSortType] = useState("");
   const isFocused = useIsFocused();
   useEffect(() => {
     const fetchDataOnFocus = async () => {
@@ -53,6 +56,34 @@ const Tomorror = ({ navigation }) => {
     };
   }, []);
 
+  const handleSortWork = async (type) => {
+    setSortModalVisible(false);
+
+    const body1 = JSON.stringify(project?.listWorkActive);
+    const body2 = JSON.stringify(project?.listWorkCompleted);
+    const response = await SortWork(body1, type);
+    const response2 = await SortWork(body2, type);
+
+    if (response.success) {
+      const worksSortedArray = response.data || [];
+      const updatedList = worksSortedArray
+        .map((item) => item.worksSorted)
+        .flat();
+      setProject((prev) => ({ ...prev, listWorkActive: updatedList }));
+    } else {
+      console.log(response.message);
+    }
+    if (response2.success) {
+      const worksSortedArray = response2.data || [];
+      const updatedList = worksSortedArray
+        .map((item) => item.worksSorted)
+        .flat();
+      setProject((prev) => ({ ...prev, listWorkCompleted: updatedList }));
+    } else {
+      console.log(response2.message);
+    }
+    setSortType(type);
+  };
   const fetchData = async () => {
     const id = await AsyncStorage.getItem("id");
     const response = await GetWorkByType("TOMORROW", id);
@@ -88,7 +119,7 @@ const Tomorror = ({ navigation }) => {
     }
     if (workName) {
       const tagslist = tags.map((id) => ({ id: id }));
-      
+
       const response = await CreateWork(
         id,
         projectId,
@@ -100,9 +131,7 @@ const Tomorror = ({ navigation }) => {
         time,
         timeWillStart
       );
-      console.log(
-       response
-      );
+      console.log(response);
       if (!response.success) {
         Alert.alert("Create Work Error", response.message);
       } else {
@@ -127,7 +156,9 @@ const Tomorror = ({ navigation }) => {
                 <Ionicons name="chevron-back-outline" size={24} color="gray" />
               </TouchableOpacity>
               <Text style={{ fontSize: 18, fontWeight: "400" }}>TOMORROW</Text>
-              <AntDesign name="filter" size={24} color="gray" />
+              <TouchableOpacity onPress={() => setSortModalVisible(true)}>
+                <AntDesign name="filter" size={24} color="gray" />
+              </TouchableOpacity>
             </View>
             <View style={styles.body}>
               <View style={styles.detail}>
@@ -153,11 +184,11 @@ const Tomorror = ({ navigation }) => {
               </TouchableOpacity>
               {project.listWorkActive?.map((workItem) => (
                 <WorkActive
-                key={workItem.id}
-                workItem={workItem}
-                reload={fetchData}
-                navigation={navigation}
-              />
+                  key={workItem.id}
+                  workItem={workItem}
+                  reload={fetchData}
+                  navigation={navigation}
+                />
               ))}
               <TouchableOpacity
                 style={styles.buttonComplete}
@@ -196,6 +227,16 @@ const Tomorror = ({ navigation }) => {
           handlecloseKeyboard={handleClosekeyboard}
           project={project}
           type="TOMORROW"
+        />
+      )}
+      {sortModalVisible && (
+        <SortWorkModal
+          isVisible={sortModalVisible}
+          onChoose={(type) => {
+            handleSortWork(type);
+          }}
+          onClose={() => setSortModalVisible(false)}
+          type={sortType}
         />
       )}
       <ImageFocus />

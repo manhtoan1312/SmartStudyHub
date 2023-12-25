@@ -97,7 +97,7 @@ const WorkDeletedDetail = ({ route, navigation }) => {
       if (work?.priority === "HIGH") {
         return "red";
       }
-      if (work?.priority === "MEDIUM") {
+      if (work?.priority === "NORMAL") {
         return "#e6e600";
       }
       if (work?.priority === "LOW") {

@@ -20,6 +20,7 @@ import HeaderDetail from "../../components/HeaderDetail";
 import { GetDetailProject } from "../../services/Guest/ProjectService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CreateWork } from "../../services/Guest/WorkService";
+import { useIsFocused } from "@react-navigation/native";
 const ProjectDetail = ({ route, navigation }) => {
   const id = route.params.id;
   const [project, setProject] = useState(null);
@@ -28,6 +29,15 @@ const ProjectDetail = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [closeKeyboard, setCloseKeyboard] = useState(false);
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    const fetchDataOnFocus = async () => {
+      if (isFocused) {
+        await fetchData();
+      }
+    };
+    fetchDataOnFocus();
+  }, [isFocused]);
   useEffect(() => {
     fetchData();
     const keyboardDidShowListener = Keyboard.addListener(

@@ -66,7 +66,8 @@ function Login({ navigation }) {
     };
   }, [navigation]);
   const handleLogin = async (e) => {
-    e.preventDefault();
+    if(email && password){
+      e.preventDefault();
     const response = await login(email, password);
     if (response.success) {
       await AsyncStorage.setItem("token", response.token);
@@ -90,8 +91,21 @@ function Login({ navigation }) {
           ]
         );
       } else {
-        Alert.alert("Smart Study Hub anoucement", response.message);
+        Alert.alert("Account was banned",'Do you want to report this problem?',[
+          [
+            {
+              text: "No",
+              style: "cancel",
+            },
+            { text: "Yes", onPress: () => navigation.navigate("Report") },
+          ]
+        ]);
+        
       }
+    }
+    }
+    else{
+      Alert.alert("Warnning", 'you need to input all field')
     }
   };
 
@@ -181,7 +195,7 @@ function Login({ navigation }) {
         <View style={styles.buttonContainer}>
           <Text style={styles.textMin}>Or</Text>
         </View>
-        <View style={styles.buttonContainer}>
+        {/* <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.googleButton}
             onPress={handleGoogleLogin}
@@ -189,9 +203,9 @@ function Login({ navigation }) {
             <AntDesign name="google" size={24} color="white" />
             <Text style={styles.buttonTextSecondary}>Login With Google</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
 
-        <View style={styles.buttonContainer}>
+        {/* <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.githubButton}
             onPress={handleGitHubLogin}
@@ -209,7 +223,7 @@ function Login({ navigation }) {
             <Entypo name="facebook-with-circle" size={24} color="white" />
             <Text style={styles.buttonTextSecondary}>Login With Facebook</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.registerBtn}

@@ -1,6 +1,14 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { DeleteCompletelyProject, RecoverProject } from "../services/Guest/ProjectService";
-import { MaterialIcons,Feather } from "@expo/vector-icons";
+import {
+  DeleteCompletelyProject,
+  RecoverProject,
+} from "../services/Guest/ProjectService";
+import { MaterialIcons, Feather } from "@expo/vector-icons";
+import WorkActive from "./WorkActive";
+import WorkCompleted from "./WorkCompleted";
+import WorkDeleted from "./WorkDeleted";
+import WorkactiveDL from "./workactiveDL";
+import WorkCompletedDL from "./WorkCompleteDL";
 const ProjectDeleted = ({ projectItem, reload, navigation }) => {
   async function confirmDelete() {
     const response = await DeleteCompletelyProject(projectItem.id);
@@ -10,7 +18,10 @@ const ProjectDeleted = ({ projectItem, reload, navigation }) => {
   }
 
   const handleDetete = () => {
-    Alert.alert('Warning', 'Are you sure you want to permanently delete this item?',[
+    Alert.alert(
+      "Warning",
+      "Are you sure you want to permanently delete this item?",
+      [
         {
           text: "Cancel",
         },
@@ -18,8 +29,9 @@ const ProjectDeleted = ({ projectItem, reload, navigation }) => {
           text: "OK",
           onPress: () => confirmDelete(),
         },
-      ])
-  }
+      ]
+    );
+  };
   const handleChange = async () => {
     const response = await RecoverProject(projectItem.id);
     if (response.success) {
@@ -30,37 +42,63 @@ const ProjectDeleted = ({ projectItem, reload, navigation }) => {
   };
 
   return (
-    <TouchableOpacity
-      key={projectItem.id}
-      style={styles.projectItemContainer}
-    >
-      {/* Circle with colorCode */}
-      <View
-        style={[styles.colorCircle, { backgroundColor: projectItem?.colorCode }]}
-      />
-
-      {/* Project Name */}
-      <View style={styles.projectNameContainer}>
-        <Text
+    <View>
+      <TouchableOpacity
+        key={projectItem.id}
+        style={styles.projectItemContainer}
+      >
+        {/* Circle with colorCode */}
+        <View
           style={[
-            styles.projectName,
-            styles.completedProject,
+            styles.colorCircle,
+            { backgroundColor: projectItem?.colorCode },
           ]}
-        >
-          {projectItem.projectName}
-        </Text>
-      </View>
+        />
 
-      {/* Status Buttons */}
-      <View style={styles.statusButtonsContainer}>
-        <TouchableOpacity onPress={() => handleChange()}>
-        <Feather name="refresh-ccw" size={24} color="green" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleDetete()}>
-          <MaterialIcons name="delete" size={24} color="gray" />
-        </TouchableOpacity>
+        {/* Project Name */}
+        <View style={styles.projectNameContainer}>
+          <Text style={[styles.projectName, styles.completedProject]}>
+            {projectItem.projectName}
+          </Text>
+        </View>
+
+        {/* Status Buttons */}
+        <View style={styles.statusButtonsContainer}>
+          <TouchableOpacity onPress={() => handleChange()}>
+            <Feather name="refresh-ccw" size={24} color="green" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleDetete()}>
+            <MaterialIcons name="delete" size={24} color="gray" />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+      <View style={{ marginLeft: 30 }}>
+        {projectItem.listWorkActive?.map((item) => (
+          <WorkactiveDL
+            workItem={item}
+            reload={reload}
+            navigation={navigation}
+            key={item.id} // Use a unique identifier here, such as item.id
+          />
+        ))}
+        {projectItem.listWorkCompleted?.map((item) => (
+          <WorkCompletedDL
+            workItem={item}
+            reload={reload}
+            navigation={navigation}
+            key={item.id} // Use a unique identifier here, such as item.id
+          />
+        ))}
+        {projectItem.listWorkDeleted?.map((item) => (
+          <WorkDeleted
+            workItem={item}
+            reload={reload}
+            navigation={navigation}
+            key={item.id} // Use a unique identifier here, such as item.id
+          />
+        ))}
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
@@ -72,10 +110,10 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 16,
     borderBottomColor: "#ddd",
-    borderBottomWidth: 1, 
-    backgroundColor:'white',
-    margin:10,
-    borderRadius:10,
+    borderBottomWidth: 1,
+    backgroundColor: "white",
+    margin: 10,
+    borderRadius: 10,
   },
   colorCircle: {
     width: 20,
@@ -91,7 +129,7 @@ const styles = StyleSheet.create({
   projectName: {
     flex: 1,
     paddingLeft: 10,
-    fontSize:16
+    fontSize: 16,
   },
   completedProject: {
     textDecorationLine: "line-through",

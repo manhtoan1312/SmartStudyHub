@@ -253,7 +253,7 @@ function Project({ navigation }) {
           <View style={s`flex flex-row`}>
             <Feather name="flag" size={24} color="yellow" />
             <Text style={s`h-full flex items-center pl-2`}>
-              Medium Priority
+              Normal Priority
             </Text>
           </View>
           <Switch

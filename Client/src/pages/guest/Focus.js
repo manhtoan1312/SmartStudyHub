@@ -297,7 +297,7 @@ const Focus = () => {
       setStop(false);
       setIsPaused(false);
       saveToAsyncStorage("initialPomodoroTime", minutes);
-      saveToAsyncStorage("startTime", new Date().getTime().toString());
+      saveToAsyncStorage("startTime",String(new Date().getTime()));
     }
   };
 
@@ -485,6 +485,7 @@ const Focus = () => {
       setIsPaused(true);
       setStop(true);
       resetData();
+      setSelectedExtra(null)
     } else {
       Alert.alert("Error when complete extra work", response.message);
     }

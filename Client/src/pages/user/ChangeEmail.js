@@ -10,36 +10,32 @@ import {
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
+  ChangeEmailUser,
   SendOTPChangePassword,
-  changePassword,
 } from "../../services/UserService";
-import getRole from "../../services/RoleService";
+import { ResendOTP } from "../../services/AccountService";
 
-function ChangePassword({ route, navigation }) {
+function ChangeEmail({ route, navigation }) {
   const email = route.params.email;
-  const [password, setPassword] = useState("");
-  const [rePassword, setRePassword] = useState("");
   const [otpInput, setOtpInput] = useState("");
   const [resendDisabled, setResendDisabled] = useState(true);
   const [countdown, setCountdown] = useState(60);
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [rePasswordVisible, setRePasswordVisible] = useState(false);
-  const [otp, setOtp] = useState('')
-  const [time, setTime] = useState()
+  const [otp, setOtp] = useState(route.params.otpCode);
+  const [time, setTime] = useState(route.params.time);
+
   const sendOTP = async () => {
-    const newResponse = await SendOTPChangePassword(email);
+    const newResponse = await ResendOTP(email);
     if (newResponse.success) {
       setCountdown(60);
       setResendDisabled(true);
       setTime(newResponse.data.otpTimeExpiration);
-      setOtp(newResponse.data.otpCode)
+      setOtp(newResponse.data.otpCode);
     } else {
       Alert.alert("Sending OTP Failed", newResponse.message);
     }
   };
-  useEffect(() => {
-    sendOTP();
-  }, []);
+
+
   useEffect(() => {
     let interval;
     if (countdown > 0 && resendDisabled) {
@@ -54,26 +50,34 @@ function ChangePassword({ route, navigation }) {
   }, [countdown, resendDisabled]);
 
   const handleNext = async () => {
-    if (password === rePassword) {
-      const currentTime = new Date().getTime();
-      if (currentTime < time) {
-        if (otpInput === otp) {
-          const response = await changePassword(email, password, otpInput);
-          if(response.success) {
-            Alert.alert('Change Password success!',"please login again")
-            await AsyncStorage.clear()
-            navigation.navigate('Login')
-          }
-          
-        } else {
-          Alert.alert("Invalid OTP", "Please enter the correct OTP.");
+    const currentTime = new Date().getTime();
+    if (currentTime < time) {
+      if (otpInput === otp) {
+        const response = await ChangeEmailUser(email, otpInput);
+        if (response.success) {
+          Alert.alert("Change Email success!", "please login again");
+          handleLogin()
+        } else if(!response.success) {
+          Alert.alert("Error", response.message);
+        }
+        else{
+          Alert.alert("Error", "Wrong or expired token, please log in again", [
+            ,
+            { text: "OK", onPress: () => {handleLogin()} },
+          ]);
         }
       } else {
-        Alert.alert("OTP Expired", "The OTP has expired. Please resend OTP.");
+        Alert.alert("Invalid OTP", "Please enter the correct OTP.");
       }
+    } else {
+      Alert.alert("OTP Expired", "The OTP has expired. Please resend OTP.");
     }
   };
 
+  const handleLogin = async () => {
+    await AsyncStorage.clear();
+    navigation.navigate("Login");
+  };
   const handleResendOTP = async () => {
     if (!resendDisabled) {
       sendOTP();
@@ -92,6 +96,7 @@ function ChangePassword({ route, navigation }) {
         <View style={styles.titleContainer}>
           <Text style={styles.title}>SMART STUDY HUB</Text>
         </View>
+       
         <View style={styles.inputContainer}>
           <TextInput
             placeholder="Enter OTP"
@@ -101,44 +106,6 @@ function ChangePassword({ route, navigation }) {
             style={styles.input}
           />
         </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Enter Password"
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-            secureTextEntry={!passwordVisible}
-            style={styles.input}
-          />
-          <TouchableOpacity
-            onPress={() => setPasswordVisible(!passwordVisible)}
-          >
-            <Ionicons
-              name={passwordVisible ?  "eye" : "eye-off"}
-              size={24}
-              color="black"
-              style={styles.eyeIcon}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Re-enter Password"
-            value={rePassword}
-            onChangeText={(text) => setRePassword(text)}
-            secureTextEntry={!rePasswordVisible}
-            style={styles.input}
-          />
-          <TouchableOpacity
-            onPress={() => setRePasswordVisible(!rePasswordVisible)}
-          >
-            <Ionicons
-              name={rePasswordVisible ? "eye" : "eye-off"}
-              size={24}
-              color="black"
-              style={styles.eyeIcon}
-            />
-          </TouchableOpacity>
-        </View>
 
         <Text style={styles.resendText} onPress={handleResendOTP}>
           {resendDisabled
@@ -146,7 +113,7 @@ function ChangePassword({ route, navigation }) {
             : "Resend OTP"}
         </Text>
         <TouchableOpacity style={styles.button} onPress={handleNext}>
-          <Text style={styles.buttonText}>Change Password</Text>
+          <Text style={styles.buttonText}>Change Email</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -177,7 +144,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: "#e27602",
     fontWeight: "bold",
-    marginBottom:20,
+    marginBottom: 20,
   },
   subTitle: {
     fontSize: 20,
@@ -192,9 +159,6 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     alignItems: "center",
     marginBottom: 20,
-  },
-  input: {
-    flex: 1,
   },
   button: {
     backgroundColor: "#FFA500",
@@ -225,9 +189,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#007bff",
   },
-  eyeIcon: {
-    marginRight: 10,
-  },
 });
 
-export default ChangePassword;
+export default ChangeEmail;

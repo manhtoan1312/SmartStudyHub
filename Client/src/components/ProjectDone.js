@@ -1,6 +1,12 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { DeleteProject, RecoverProject } from "../services/Guest/ProjectService";
-import { MaterialIcons } from "@expo/vector-icons";
+import {
+  DeleteProject,
+  RecoverProject,
+} from "../services/Guest/ProjectService";
+import { MaterialIcons,Feather } from "@expo/vector-icons";
+import WorkActive from "./WorkActive";
+import WorkCompleted from "./WorkCompleted";
+import WorkDeleted from "./WorkDeleted";
 const ProjectDone = ({ projectItem, reload, navigation }) => {
   async function confirmDeleteProject() {
     const response = await DeleteProject(projectItem.id);
@@ -23,45 +29,69 @@ const ProjectDone = ({ projectItem, reload, navigation }) => {
   };
 
   return (
-    <TouchableOpacity
-      key={projectItem.id}
-      style={styles.projectItemContainer}
-      onPress={() => toDetail()}
-    >
-      {/* Circle with colorCode */}
-      <View
-        style={[styles.colorCircle, { backgroundColor: projectItem?.colorCode }]}
-      />
-
-      {/* Project Name */}
-      <View style={styles.projectNameContainer}>
-        <Text
+    <View>
+      <TouchableOpacity
+        key={projectItem.id}
+        style={styles.projectItemContainer}
+        onPress={() => toDetail()}
+      >
+        {/* Circle with colorCode */}
+        <View
           style={[
-            styles.projectName,
-            projectItem.status === "COMPLETED" && styles.completedProject,
-          ]}
-        >
-          {projectItem.projectName}
-        </Text>
-      </View>
-
-      {/* Status Buttons */}
-      <View style={styles.statusButtonsContainer}>
-        <TouchableOpacity
-          onPress={() => handleChange(projectItem)}
-          style={[
-            styles.statusCircle,
-            {
-              backgroundColor:
-                projectItem.status === "ACTIVE" ? "transparent" : "green",
-            },
+            styles.colorCircle,
+            { backgroundColor: projectItem?.colorCode },
           ]}
         />
-        <TouchableOpacity onPress={() => confirmDeleteProject(projectItem.id)}>
-          <MaterialIcons name="delete" size={24} color="gray" />
-        </TouchableOpacity>
+
+        {/* Project Name */}
+        <View style={styles.projectNameContainer}>
+          <Text
+            style={[
+              styles.projectName,
+              projectItem.status === "COMPLETED" && styles.completedProject,
+            ]}
+          >
+            {projectItem.projectName}
+          </Text>
+        </View>
+
+        {/* Status Buttons */}
+        <View style={styles.statusButtonsContainer}>
+        <Feather name="refresh-ccw" size={24} color="gray" />
+          <TouchableOpacity
+            onPress={() => confirmDeleteProject(projectItem.id)}
+          >
+            <MaterialIcons name="delete" size={24} color="gray" />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+      <View style={{ marginLeft: 30 }}>
+        {projectItem.listWorkActive?.map((item) => (
+          <WorkActive
+            workItem={item}
+            reload={reload}
+            navigation={navigation}
+            key={item.id} // Use a unique identifier here, such as item.id
+          />
+        ))}
+        {projectItem.listWorkCompleted?.map((item) => (
+          <WorkCompleted
+            workItem={item}
+            reload={reload}
+            navigation={navigation}
+            key={item.id} // Use a unique identifier here, such as item.id
+          />
+        ))}
+        {projectItem.listWorkDeleted?.map((item) => (
+          <WorkDeleted
+            workItem={item}
+            reload={reload}
+            navigation={navigation}
+            key={item.id} // Use a unique identifier here, such as item.id
+          />
+        ))}
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
@@ -73,10 +103,10 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 16,
     borderBottomColor: "#ddd",
-    borderBottomWidth: 1, 
-    backgroundColor:'white',
-    margin:10,
-    borderRadius:10,
+    borderBottomWidth: 1,
+    backgroundColor: "white",
+    margin: 10,
+    borderRadius: 10,
   },
   colorCircle: {
     width: 20,
@@ -92,7 +122,7 @@ const styles = StyleSheet.create({
   projectName: {
     flex: 1,
     paddingLeft: 10,
-    fontSize:16
+    fontSize: 16,
   },
   completedProject: {
     textDecorationLine: "line-through",

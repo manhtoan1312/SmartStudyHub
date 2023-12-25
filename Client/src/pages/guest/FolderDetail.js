@@ -165,7 +165,7 @@ const FolderDetail = ({ route, navigation }) => {
               </TouchableOpacity>
               {project.listProjectActive?.map((projectItem) => (
                 <View key={projectItem.id}>
-                  <Text>{projectItem.projectName}</Text>
+                  <Text style={{padding:10}}>{projectItem.projectName}</Text>
                   {projectItem?.listWorkActive?.map((workItem) => (
                     <WorkActive
                       key={workItem.id}
@@ -203,6 +203,7 @@ const FolderDetail = ({ route, navigation }) => {
               {doneVisible &&
                 project.listProjectCompleted?.map((projectItem) => (
                   <View key={projectItem.id}>
+                    <Text style={{padding:10}}>{projectItem.projectName}</Text>
                     {projectItem?.listWorkActive?.map((workItem) => (
                       <WorkActive
                         key={workItem.id}

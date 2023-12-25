@@ -151,7 +151,7 @@ const AddWorkModal = ({
   const colorFlag = () => {
     if (prioritSelect === "LOW") {
       return "green";
-    } else if (prioritSelect === "MEDIUM") {
+    } else if (prioritSelect === "NORMAL") {
       return "yellow";
     } else if (prioritSelect === "HIGH") {
       return "red";
@@ -198,7 +198,7 @@ const AddWorkModal = ({
         <View style={styles.priorityModal}>
           <View style={styles.priorityRow}>
             {renderPriorityButton("HIGH", "red")}
-            {renderPriorityButton("MEDIUM", "yellow")}
+            {renderPriorityButton("NORMAL", "yellow")}
           </View>
           <View style={styles.priorityRow}>
             {renderPriorityButton("LOW", "green")}

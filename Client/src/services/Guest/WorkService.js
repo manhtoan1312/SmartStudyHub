@@ -85,7 +85,7 @@ const UpdateWork = async (
         note,
         status,
         tags,
-        extraWorks
+        extraWorks,
       }),
     });
 
@@ -372,6 +372,27 @@ const GetWorkDeleted = async (id) => {
   }
 };
 
+const SortWork = async (work, type) => {
+  try {
+    const response = await fetch(`${uri}/sort-work?type=${type}`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: work,
+    });
+    const data = await response.json();
+    if (response.status === 200) {
+      return { success: true, data: data.data };
+    } else {
+      return { success: false, message: data.meta.message };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
 export {
   CreateWork,
   UpdateWork,
@@ -387,4 +408,5 @@ export {
   GetWorkByType,
   GetWorkCompleted,
   GetWorkDeleted,
+  SortWork,
 };

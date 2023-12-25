@@ -36,7 +36,7 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
     "TaskDefault",
     "Planned",
     "LowPriority",
-    "MediumPriority",
+    "NORMALPriority",
     "HighPriority",
   ]);
   const [data, setData] = useState([]);
@@ -79,8 +79,8 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
         case "LowPriority":
           result = await GetWorkByPriority("LOW", id);
           break;
-        case "MediumPriority":
-          result = await GetWorkByPriority("MEDIUM", id);
+        case "NORMALPriority":
+          result = await GetWorkByPriority("NORMAL", id);
           break;
         case "HighPriority":
           result = await GetWorkByPriority("HIGH", id);

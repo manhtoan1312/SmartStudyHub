@@ -24,8 +24,11 @@ import {
 } from "../services/Guest/ExtraWork";
 import { Swipeable } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import ExtraDeleted from "./ExtraDeleted";
+import ExtraCompleted from "./ExtraCompleted";
+import ExtraActive from "./ExtraActive";
 
-const WorkActive = ({ workItem, reload, navigation }) => {
+const WorkactiveDL = ({ workItem, reload, navigation }) => {
   const [extraVisible, setExtraVisible] = useState(false);
 
   async function playSound() {
@@ -294,89 +297,21 @@ const WorkActive = ({ workItem, reload, navigation }) => {
             <View style={styles.extraContainer}>
               {workItem.extraWorks?.map((item) => (
                 <View key={item.id}>
-                  <Swipeable
-                    renderRightActions={renderRightActionsForExtraWork(item.id)}
-                  >
-                    <TouchableOpacity
-                      onPress={() => playExtra(workItem)}
-                      style={{ flexDirection: "column", marginVertical: 5 }}
-                    >
-                      <View style={styles.extraWorkItem} key={item.id}>
-                        <View style={{ flexDirection: "row" }}>
-                          <TouchableOpacity
-                            onPress={() =>
-                              CompletedExtraWork(item.id, item.status)
-                            }
-                          >
-                            {item.status === "COMPLETED" ? (
-                              <AntDesign
-                                name="checkcircle"
-                                size={20}
-                                color="#00cc00"
-                              />
-                            ) : (
-                              <View
-                                style={[styles.circle, { borderColor: "gray" }]}
-                              />
-                            )}
-                          </TouchableOpacity>
-                          <View
-                            style={{ alignItems: "center", paddingLeft: 5 }}
-                          >
-                            <Text
-                              style={{
-                                textDecorationLine:
-                                  item.status === "COMPLETED"
-                                    ? "line-through"
-                                    : "none",
-                              }}
-                            >
-                              {item.extraWorkName}
-                            </Text>
-                            {item.numberOfPomodoros > 0 && (
-                              <View
-                                style={{
-                                  flexDirection: "row",
-                                  alignItems: "center",
-                                }}
-                              >
-                                {[...Array(item.numberOfPomodoros)].map(
-                                  (_, index) => (
-                                    <MaterialCommunityIcons
-                                      key={index}
-                                      name="clock"
-                                      size={14}
-                                      color="#ff9999"
-                                    />
-                                  )
-                                )}
-                              </View>
-                            )}
-                          </View>
-                        </View>
-                        {item.status === "ACTIVE" ? (
-                          <TouchableOpacity
-                            onPress={() => playExtra(item)}
-                            style={styles.playButton}
-                          >
-                            <Ionicons
-                              name="ios-play-circle-sharp"
-                              size={26}
-                              color="#ff3232"
-                            />
-                          </TouchableOpacity>
-                        ) : (
-                          <TouchableOpacity style={styles.playButton}>
-                            <AntDesign
-                              name="checkcircle"
-                              size={26}
-                              color="#00cc00"
-                            />
-                          </TouchableOpacity>
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                  </Swipeable>
+                {item.status === "ACTIVE" && (
+                  <ExtraActive extra={item} reload={reload} navigation={navigation} />
+                )}
+                {item.status === "COMPLETED" && (
+                  <ExtraCompleted
+                    extra={item}
+                    reload={reload}
+                    navigation={navigation}
+                  />
+                )}
+              </View>
+              ))}
+              {workItem?.extraWorksDeleted?.map((item) => (
+                <View key={item}>
+                  <ExtraDeleted extra={item} reload={reload} />
                 </View>
               ))}
             </View>
@@ -445,4 +380,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WorkActive;
+export default WorkactiveDL;

@@ -50,8 +50,6 @@ const AddFolder = ({ navigation }) => {
         const response = await GetProjectForAddFolder(id);
         if (response.success) {
           setListProject(response.data);
-        } else {
-          Alert.alert("Error!", response.message);
         }
       } catch (e) {
         Alert.alert("Error!!", e);

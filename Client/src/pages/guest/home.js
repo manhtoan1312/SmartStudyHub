@@ -176,7 +176,7 @@ export default function Home({ navigation }) {
       };
 
       fetchData();
-      reload();
+      fetchDataFPT()
       return () => {
         setEmail(null);
       };
@@ -231,7 +231,7 @@ export default function Home({ navigation }) {
           GetWorkByType("TASK_DEFAULT", id),
           planed && GetWorkByType("PLANNED", id),
           lowPriority && GetWorkByPriority("LOW", id),
-          mediumPriority && GetWorkByPriority("MEDIUM", id),
+          mediumPriority && GetWorkByPriority("NORMAL", id),
           hightPriority && GetWorkByPriority("HIGH", id),
         ]);
         if (rsToday.success) {
@@ -597,7 +597,7 @@ export default function Home({ navigation }) {
                   size={20}
                   color="orange"
                 />
-                <Text>Medium Priority</Text>
+                <Text>Normal Priority</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.itemRow}>{mediumPriorityData.time}</Text>

@@ -23,7 +23,7 @@ import ExtraActive from "./ExtraActive";
 import ExtraDeleted from "./ExtraDeleted";
 import ExtraCompleted from "./ExtraCompleted";
 
-const WorkCompleted = ({ workItem, reload, navigation }) => {
+const WorkCompletedDL = ({ workItem, reload, navigation }) => {
   const renderDay = () => {
     const dueDate = workItem.statusWork;
     const options = { weekday: "short", month: "numeric", day: "numeric" };
@@ -190,16 +190,9 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
       </Swipeable>
       {workItem?.extraWorks.length > 0 &&
         workItem.extraWorks?.map((item) => (
-          <View
-            key={item.id}
-            style={[styles.container, { paddingLeft: 30, flex: 1 }]}
-          >
+          <View key={item.id} style={[styles.container, { paddingLeft: 30, flex:1 }]}>
             {item.status === "ACTIVE" && (
-              <ExtraActive
-                extra={item}
-                reload={reload}
-                navigation={navigation}
-              />
+              <ExtraActive extra={item} reload={reload} navigation={navigation} />
             )}
             {item.status === "COMPLETED" && (
               <ExtraCompleted
@@ -207,6 +200,27 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
                 reload={reload}
                 navigation={navigation}
               />
+            )}
+            {item.status === "DELETED" && (
+              <ExtraDeleted extra={item} reload={reload} navigation={navigation} />
+            )}
+          </View>
+        ))}
+        {workItem?.extraWorksDeleted.length > 0 &&
+        workItem.extraWorksDeleted.map((item) => (
+          <View key={item.id} style={[styles.container, { paddingLeft: 30, flex:1 }]}>
+            {item.status === "ACTIVE" && (
+              <ExtraActive extra={item} reload={reload} navigation={navigation} />
+            )}
+            {item.status === "COMPLETED" && (
+              <ExtraCompleted 
+                extra={item}
+                reload={reload}
+                navigation={navigation}
+              />
+            )}
+            {item.status === "DELETED" && (
+              <ExtraDeleted extra={item} reload={reload} navigation={navigation} />
             )}
           </View>
         ))}
@@ -269,4 +283,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WorkCompleted;
+export default WorkCompletedDL;

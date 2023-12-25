@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 const PriorityModal = ({ visible, onSelectPriority, onClose }) => {
   const priorities = [
     { label: "High priority", color: "red", icon: "ios-flag", value:'HIGH' },
-    { label: "Medium Priority", color: "#e6e600", icon: "ios-flag" , value:'MEDIUM'},
+    { label: "Normal Priority", color: "#e6e600", icon: "ios-flag" , value:'NORMAL'},
     { label: "Low Priority", color: "green", icon: "ios-flag", value:'LOW' },
     { label: "None", color: "gray", icon: null, value:'NONE' },
   ];

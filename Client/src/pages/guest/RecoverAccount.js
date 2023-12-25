@@ -32,7 +32,8 @@ function RecoverAccount({ navigation }) {
         }
     }
     else{
-        Alert.alert('Login fail', rs.message)
+        Alert.alert('Login fail', rs
+        )
     }
   };
 

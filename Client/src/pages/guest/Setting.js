@@ -336,7 +336,7 @@ export default function Setting({ navigation }) {
         </View>
 
         <View style={s`flex flex-row`}>
-          <Text style={s`text-red-500 text-lg`}>{preTime} Date</Text>
+          <Text style={s`text-red-500 text-lg`}>{preTime} Days</Text>
           <AntDesign style={s`text-lg`} name="right" color="red" />
         </View>
       </View>
@@ -518,10 +518,10 @@ export default function Setting({ navigation }) {
           <AntDesign style={s`text-lg`} name="right" />
         </View>
 
-        <View style={s`flex flex-row justify-between py-2`}>
+        <TouchableOpacity onPress={()=> navigation.navigate('HelpAndFeedBack')} style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Help and feedback</Text>
           <AntDesign style={s`text-lg`} name="right" />
-        </View>
+        </TouchableOpacity>
 
         <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Application information</Text>
@@ -539,7 +539,7 @@ export default function Setting({ navigation }) {
         </View>
       </View>
 
-      {!email && (
+      
         <View
           style={s`flex flex-col justify-between px-2 mt-6 bg-white py-2 mb-4`}
         >
@@ -547,10 +547,10 @@ export default function Setting({ navigation }) {
             style={s`flex flex-row justify-center items-center py-2`}
             onTouchEnd={() => deleteData()}
           >
-            <Text style={s`text-lg font-medium text-red-500`}>Delete Data</Text>
+            <Text style={s`text-lg font-medium text-red-500`}>{email ? 'Log Out' : 'Delete Data'} </Text>
           </View>
         </View>
-      )}
+      
     </ScrollView>
   );
 }

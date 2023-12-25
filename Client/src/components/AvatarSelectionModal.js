@@ -1,25 +1,56 @@
-import React, { useState } from 'react';
-import { View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import React, { useEffect, useState } from "react";
+import { View, Text, Modal, TouchableOpacity, StyleSheet, Image } from "react-native";
+import * as ImagePicker from 'expo-image-picker';
 
 const AvatarSelectionModal = ({ isVisible, onClose, onSelectImage }) => {
-  const handleSelectCamera = () => {
-    launchCamera({ mediaType: 'photo' }, handleImageSelection);
-  };
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  const handleSelectGallery = () => {
-    launchImageLibrary({ mediaType: 'photo' }, handleImageSelection);
-  };
+  useEffect(() => {
+    (async () => {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission denied!');
+      }
+    })();
+  }, []);
 
-  const handleImageSelection = (response) => {
-    if (response.didCancel || response.error) {
-      console.log('Image selection cancelled or error:', response.error);
-    } else {
-      // Pass the selected image URI to the parent component
-      onSelectImage(response.uri);
+  const handleSelectCamera = async () => {
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!result.cancelled) {
+        setSelectedImage(result.uri);
+        onSelectImage(result.uri);
+      }
+    } catch (error) {
+      console.error('Camera launch error:', error);
     }
 
-    // Close the modal
+    onClose();
+  };
+
+  const handleSelectGallery = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!result.cancelled) {
+        setSelectedImage(result.uri);
+        onSelectImage(result.uri);
+      }
+    } catch (error) {
+      console.error('Image library launch error:', error);
+    }
+
     onClose();
   };
 
@@ -36,6 +67,9 @@ const AvatarSelectionModal = ({ isVisible, onClose, onSelectImage }) => {
           <TouchableOpacity onPress={onClose} style={styles.cancelButton}>
             <Text style={styles.cancelText}>Cancel</Text>
           </TouchableOpacity>
+          {selectedImage && (
+            <Image source={{ uri: selectedImage }} style={{ width: 200, height: 200 }} />
+          )}
         </View>
       </View>
     </Modal>
@@ -45,11 +79,11 @@ const AvatarSelectionModal = ({ isVisible, onClose, onSelectImage }) => {
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
@@ -57,11 +91,11 @@ const styles = StyleSheet.create({
   optionButton: {
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: "#ddd",
   },
   optionText: {
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
   cancelButton: {
     paddingVertical: 15,
@@ -69,8 +103,8 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 16,
-    textAlign: 'center',
-    color: 'red',
+    textAlign: "center",
+    color: "red",
   },
 });
 

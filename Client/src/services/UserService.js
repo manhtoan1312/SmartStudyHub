@@ -123,10 +123,10 @@ const CheckPasswordCorrect = async (password) => {
 
       if (response.status === 200) {
         const data = await response.json();
-        return { success: true, message: data.meta.message };
+        return { success: data.data.booleanType, message: data.data.stringType };
       } else {
         const data = await response.json();
-        return { success: false, message: data.meta.message };
+        return { success: false, message: data.data.stringType };
       }
     } else {
       return { success: false, message: "Token not found" };
@@ -138,14 +138,7 @@ const CheckPasswordCorrect = async (password) => {
 };
 
 const updateInformation = async (
-  phoneNumber,
-  firstName,
-  lastName,
-  address,
-  dateOfBirth,
-  country,
-  imageUrl,
-  roles
+  phoneNumber,firstName,lastName,address,dateOfBirth,country,imageUrl,roles
 ) => {
   try {
     const role = await getRole();
@@ -160,20 +153,13 @@ const updateInformation = async (
           authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          phoneNumber,
-          firstName,
-          lastName,
-          address,
-          dateOfBirth,
-          country,
-          imageUrl,
-          roles,
+          phoneNumber,firstName,lastName,address,dateOfBirth,country,imageUrl,roles
         }),
       });
 
       if (response.status === 200) {
         const data = await response.json();
-        return { success: true, message: data.meta.message };
+        return { success: true, message: data.data };
       } else {
         const data = await response.json();
         return { success: false, message: data.meta.message };
@@ -190,10 +176,8 @@ const updateInformation = async (
 const ChangeEmailUser = async (email, otpCode) => {
   try {
     const role = await getRole();
-
     if (role) {
       const { token } = role;
-
       const response = await fetch(`${uri}/change-email`, {
         method: "post",
         headers: {
@@ -228,7 +212,6 @@ const getUserInfor = async () => {
 
     if (role) {
       const { token } = role;
-
       const response = await fetch(`${uri}/get-info`, {
         method: "get",
         headers: {
@@ -252,4 +235,36 @@ const getUserInfor = async () => {
     return { success: false, message: "Client Error" };
   }
 };
-export { SendOTPChangePassword, changePassword, deleteAccount,CheckPasswordCorrect, updateInformation, ChangeEmailUser, getUserInfor };
+
+const CleanData = async (id) => {
+  try {
+    const role = await getRole();
+
+    if (role) {
+      const { token } = role;
+      const response = await fetch(`${uri}/cleandata?userId=${id}`, {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        return { success: true, message: data.meta.message };
+      } else {
+        const data = await response.json();
+        return { success: false, message: data.meta.message };
+      }
+    } else {
+      return { success: false, message: "Token not found" };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
+
+export { SendOTPChangePassword, changePassword, deleteAccount,CheckPasswordCorrect, updateInformation, ChangeEmailUser, getUserInfor,CleanData };

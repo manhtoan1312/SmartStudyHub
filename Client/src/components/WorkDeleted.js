@@ -4,10 +4,15 @@ import { Swipeable } from "react-native-gesture-handler";
 import {
   AntDesign,
   MaterialCommunityIcons,
-  FontAwesome5,Feather
+  FontAwesome5,
+  Feather,
 } from "@expo/vector-icons";
 import { RecoverWork, RecoverExtraWork } from "../services/Guest/WorkService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import ExtraCompleted from "./ExtraCompleted";
+import ExtraDeleted from "./ExtraDeleted";
+import { ExtraMarkCompleted } from "../services/Guest/ExtraWork";
+import ExtraActive from "./ExtraActive";
 
 const WorkDeleted = ({ workItem, reload, navigation }) => {
   const renderRightActions = (progress, dragX) => {
@@ -64,7 +69,7 @@ const WorkDeleted = ({ workItem, reload, navigation }) => {
     const options = { weekday: "short", month: "numeric", day: "numeric" };
     let color = "gray";
     let dateStart = new Date(workItem.dueDate);
-    dateStart.setDate(dateStart.getDate()-1)
+    dateStart.setDate(dateStart.getDate() - 1);
     let date = dateStart.toLocaleDateString("en-US", options);
 
     if (dueDate === "TODAY") {
@@ -85,69 +90,99 @@ const WorkDeleted = ({ workItem, reload, navigation }) => {
     );
   };
 
-  const handleRecoverExtraWork = async (id) => {
-    const response = await RecoverExtraWork(id);
-    if (response.success) {
-      reload();
-    } else {
-      Alert.alert("Error when recover extra work", response.message);
-    }
-  };
-
-  const handlePlay = async () => {  
-    navigation.navigate("WorkDeletedDetail", {id:workItem.id});
+  const handlePlay = async () => {
+    navigation.navigate("WorkDeletedDetail", { id: workItem.id });
   };
 
   return (
-    <Swipeable renderRightActions={renderRightActions}>
-      <TouchableOpacity
-        onPress={() => handlePlay()}
-        style={{ flexDirection: "column", marginVertical: 5 }}
-      >
-        <View style={styles.container}>
-          <AntDesign name="closecircle" size={24} color="red" />
-          <View style={styles.content}>
-            <Text
-              style={[
-                styles.workName,
-                workItem.status === "DELETED" && styles.deletedText,
-              ]}
-            >
-              {workItem.workName}
-            </Text>
-            <View
-              style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
-            >
-              {workItem.numberOfPomodoros !== 0 && (
-                <View style={styles.pomodoroContainer}>
-                  <MaterialCommunityIcons
-                    name="clock-check"
-                    size={14}
-                    color="#ff3232"
-                  />
-                  <Text style={styles.pomodoroText}>
-                    {workItem.numberOfPomodorosDone}/
-                  </Text>
-                  <MaterialCommunityIcons
-                    name="clock"
-                    size={14}
-                    color="#ff9999"
-                  />
-                  <Text style={[styles.pomodoroText, { marginRight: 5 }]}>
-                    {workItem.numberOfPomodoros}
-                  </Text>
-                </View>
-              )}
-              {workItem.statusWork !== "SOMEDAY" && renderDay()}
+    <View>
+      <Swipeable renderRightActions={renderRightActions}>
+        <TouchableOpacity
+          onPress={() => handlePlay()}
+          style={{ flexDirection: "column", marginVertical: 5 }}
+        >
+          <View style={styles.container}>
+            <AntDesign name="closecircle" size={24} color="red" />
+            <View style={styles.content}>
+              <Text
+                style={[
+                  styles.workName,
+                  workItem.status === "DELETED" && styles.deletedText,
+                ]}
+              >
+                {workItem.workName}
+              </Text>
+              <View
+                style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
+              >
+                {workItem.numberOfPomodoros !== 0 && (
+                  <View style={styles.pomodoroContainer}>
+                    <MaterialCommunityIcons
+                      name="clock-check"
+                      size={14}
+                      color="#ff3232"
+                    />
+                    <Text style={styles.pomodoroText}>
+                      {workItem.numberOfPomodorosDone}/
+                    </Text>
+                    <MaterialCommunityIcons
+                      name="clock"
+                      size={14}
+                      color="#ff9999"
+                    />
+                    <Text style={[styles.pomodoroText, { marginRight: 5 }]}>
+                      {workItem.numberOfPomodoros}
+                    </Text>
+                  </View>
+                )}
+                {workItem.statusWork !== "SOMEDAY" && renderDay()}
+              </View>
             </View>
+            <TouchableOpacity
+              onPress={() => handleRecover()}
+              style={styles.recoverButton}
+            >
+              <Feather name="refresh-ccw" size={24} color="gray" />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => handleRecover()} style={styles.recoverButton}>
-          <Feather name="refresh-ccw" size={24} color="gray" />
-      </TouchableOpacity>
-        </View>
-        
-      </TouchableOpacity>
-    </Swipeable>
+        </TouchableOpacity>
+      </Swipeable>
+      {workItem?.extraWorks.length > 0 &&
+        workItem.extraWorks.map((item) => (
+          <View
+            key={item.id}
+            style={[styles.container, { paddingLeft: 30, flex: 1 }]}
+          >
+            {item.status === "ACTIVE" && (
+              <ExtraActive
+                extra={item}
+                reload={reload}
+                navigation={navigation}
+              />
+            )}
+            {item.status === "COMPLETED" && (
+              <ExtraCompleted
+                extra={item}
+                reload={reload}
+                navigation={navigation}
+              />
+            )}
+          </View>
+        ))}
+      {workItem?.extraWorksDeleted.length > 0 &&
+        workItem.extraWorksDeleted.map((item) => (
+          <View
+            key={item.id}
+            style={[styles.container, { paddingLeft: 30, flex: 1 }]}
+          >
+            <ExtraDeleted
+              extra={item}
+              reload={reload}
+              navigation={navigation}
+            />
+          </View>
+        ))}
+    </View>
   );
 };
 
@@ -171,7 +206,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: "center",
-    paddingLeft:10
+    paddingLeft: 10,
   },
   workName: {
     fontSize: 14,
@@ -210,9 +245,9 @@ const styles = StyleSheet.create({
   playButton: {
     marginLeft: 10,
   },
-  recoverButton:{
-    marginRight:10
-  }
+  recoverButton: {
+    marginRight: 10,
+  },
 });
 
 export default WorkDeleted;

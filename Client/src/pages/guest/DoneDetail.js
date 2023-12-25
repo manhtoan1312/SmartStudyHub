@@ -18,6 +18,7 @@ import ImageFocus from "../../components/Image_Focus";
 import PomodoroCompleted from "../../components/PomodoroCompleted";
 import ProjectDone from "../../components/ProjectDone";
 import { useIsFocused } from "@react-navigation/native";
+
 const DoneDetail = ({ navigation }) => {
   const [listwork, setListWork] = useState();
   const [listPomodoro, setListPomodoro] = useState();
@@ -207,6 +208,8 @@ const DoneDetail = ({ navigation }) => {
           ))}
         </ScrollView>
       )}
+      
+
       <ImageFocus />
     </View>
   );
