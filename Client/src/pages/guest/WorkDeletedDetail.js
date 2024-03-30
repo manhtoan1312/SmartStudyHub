@@ -317,48 +317,145 @@ const WorkDeletedDetail = ({ route, navigation }) => {
                 </View>
               </TouchableOpacity>
             </View>
-            <View style={styles.namecontainer}>
+            <View style={styles.container2}>
               <View>
-                {work.extraWorksDeleted.length > 0 &&
-                  work.extraWorksDeleted.map((item) => (
-                    <View style={styles.content} key={item.id}>
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
-                      >
-                        <TouchableOpacity>
-                          <AntDesign name="closecircle" size={24} color="red" />
-                        </TouchableOpacity>
-                        <View style={{ paddingLeft: 10 }}>
-                          <View
-                            style={{
-                              alignItems: "center",
-                            }}
-                          >
-                            <Text>{item.extraWorkName}</Text>
-                          </View>
-                          {item.numberOfPomodoros > 0 && (
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  {work.extraWorks.length > 0 &&
+                    work.extraWorks.map((item) => (
+                      <View style={styles.content} key={item.id}>
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <TouchableOpacity>
+                            {item.status === "COMPLETED" ? (
+                              <AntDesign
+                                style={{ marginRight: 5 }}
+                                name="checkcircle"
+                                size={24}
+                                color="#00cc00"
+                              />
+                            ) : (
+                              <View
+                                style={[styles.cirle, { borderColor: "gray" }]}
+                              />
+                            )}
+                          </TouchableOpacity>
+                          <View style={{ paddingLeft: 10 }}>
                             <View
                               style={{
-                                flexDirection: "row",
                                 alignItems: "center",
                               }}
                             >
-                              {[...Array(item.numberOfPomodoros)].map(
-                                (_, index) => (
-                                  <MaterialCommunityIcons
-                                    key={index}
-                                    name="clock"
-                                    size={14}
-                                    color="#ff9999"
-                                  />
-                                )
-                              )}
+                              <Text>{item.extraWorkName}</Text>
                             </View>
+                            {item.numberOfPomodoros > 0 && (
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  alignItems: "center",
+                                }}
+                              >
+                                {[...Array(item.numberOfPomodoros)].map(
+                                  (_, index) => (
+                                    <MaterialCommunityIcons
+                                      key={index}
+                                      name="clock"
+                                      size={14}
+                                      color="#ff9999"
+                                    />
+                                  )
+                                )}
+                              </View>
+                            )}
+                          </View>
+                        </View>
+                        <View style={{}}>
+                          {item.status === "ACTIVE" ? (
+                            <TouchableOpacity onPress={() => playExtra(item)}>
+                              <Ionicons
+                                name="ios-play-circle-sharp"
+                                size={28}
+                                color="#ff3232"
+                              />
+                            </TouchableOpacity>
+                          ) : (
+                            <TouchableOpacity>
+                              <AntDesign
+                                name="checkcircle"
+                                size={24}
+                                color="#00cc00"
+                              />
+                            </TouchableOpacity>
                           )}
                         </View>
                       </View>
+                    ))}
+                  {work.status === "ACTIVE" && (
+                    <View style={styles.addExtraWorkContainer}>
+                      <AntDesign name="plus" size={24} color="gray" />
+                      <TextInput
+                        style={styles.extraWorkInput}
+                        placeholder="Add Extra Work"
+                        value={extraWorkName}
+                        onChangeText={(text) => setExtraWorkName(text)}
+                        returnKeyType="done"
+                        onSubmitEditing={addExtraWork}
+                      />
                     </View>
-                  ))}
+                  )}
+                </View>
+                <View>
+                  {work.extraWorksDeleted.length > 0 &&
+                    work.extraWorksDeleted.map((item) => (
+                      <View style={styles.content} key={item.id}>
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <TouchableOpacity>
+                            <AntDesign
+                              name="closecircle"
+                              size={24}
+                              color="red"
+                            />
+                          </TouchableOpacity>
+                          <View style={{ paddingLeft: 10 }}>
+                            <View
+                              style={{
+                                alignItems: "center",
+                              }}
+                            >
+                              <Text>{item.extraWorkName}</Text>
+                            </View>
+                            {item.numberOfPomodoros > 0 && (
+                              <View
+                                style={{
+                                  flexDirection: "row",
+                                  alignItems: "center",
+                                }}
+                              >
+                                {[...Array(item.numberOfPomodoros)].map(
+                                  (_, index) => (
+                                    <MaterialCommunityIcons
+                                      key={index}
+                                      name="clock"
+                                      size={14}
+                                      color="#ff9999"
+                                    />
+                                  )
+                                )}
+                              </View>
+                            )}
+                          </View>
+                        </View>
+                      </View>
+                    ))}
+                </View>
               </View>
             </View>
             <View style={styles.namecontainer}>
@@ -469,6 +566,12 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     alignContent: "space-between",
     alignItems: "center",
+  },
+  container2: {
+    marginTop: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 20,
+    backgroundColor: "white",
   },
   bodycontainer: {
     marginTop: 20,

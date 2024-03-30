@@ -105,7 +105,7 @@ const AddWorkModal = ({
     if (!prioritSelect) {
       setPriority("NONE");
     }
-    if (type === "SOMEDAY") {
+    if (type === "SOMEDAY" && !onDateChange) {
       onDone(
         selectedProject.id,
         prioritSelect,
@@ -383,6 +383,7 @@ const AddWorkModal = ({
     setOnDateChange(true);
     setSelectedDate(dateTime);
     hideDateTimePicker();
+    setOnDateChange(true)
   };
 
   return (

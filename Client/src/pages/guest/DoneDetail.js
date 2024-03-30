@@ -48,7 +48,6 @@ const DoneDetail = ({ navigation }) => {
     const response = await GetWorkCompleted(id);
     if (response.success) {
       setListWork(response.data);
-      console.log("xong work");
     } else {
       console.log("loi work: ", response.message);
     }
@@ -58,7 +57,6 @@ const DoneDetail = ({ navigation }) => {
     const Po = await GetPomodoro(id);
     if (Po.success) {
       translatePomodoro(Po.data);
-      console.log("xong pomo");
     } else {
       console.log("loi po: ", Po.message);
     }
@@ -68,9 +66,8 @@ const DoneDetail = ({ navigation }) => {
     const Project = await GetProjectByStatus(id, "COMPLETED");
     if (Project.success) {
       setListProject(Project.data);
-      console.log("xong proejct");
     } else {
-      console.log("loi prọect: ", Project.message);
+      console.log("loi project: ", Project.message);
     }
   };
 

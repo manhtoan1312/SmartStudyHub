@@ -102,7 +102,6 @@ const Focus = () => {
     const endTime = new Date().getTime();
     const id = await AsyncStorage.getItem("id");
     const sTime = await AsyncStorage.getItem("startTime");
-    console.log(sTime);
     let workid = null;
     let extraId = null;
     if (selectedTask) {
@@ -328,6 +327,7 @@ const Focus = () => {
     setSelectedExtra(null);
     setStop(true);
     setIsPaused(true);
+    await resetData();
     if (type === "+") {
       setSecondsLeft(0);
     }
@@ -493,7 +493,6 @@ const Focus = () => {
   const handleDoneWork = async (id) => {
     if (typeWorkSelect === "WORK") {
       const response = await MarkCompleted(id);
-      console.log(response);
       if (response.success) {
         await AsyncStorage.removeItem("work");
         await AsyncStorage.removeItem("workType");
@@ -506,7 +505,6 @@ const Focus = () => {
       }
     } else {
       const response = await ExtraMarkCompleted(id);
-      console.log(response);
       if (response.success) {
         await AsyncStorage.removeItem("work");
         await AsyncStorage.removeItem("workType");

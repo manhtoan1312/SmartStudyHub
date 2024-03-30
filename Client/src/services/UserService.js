@@ -123,7 +123,10 @@ const CheckPasswordCorrect = async (password) => {
 
       if (response.status === 200) {
         const data = await response.json();
-        return { success: data.data.booleanType, message: data.data.stringType };
+        return {
+          success: data.data.booleanType,
+          message: data.data.stringType,
+        };
       } else {
         const data = await response.json();
         return { success: false, message: data.data.stringType };
@@ -138,7 +141,14 @@ const CheckPasswordCorrect = async (password) => {
 };
 
 const updateInformation = async (
-  phoneNumber,firstName,lastName,address,dateOfBirth,country,imageUrl,roles
+  phoneNumber,
+  firstName,
+  lastName,
+  address,
+  dateOfBirth,
+  country,
+  imageUrl,
+  roles
 ) => {
   try {
     const role = await getRole();
@@ -153,7 +163,14 @@ const updateInformation = async (
           authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          phoneNumber,firstName,lastName,address,dateOfBirth,country,imageUrl,roles
+          phoneNumber,
+          firstName,
+          lastName,
+          address,
+          dateOfBirth,
+          country,
+          imageUrl,
+          roles,
         }),
       });
 
@@ -266,5 +283,111 @@ const CleanData = async (id) => {
   }
 };
 
+const deleteCurrentAvatar = async () => {
+  try {
+    const role = await getRole();
 
-export { SendOTPChangePassword, changePassword, deleteAccount,CheckPasswordCorrect, updateInformation, ChangeEmailUser, getUserInfor,CleanData };
+    if (role) {
+      const { token } = role;
+      const response = await fetch(`${uri}/delete-current-avatar`, {
+        method: "delete",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        return { success: true, data: data.data };
+      } else {
+        const data = await response.json();
+        return { success: false, message: data.meta.message };
+      }
+    } else {
+      return { success: false, message: "Token not found" };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
+const getAvtUploaded = async (type) => {
+  try {
+    const role = await getRole();
+    if (role) {
+      const { token } = role;
+      const response = await fetch(
+        `${uri}/files/get-files-uploaded-user?type=${type}`,
+        {
+          method: "get",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const data = await response.json();
+        return { success: true, data: data.data };
+      } else {
+        const data = await response.json();
+        return { success: false, message: data.meta.message };
+      }
+    } else {
+      return { success: false, message: "Token not found" };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
+const deleteCompletelyAvt = async (id) => {
+  try {
+    const role = await getRole();
+
+    if (role) {
+      const { token } = role;
+      const response = await fetch(
+        `${uri}/files/delete-completely-files-by-id/${id}`,
+        {
+          method: "delete",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const data = await response.json();
+        return { success: true, data: data.meta.message };
+      } else {
+        const data = await response.json();
+        return { success: false, message: data.meta.message };
+      }
+    } else {
+      return { success: false, message: "Token not found" };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
+export {
+  SendOTPChangePassword,
+  changePassword,
+  deleteAccount,
+  CheckPasswordCorrect,
+  updateInformation,
+  ChangeEmailUser,
+  getUserInfor,
+  CleanData,
+  deleteCurrentAvatar,
+  getAvtUploaded,
+  deleteCompletelyAvt,
+};

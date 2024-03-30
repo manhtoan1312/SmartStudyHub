@@ -351,20 +351,20 @@ export default function Setting({ navigation }) {
 
       <View style={s`flex flex-col px-2 mt-6 bg-white py-2`}>
         <View style={s`flex flex-row justify-between py-2`}>
-          <Text style={s` text-lg font-medium`}>Working alarm</Text>
+          <Text style={s` text-lg font-medium`}>Working bell</Text>
           <View style={s`flex flex-row`}>
             <Text style={s`text-gray-500 text-lg `}>{workSound}</Text>
             <AntDesign style={s`text-lg`} name="right" />
           </View>
         </View>
 
-        <View style={s`flex flex-row justify-between py-2`}>
+        <TouchableOpacity style={s`flex flex-row justify-between py-2`} onPress={() => navigate('SoundDone')}>
           <Text style={s` text-lg font-medium`}>Break bell</Text>
           <View style={s`flex flex-row`}>
             <Text style={s`text-gray-500 text-lg`}>{breakSound}</Text>
             <AntDesign style={s`text-lg `} name="right" />
           </View>
-        </View>
+        </TouchableOpacity>
 
         <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s` text-lg font-medium`}>Noise helps concentration</Text>
@@ -459,9 +459,11 @@ export default function Setting({ navigation }) {
       </View>
 
       <View style={s`flex flex-col justify-between px-2 mt-6 bg-white py-4`}>
-        <View style={s` py-2`}>
-          <Text style={s`text-lg font-medium`}>Display</Text>
-        </View>
+        <TouchableOpacity onPress={() => navigate('Theme')}>
+          <View style={s` py-2`}>
+            <Text style={s`text-lg font-medium`}>Theme</Text>
+          </View>
+        </TouchableOpacity>
 
         <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Application notifications</Text>
@@ -518,7 +520,7 @@ export default function Setting({ navigation }) {
           <AntDesign style={s`text-lg`} name="right" />
         </View>
 
-        <TouchableOpacity onPress={()=> navigation.navigate('HelpAndFeedBack')} style={s`flex flex-row justify-between py-2`}>
+        <TouchableOpacity onPress={()=> navigate('HelpAndFeedBack')} style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Help and feedback</Text>
           <AntDesign style={s`text-lg`} name="right" />
         </TouchableOpacity>

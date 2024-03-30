@@ -22,8 +22,19 @@ class TimerService {
     const seconds = await AsyncStorage.getItem("secondsLeft");
     const play = await AsyncStorage.getItem("play");
     const mode = await AsyncStorage.getItem("mode");
-    const settings = await this.getSettings();
-
+    const work = await AsyncStorage.getItem("work");
+    const type = await AsyncStorage.getItem("workType");
+    if (work) {
+      const parseWork = JSON.parse(work);
+      if (type === "WORK") {
+        this.pomodorotime = parseWork.timeOfPomodoro;
+      }
+    } else {
+      const settings = await this.getSettings();
+      if (settings) {
+        this.pomodorotime = settings.pomodoroTime;
+      }
+    }
     if (seconds) {
       this.secondLeftRef = parseInt(seconds);
       this.minutesLeft = Math.floor(this.secondLeftRef / 60);
@@ -36,9 +47,7 @@ class TimerService {
     if (play) {
       this.isPlay = parseInt(play);
     }
-    if (settings) {
-      this.pomodorotime = settings.pomodoroTime;
-    }
+
     if (this.isPlay === 1) {
       this.intervalRef = setInterval(() => {
         if (this.secondLeftRef === 0 && this.mode === "-") {
@@ -50,7 +59,6 @@ class TimerService {
           this.secondLeftRef =
             this.mode === "+" ? this.secondLeftRef + 1 : this.secondLeftRef - 1;
         }
-        console.log(this.secondLeftRef);
       }, 1000);
     }
   }
@@ -82,7 +90,6 @@ class TimerService {
       startTime,
       endTime
     );
-    console.log(id, workid, extraId, timePo, parseInt(startTime), endTime);
     if (!response.success) {
       Alert.alert("Error!!", response.message);
     } else {

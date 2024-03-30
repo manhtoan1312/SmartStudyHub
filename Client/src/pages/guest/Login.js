@@ -34,11 +34,11 @@ function Login({ navigation }) {
         const decodedToken = jwt_decode(token);
         const subArray = decodedToken.sub.split("-");
         const id = subArray[0];
-        await AsyncStorage.setItem('token', tokenIndex)
+        await AsyncStorage.setItem("token", tokenIndex);
         await AsyncStorage.setItem("id", id);
         const firstName = subArray[subArray.length - 1].trim().split(" ")[0];
         const lastName = subArray[subArray.length - 1].trim().split(" ")[1];
-        console.log(id, token, firstName, lastName)
+        console.log(id, token, firstName, lastName);
         await AsyncStorage.setItem("accountName", `${lastName} ${firstName}`);
         navigation.navigate("Home");
       } else if (url.includes("account-deleted")) {
@@ -66,46 +66,49 @@ function Login({ navigation }) {
     };
   }, [navigation]);
   const handleLogin = async (e) => {
-    if(email && password){
+    if (email && password) {
       e.preventDefault();
-    const response = await login(email, password);
-    if (response.success) {
-      await AsyncStorage.setItem("token", response.token);
-      const role = jwt_decode(response.token);
-      const subArray = role.sub.split("-");
-      const id = subArray[0];
-      await AsyncStorage.setItem("id", id);
+      const response = await login(email, password);
+      if (response.success) {
+        await AsyncStorage.setItem("token", response.token);
+        const role = jwt_decode(response.token);
+        const subArray = role.sub.split("-");
+        const id = subArray[0];
+        await AsyncStorage.setItem("id", id);
 
-      navigation.navigate("Home");
-    } else {
-      if (response.status === "2_4_f") {
-        Alert.alert(
-          "Your account has been deleted",
-          "Do you want to recover your account?",
-          [
-            {
-              text: "No",
-              style: "cancel",
-            },
-            { text: "Yes", onPress: () => navigation.navigate("Recover") },
-          ]
-        );
+        navigation.navigate("Home");
       } else {
-        Alert.alert("Account was banned",'Do you want to report this problem?',[
-          [
-            {
-              text: "No",
-              style: "cancel",
-            },
-            { text: "Yes", onPress: () => navigation.navigate("Report") },
-          ]
-        ]);
-        
+        if (response.status === "2_4_f") {
+          Alert.alert(
+            "Your account has been deleted",
+            "Do you want to recover your account?",
+            [
+              {
+                text: "No",
+                style: "cancel",
+              },
+              { text: "Yes", onPress: () => navigation.navigate("Recover") },
+            ]
+          );
+        } else if(response.status==='2_3_f') {
+          Alert.alert(
+            "Account was banned",
+            "Do you want to reportt this problem?",
+            [
+              {
+                text: "No",
+                style: "cancel",
+              },
+              { text: "Yes", onPress: () => navigation.navigate("Report") },
+            ]
+          );
+        }
+        else{
+          Alert.alert('Error',response.message)
+        }
       }
-    }
-    }
-    else{
-      Alert.alert("Warnning", 'you need to input all field')
+    } else {
+      Alert.alert("Warnning", "you need to input all field");
     }
   };
 

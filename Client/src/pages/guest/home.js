@@ -28,7 +28,6 @@ import ImageFocus from "../../components/Image_Focus";
 import getRole from "../../services/RoleService";
 import {
   CheckMaxProject,
-  GetProjectByStatus,
   GetProjectForAddFolder,
 } from "../../services/Guest/ProjectService";
 import { CreateGuest } from "../../services/GuestService";
@@ -61,7 +60,9 @@ export default function Home({ navigation }) {
   const [plan, setPlan] = useState(true);
   const [group, setGroup] = useState(true);
   const [rating, setRating] = useState(true);
-  const [avt, setAvt] = useState(null);
+  const [avt, setAvt] = useState(
+    "https://res.cloudinary.com/dnj5purhu/image/upload/v1701175788/SmartStudyHub/USER/default-avatar_c2ruot.png"
+  );
   const [deleted, setDeleted] = useState(true);
   const [prenium, setPrenium] = useState(true);
   const [project, setProject] = useState([]);
@@ -176,7 +177,7 @@ export default function Home({ navigation }) {
       };
 
       fetchData();
-      fetchDataFPT()
+      fetchDataFPT();
       return () => {
         setEmail(null);
       };
@@ -328,12 +329,14 @@ export default function Home({ navigation }) {
             });
           }
           if (!rsFolder.success) {
-            
+            setFolder(null);
           } else {
             setFolder(rsFolder.data);
           }
           if (rsProject.success) {
             setProject(rsProject.data);
+          } else {
+            setProject(null);
           }
           if (rsTag.success) {
             setTag(rsTag.data);
@@ -406,7 +409,7 @@ export default function Home({ navigation }) {
             <ImageBackground
               style={styles.avt}
               resizeMode="cover"
-              source={avt ? { uri: avt } : require("../../images/avt.jpg")}
+              source={{ uri: avt }}
             ></ImageBackground>
             <Text
               style={{

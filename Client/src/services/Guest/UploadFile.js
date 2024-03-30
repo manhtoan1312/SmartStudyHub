@@ -8,7 +8,7 @@ const UploadAvt = async (file, roleU) => {
       const { token } = role;
       const formData = new FormData();
       formData.append("files", file);
-      formData.append("type", "USER");
+      formData.append("type", roleU);
       const response = await fetch(`${uri}/upload`, {
         method: "post",
         headers: {
@@ -30,7 +30,7 @@ const UploadAvt = async (file, roleU) => {
     }
   } catch (err) {
     console.log(err);
-    return { success: false, message: "Client Error" };
+    return { success: false, message: "Wrong token" };
   }
 };
 

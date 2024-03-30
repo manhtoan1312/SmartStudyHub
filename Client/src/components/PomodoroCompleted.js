@@ -128,7 +128,7 @@ const PomodoroCompleted = ({ pomoItem, reload, navigation }) => {
                 }}
               >
                 <TouchableOpacity style={styles.playButton}>
-                  <Text>{renderTime(item.startTime)}</Text>
+                  <Text>{item.startTime ? renderTime(item.startTime) : renderTime(item.endTime)}</Text>
                   <Text>|</Text>
                   <Text>{renderTime(item.endTime)}</Text>
                 </TouchableOpacity>

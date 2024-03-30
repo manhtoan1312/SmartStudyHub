@@ -54,7 +54,7 @@ const ProjectComponent = ({
     const response = await MarkCompleteProject(id);
     if (response.success) {
       playSound();
-      reload();
+      reload()
     } else {
       Alert.alert("Error", response.message);
     }

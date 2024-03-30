@@ -23,10 +23,8 @@ import {
   updateInformation,
 } from "../../services/UserService";
 import { DeleteGuest } from "../../services/GuestService";
-import * as ImagePicker from "expo-image-picker";
-import { UploadAvt } from "../../services/Guest/UploadFile";
-import { UpdateWork } from "../../services/Guest/WorkService";
 import { ResendOTP } from "../../services/AccountService";
+import { useIsFocused } from "@react-navigation/native";
 const InforUser = ({ navigation }) => {
   const [infor, setInfor] = useState(null);
   const [editNameModalVisible, setEditNameModalVisible] = useState(false);
@@ -36,28 +34,35 @@ const InforUser = ({ navigation }) => {
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
+  const isFocused = useIsFocused();
+  const fetchData = async () => {
+    const response = await getUserInfor();
+    if (response.success) {
+      setInfor(response.data);
+      setNewFirstName(response.data.firstName);
+      setNewLastName(response.data.lastName);
+    } else {
+      console.log("fetch data error!: ", response.message);
+      Alert.alert("Error", "Wrong or expired token, please log in again", [
+        ,
+        { text: "OK", onPress: () => handleLogin() },
+      ]);
+    }
+  };
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await getUserInfor();
-      if (response.success) {
-        setInfor(response.data);
-        setNewFirstName(response.data.firstName);
-        setNewLastName(response.data.lastName);
-      } else {
-        console.log("fetch data error!: ", response.message);
-        Alert.alert("Error", "Wrong or expired token, please log in again", [
-          ,
-          { text: "OK", onPress: () => handleLogin() },
-        ]);
+    const fetchDataOnFocus = async () => {
+      if (isFocused) {
+        await fetchData();
       }
     };
-    fetchData();
-  }, []);
+    fetchDataOnFocus();
+  }, [isFocused]);
   const openEditNameModal = () => {
     setEditNameModalVisible(true);
   };
 
   const updateInfor = async () => {
+    const avt = await AsyncStorage.getItem("img");
     const response = await updateInformation(
       infor.phoneNumber ? infor.phoneNumber : null,
       infor.firstName,
@@ -65,15 +70,14 @@ const InforUser = ({ navigation }) => {
       infor.address ? infor.address : null,
       infor.dateOfBirth ? infor.dateOfBirth : null,
       infor.country ? infor.country : null,
-      infor.imageUrl
-        ? infor.imageUrl
+      avt
+        ? avt
         : '"https://res.cloudinary.com/dnj5purhu/image/upload/v1701175788/SmartStudyHub/USER/default-avatar_c2ruot.png"',
       infor.roles ? infor.roles : "CUSTOMER"
     );
     if (!response.success) {
       Alert.alert("Change User Information fail", response.message);
     } else {
-      await AsyncStorage.setItem("img", String(response.message.imageUrl));
       await AsyncStorage.setItem(
         "accountName",
         `${response.message.firstName} ${response.message.lastName}`
@@ -176,37 +180,40 @@ const InforUser = ({ navigation }) => {
   };
 
   const handleSelectGallery = async () => {
-    try {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert("Warning", "Permission denied!");
-      } else {
-        const result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [1, 1],
-          quality: 1,
-        });
+    navigation.navigate("AvtUploaded", {
+      infor: infor,
+    });
+    // try {
+    //   const { status } =
+    //     await ImagePicker.requestMediaLibraryPermissionsAsync();
+    //   if (status !== "granted") {
+    //     Alert.alert("Warning", "Permission denied!");
+    //   } else {
+    //     const result = await ImagePicker.launchImageLibraryAsync({
+    //       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    //       allowsEditing: true,
+    //       aspect: [1, 1],
+    //       quality: 1,
+    //     });
 
-        if (!result.canceled) {
-          const file = {
-            uri: result.assets[0].uri,
-            name: `${result.assets[0].fileName}`,
-            type: "image/jpeg",
-          };
-          const response = await UploadAvt(file, "USER");
-          if (response.success) {
-            setInfor({ ...infor, imageUrl: response.data });
-            UpdateWork();
-          } else {
-            Alert.alert("Error!", "upload avatar fail");
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Image library launch error:", error);
-    }
+    //     if (!result.canceled) {
+    //       const file = {
+    //         uri: result.assets[0].uri,
+    //         name: `${result.assets[0].fileName}`,
+    //         type: "image/jpeg",
+    //       };
+    //       const response = await UploadAvt(file, "USER");
+    //       if (response.success) {
+    //         setInfor({ ...infor, imageUrl: response.data });
+    //         updateInfor();
+    //       } else {
+    //         Alert.alert("Error!", "upload avatar fail");
+    //       }
+    //     }
+    //   }
+    // } catch (error) {
+    //   console.error("Image library launch error:", error);
+    // }
   };
 
   return (
@@ -403,10 +410,9 @@ const InforUser = ({ navigation }) => {
                         Delete Account
                       </Text>
                     </TouchableOpacity>
-                    
                   </View>
                   <View style={styles.moreOptionsButton}>
-                  <TouchableOpacity
+                    <TouchableOpacity
                       onPress={() => handleDeleteData()}
                       style={{
                         width: "100%",

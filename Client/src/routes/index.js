@@ -45,6 +45,9 @@ import WorkDeletedDetail from "../pages/guest/WorkDeletedDetail";
 import ChangeEmail from "../pages/user/ChangeEmail";
 import HelpAndFeedBack from "../pages/guest/HelpAndFeedBack";
 import Report from "../pages/guest/Report";
+import Theme from "../pages/guest/Theme";
+import AvatarUploaded from "../pages/user/AvatarUploaded";
+import SoundDone from "../pages/guest/SoundDone";
 
 const Stack = createStackNavigator();
 
@@ -93,6 +96,9 @@ const Navigator = () => (
     <Stack.Screen name="ChangeEmail" component={ChangeEmail} />
     <Stack.Screen name="Report" component={Report} />
     <Stack.Screen name="HelpAndFeedBack" component={HelpAndFeedBack} />
+    <Stack.Screen name="Theme" component={Theme} />
+    <Stack.Screen name="AvtUploaded" component={AvatarUploaded} />
+    <Stack.Screen name="SoundDone" component={SoundDone} />
   </Stack.Navigator>
 );
 
