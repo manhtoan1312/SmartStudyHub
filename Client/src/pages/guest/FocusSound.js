@@ -1,4 +1,3 @@
-// SoundDone.js
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -11,31 +10,32 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import getRole from "../../services/RoleService";
-import {
-  deleteSoundDone,
-  getAllSoundDonePrenium,
-} from "../../services/Prenium/SoundDoneService";
-import { getAllSoundDoneOfGuest } from "../../services/Guest/getDataService";
+import { deleteSoundDone } from "../../services/Prenium/SoundDoneService";
+import { getAllSoundConcentrationOfGuest } from "../../services/Guest/getDataService";
 import SoundItem from "../../components/SoundItem";
 import { Audio } from "expo-av";
-const SoundDone = ({ navigation }) => {
+import {
+  getAllSoundPrenium,
+  markDeleteSound,
+} from "../../services/Prenium/SoundService";
+
+const FocusSound = ({ navigation }) => {
   const [soundList, setSoundList] = useState([]);
-  const [selectedSound, setSelectedSound] = useState({
-    nameSound: "Default Bell",
-    url: "https://res.cloudinary.com/dnj5purhu/video/upload/v1702956713/SmartStudyHub/SOUNDDONE/DEFAULT/DefaultBell_vh2hg0.mp3",
-  });
+  const [selectedSound, setSelectedSound] = useState({});
   const [soundObject, setSoundObject] = useState(null);
+  const [noneSelected, setNoneSelected] = useState(false);
+
   const fetchData = async () => {
-    const sound = await AsyncStorage.getItem("soundDone");
+    const sound = await AsyncStorage.getItem("focusSound");
     if (sound) {
       setSelectedSound(JSON.parse(sound));
     }
     let response;
     const role = getRole();
     if (role?.role === "PRENIUM") {
-      response = await getAllSoundDonePrenium();
+      response = await getAllSoundPrenium();
     } else {
-      response = await getAllSoundDoneOfGuest();
+      response = await getAllSoundConcentrationOfGuest();
     }
     if (response.success) {
       setSoundList(response.data);
@@ -51,17 +51,27 @@ const SoundDone = ({ navigation }) => {
       await soundObject.stopAsync();
     }
     setSelectedSound(sound);
+    setNoneSelected(false);
     const newSoundObject = new Audio.Sound();
     try {
       await newSoundObject.loadAsync({ uri: sound.url });
       await newSoundObject.playAsync();
       setSoundObject(newSoundObject);
-
-      await AsyncStorage.setItem("soundDone", JSON.stringify(sound));
+      await AsyncStorage.setItem("focusSound", JSON.stringify(sound));
     } catch (error) {
       console.error("Error playing sound:", error);
     }
   };
+
+  const handleNone = async () => {
+    if (soundObject) {
+      await soundObject.stopAsync();
+    }
+    setSelectedSound({}); 
+    setNoneSelected(true); 
+    await AsyncStorage.removeItem("focusSound");
+  };
+
   const handleDeleteSound = (sound) => {
     if (sound.statusSound !== "DEFAULT") {
       Alert.alert(
@@ -76,18 +86,19 @@ const SoundDone = ({ navigation }) => {
     }
   };
 
+  const confirmDelete = async (sound) => {
+    const response = await markDeleteSound(sound.id);
+    Alert.alert("Smart Study Hub announced", response.message);
+  };
+
+  const handleAddSound = async () => {};
+
   const handleBack = async ()=> {
     if (soundObject) {
       await soundObject.stopAsync();
     }
     navigation.goBack()
   }
-
-  const confirmDelete = async (sound) => {
-    const response = await deleteSoundDone(sound.id);
-    Alert.alert("Smart Study Hub announced", response.message);
-  };
-  const handleAddSound = async () => {};
   return (
     <View style={{ backgroundColor: "#eeeeee" }}>
       {/* Header */}
@@ -95,7 +106,7 @@ const SoundDone = ({ navigation }) => {
         <TouchableOpacity onPress={() => handleBack()}>
           <MaterialIcons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Break Bell</Text>
+        <Text style={styles.headerText}>Working Sound</Text>
         <TouchableOpacity>
           <MaterialIcons name="more-vert" size={24} color="white" />
         </TouchableOpacity>
@@ -114,6 +125,14 @@ const SoundDone = ({ navigation }) => {
           style={styles.addItem}
         >
           <Text style={styles.bodyText}>+ Add Sound</Text>
+        </TouchableOpacity>
+        {/* Hiển thị mục "None" */}
+        <TouchableOpacity
+          onPress={() => handleNone()}
+          style={[styles.addItem, noneSelected && styles.selectedItem]}
+        >
+          <Text style={[styles.bodyText]}>None</Text>
+          {noneSelected && <MaterialIcons name="check" size={24} color="orange" />}
         </TouchableOpacity>
         <FlatList
           data={soundList}
@@ -145,13 +164,19 @@ const styles = StyleSheet.create({
   },
   addItem: {
     height: 50,
-    paddingLeft: 20,
+    paddingHorizontal: 20,
     justifyContent: "center",
   },
   bodyText: {
     fontSize: 16,
     color: "#555555",
   },
+  selectedItem: {
+    backgroundColor: "#fee4d4",
+    flexDirection:'row',
+    justifyContent:'space-between',
+    alignItems:'center'
+  },
 });
 
-export default SoundDone;
+export default FocusSound;

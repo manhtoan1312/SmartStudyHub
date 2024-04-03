@@ -132,7 +132,7 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
                     {workItem.workName}{" "}
                   </Text>
                   <View>
-                    <Text>focus time: {workItem.timePassed}M</Text>
+                    <Text>Total focus time: {workItem.timePassed}M</Text>
                   </View>
                 </View>
                 <View

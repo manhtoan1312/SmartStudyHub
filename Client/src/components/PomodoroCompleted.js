@@ -30,11 +30,11 @@ const PomodoroCompleted = ({ pomoItem, reload, navigation }) => {
       inputRange: [0, 50, 100, 101],
       outputRange: [0, 0, 0, 1],
     });
-  
+
     return (
       <TouchableOpacity
         style={styles.rightActions}
-        onPress={() => handleDelete(itemId)} 
+        onPress={() => handleDelete(itemId)}
       >
         <TouchableOpacity onPress={() => handleDelete(itemId)}>
           <AntDesign name="delete" size={24} color="black" />
@@ -67,10 +67,10 @@ const PomodoroCompleted = ({ pomoItem, reload, navigation }) => {
         {renderDay()}
         <View style={styles.time}>
           <Text style={{ color: "gray" }}>
-            Focus time: {pomoItem?.timeFocus}M
+            Focus time: {pomoItem?.timeFocus} Minute
           </Text>
           <Text style={{ color: "gray" }}>
-            WorkCompleted: {pomoItem.totalWorkCompleted}
+            WorkCompleted: {pomoItem.totalWorkCompleted} {pomoItem.totalWorkCompleted> 1? 'Missions': 'Mission' }
           </Text>
         </View>
 
@@ -93,32 +93,48 @@ const PomodoroCompleted = ({ pomoItem, reload, navigation }) => {
           >
             <View style={styles.container}>
               <TouchableOpacity>
-                <AntDesign
-                  name="clockcircle"
-                  size={20}
-                  color="#ff3232"
-                  style={{
-                    marginRight: 15,
-                  }}
-                />
+                {item.isEndPomo ? (
+                  <AntDesign
+                    name="checkcircle"
+                    size={20}
+                    color="#00cc00"
+                    style={{
+                      marginRight: 15,
+                    }}
+                  />
+                ) : (
+                  <AntDesign
+                    name="clockcircle"
+                    size={20}
+                    color="#ff3232"
+                    style={{
+                      marginRight: 15,
+                    }}
+                  />
+                )}
               </TouchableOpacity>
               <View style={styles.content}>
                 <View
                   style={{
                     flex: 1,
-                    flexDirection: "row",
+                    flexDirection: 'row',
                     alignItems: "center",
                   }}
                 >
                   <Text
                     style={[
                       styles.workName,
+                      {textDecorationLine: item?.isEndPomo? 'line-through': 'none'},
                       { color: item.mode === "SPECIFIED" ? "black" : "red" },
                     ]}
                   >
                     {item.pomodoroName}{" "}
                   </Text>
+                  
                 </View>
+                {item?.timeOfPomodoro && <View>
+                <Text>{`${item?.timeOfPomodoro} minute`}</Text>
+                </View>}
               </View>
               <View
                 style={{
@@ -128,9 +144,21 @@ const PomodoroCompleted = ({ pomoItem, reload, navigation }) => {
                 }}
               >
                 <TouchableOpacity style={styles.playButton}>
-                  <Text>{item.startTime ? renderTime(item.startTime) : renderTime(item.endTime)}</Text>
-                  <Text>|</Text>
-                  <Text>{renderTime(item.endTime)}</Text>
+                  {item?.isEndPomo ? (
+                    <View>
+                      <Text>{renderTime(item.endTime)}</Text>
+                    </View>
+                  ) : (
+                    <View style={{ alignItems: "center" }}>
+                      <Text>
+                        {item.startTime
+                          ? renderTime(item.startTime)
+                          : renderTime(item.endTime)}
+                      </Text>
+                      <Text>|</Text>
+                      <Text>{renderTime(item.endTime)}</Text>
+                    </View>
+                  )}
                 </TouchableOpacity>
               </View>
             </View>

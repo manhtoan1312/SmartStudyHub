@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,15 +10,15 @@ import {
 } from "react-native";
 import { s } from "react-native-wind";
 import { AntDesign, FontAwesome5, Feather } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import getRole from "../../services/RoleService";
 import { Picker } from "react-native-wheel-pick";
 import { DeleteGuest } from "../../services/GuestService";
 export default function Setting({ navigation }) {
   const [preTime, setPreTime] = useState(0);
-  const [workSound, setWorkSound] = useState("Timer");
-  const [breakSound, setBreakSound] = useState("Timer");
+  const [workSound, setWorkSound] = useState("None");
+  const [breakSound, setBreakSound] = useState("Default Bell");
   const [focusSound, setFocusSound] = useState("None");
   const [vibrate, setVibrate] = useState(true);
   const [pomodoroTime, setPomodoroTime] = useState(25);
@@ -35,6 +35,7 @@ export default function Setting({ navigation }) {
   const [plan, setPlan] = useState(true);
   const [email, setEmail] = useState("");
   const [img, setImg] = useState(null);
+  const isFocused = useIsFocused()
   const [isPomodoroTimePickerVisible, setIsPomodoroTimePickerVisible] =
     useState(false);
   const [isShortBreakTimePickerVisible, setIsShortBreakTimePickerVisible] =
@@ -47,57 +48,67 @@ export default function Setting({ navigation }) {
   for (let i = 1; i <= 250; i++) {
     data.push({ label: i.toString(), value: i });
   }
-  useFocusEffect(
-    React.useCallback(() => {
-      const fetchSettings = async () => {
-        try {
-          const nameAcc = await AsyncStorage.getItem('accountName')
-          setEmail(nameAcc ? nameAcc : '')
-          const storedImg = await AsyncStorage.getItem("img");
-          setImg(storedImg ? storedImg : null);
-          const storedSettings = await AsyncStorage.getItem("settings");
-          if (storedSettings) {
-            const parsedSettings = JSON.parse(storedSettings);
-            setPreTime(parsedSettings.preTime);
-            setWorkSound(parsedSettings.workSound);
-            setBreakSound(parsedSettings.breakSound);
-            setFocusSound(parsedSettings.focusSound);
-            setVibrate(parsedSettings.vibrate);
-            setPomodoroTime(parsedSettings.pomodoroTime);
-            setShortBreakTime(parsedSettings.shortBreakTime);
-            setLongBreakTime(parsedSettings.longBreakTime);
-            setBreakAfter(parsedSettings.breakAfter);
-            setAutoStartPo(parsedSettings.autoStartPo);
-            setAutoStartBreak(parsedSettings.autoStartBreak);
-            setDisableBreakTime(parsedSettings.disableBreakTime);
-            setAppNotification(parsedSettings.appNotification);
-            setNotifyEveryday(parsedSettings.notifyEveryday);
-            setGroup(parsedSettings.group);
-            setRatings(parsedSettings.ratings);
-            setPlan(parsedSettings.plan);
-          }
-        } catch (error) {
-          console.log(error);
-          Alert.alert(
-            "Smart Study Hub Announcement",
-            "An error occurred while saving the settings",
-            [
-              {
-                text: "Cancel",
-              },
-              {
-                text: "OK",
-              },
-            ],
-            { cancelable: false }
-          );
-        }
-      };
+  const fetchSettings = async () => {
+    try {
+      const nameAcc = await AsyncStorage.getItem('accountName')
+      setEmail(nameAcc ? nameAcc : '')
+      const storedImg = await AsyncStorage.getItem("img");
+      setImg(storedImg ? storedImg : null);
+      const workingSound = await AsyncStorage.getItem("focusSound");
+      if(workingSound){
+        const parse = JSON.parse(workingSound)
+        setWorkSound(parse?.nameSound)
+      }
+      const breakSound = await AsyncStorage.getItem("soundDone");
+      if(breakSound){
+        const parse = JSON.parse(breakSound)
+        setBreakSound(parse?.nameSound)
+      }
+      const storedSettings = await AsyncStorage.getItem("settings");
+      if (storedSettings) {
+        const parsedSettings = JSON.parse(storedSettings);
+        setPreTime(parsedSettings.preTime);
+        setFocusSound(parsedSettings.focusSound);
+        setVibrate(parsedSettings.vibrate);
+        setPomodoroTime(parsedSettings.pomodoroTime);
+        setShortBreakTime(parsedSettings.shortBreakTime);
+        setLongBreakTime(parsedSettings.longBreakTime);
+        setBreakAfter(parsedSettings.breakAfter);
+        setAutoStartPo(parsedSettings.autoStartPo);
+        setAutoStartBreak(parsedSettings.autoStartBreak);
+        setDisableBreakTime(parsedSettings.disableBreakTime);
+        setAppNotification(parsedSettings.appNotification);
+        setNotifyEveryday(parsedSettings.notifyEveryday);
+        setGroup(parsedSettings.group);
+        setRatings(parsedSettings.ratings);
+        setPlan(parsedSettings.plan);
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert(
+        "Smart Study Hub Announcement",
+        "An error occurred while saving the settings",
+        [
+          {
+            text: "Cancel",
+          },
+          {
+            text: "OK",
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+  };
 
-      fetchSettings();
-    }, [])
-  );
-
+  useEffect(() => {
+    const fetchDataOnFocus = async () => {
+      if (isFocused) {
+        await fetchSettings();
+      }
+    };
+    fetchDataOnFocus();
+  }, [isFocused]);
   const updateData = async () => {
     const settings = {
       preTime,
@@ -297,29 +308,31 @@ export default function Setting({ navigation }) {
         />
         <Text style={s`font-medium text-2xl`}>Setting</Text>
       </View>
-      <View style={s`flex-1 flex-row py-4 pl-4 bg-white`}>
-        <View>
-          <Image
-            source={img ? { uri: img } : require("../../images/avt.jpg")}
-            style={s`w-12 h-12 rounded-3xl`}
-          />
-        </View>
-        <TouchableOpacity onPress={() => handleHeader()} style={s`flex flex-col px-2`}>
-          <TouchableOpacity onPress={() => handleHeader()} style={s`flex flex-row items-center`}>
-            <View style={s`mr-2`} >
-              {!email ? (
-                <Text style={s` text-lg font-medium`}>Sign In | Sign Up</Text>
-              ) : (
-                <Text style={s` text-lg font-medium`}>{email}</Text>
-              )}
+      <TouchableOpacity onPress={() => handleHeader()}>
+        <View style={s`flex-1 flex-row py-4 pl-4 bg-white`}>
+          <View>
+            <Image
+              source={img ? { uri: img } : require("../../images/avt.jpg")}
+              style={s`w-12 h-12 rounded-3xl`}
+            />
+          </View>
+          <TouchableOpacity style={s`flex flex-col px-2`}>
+            <TouchableOpacity  style={s`flex flex-row items-center`}>
+              <View style={s`mr-2`} >
+                {!email ? (
+                  <Text style={s` text-lg font-medium`}>Sign In | Sign Up</Text>
+                ) : (
+                  <Text style={s` text-lg font-medium`}>{email}</Text>
+                )}
+              </View>
+            </TouchableOpacity>
+  
+            <View style={s`mt-1`}>
+              <Text>Sync all devices</Text>
             </View>
           </TouchableOpacity>
-
-          <View style={s`mt-1`}>
-            <Text>Sync all devices</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+        </View>
+      </TouchableOpacity>
 
       <View
         style={s`flex flex-row justify-between px-2 mt-6 bg-white py-4`}
@@ -350,13 +363,13 @@ export default function Setting({ navigation }) {
       </View>
 
       <View style={s`flex flex-col px-2 mt-6 bg-white py-2`}>
-        <View style={s`flex flex-row justify-between py-2`}>
-          <Text style={s` text-lg font-medium`}>Working bell</Text>
+        <TouchableOpacity onPress={() => navigate('FocusSound')} style={s`flex flex-row justify-between py-2`}>
+          <Text style={s` text-lg font-medium`}>Working sound</Text>
           <View style={s`flex flex-row`}>
             <Text style={s`text-gray-500 text-lg `}>{workSound}</Text>
             <AntDesign style={s`text-lg`} name="right" />
           </View>
-        </View>
+        </TouchableOpacity>
 
         <TouchableOpacity style={s`flex flex-row justify-between py-2`} onPress={() => navigate('SoundDone')}>
           <Text style={s` text-lg font-medium`}>Break bell</Text>

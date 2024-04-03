@@ -49,7 +49,7 @@ export default function Home({ navigation }) {
   const [tomorow, setTomorow] = useState(true);
   const [thisWeek, setThisWeek] = useState(true);
   const [next7Day, setnext7Day] = useState(true);
-  const [hightPriority, setHightPriority] = useState(true);
+  const [highPriority, sethighPriority] = useState(true);
   const [mediumPriority, setMediumPriority] = useState(true);
   const [lowPriority, setLowPriority] = useState(true);
   const [planed, setPlaned] = useState(true);
@@ -136,7 +136,7 @@ export default function Home({ navigation }) {
             setTomorow(parsedData.tomorow);
             setThisWeek(parsedData.thisWeek);
             setnext7Day(parsedData.next7Day);
-            setHightPriority(parsedData.hightPriority);
+            sethighPriority(parsedData.highPriority);
             setMediumPriority(parsedData.mediumPriority);
             setLowPriority(parsedData.lowPriority);
             setPlaned(parsedData.planed);
@@ -233,7 +233,7 @@ export default function Home({ navigation }) {
           planed && GetWorkByType("PLANNED", id),
           lowPriority && GetWorkByPriority("LOW", id),
           mediumPriority && GetWorkByPriority("NORMAL", id),
-          hightPriority && GetWorkByPriority("HIGH", id),
+          highPriority && GetWorkByPriority("HIGH", id),
         ]);
         if (rsToday.success) {
           setTodayTime({
@@ -406,11 +406,13 @@ export default function Home({ navigation }) {
       >
         <View>
           <View style={styles.headers}>
-            <ImageBackground
-              style={styles.avt}
-              resizeMode="cover"
-              source={{ uri: avt }}
-            ></ImageBackground>
+            <TouchableOpacity onPress={() => navigation.navigate("Setting")}>
+              <ImageBackground
+                style={styles.avt}
+                resizeMode="cover"
+                source={{ uri: avt }}
+              ></ImageBackground>
+            </TouchableOpacity>
             <Text
               style={{
                 fontSize: 20,
@@ -568,7 +570,7 @@ export default function Home({ navigation }) {
               </View>
             </TouchableOpacity>
           )}
-          {hightPriority && (
+          {highPriority && (
             <TouchableOpacity
               style={styles.headers}
               onPress={() => navigation.navigate("High")}
@@ -580,7 +582,7 @@ export default function Home({ navigation }) {
                   size={20}
                   color="red"
                 />
-                <Text>Hight Priority</Text>
+                <Text>High Priority</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.itemRow}>{highPriorityData.time}</Text>
