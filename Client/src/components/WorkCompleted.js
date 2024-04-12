@@ -29,9 +29,9 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
     const options = { weekday: "short", month: "numeric", day: "numeric" };
     let color = "gray";
     let dateStart = new Date(workItem.endTime);
-    dateStart.setDate(dateStart.getDate() - 1);
+    dateStart.setDate(dateStart.getDate()+1);
     let date = dateStart.toLocaleDateString("en-US", options);
-
+    console.log(date)
     if (dueDate === "TODAY") {
       color = "green";
       date = "Today";

@@ -19,7 +19,7 @@ import {
 import { GetAllTagOfUser } from "../services/Guest/TagService";
 import { GetProjectByStatus } from "../services/Guest/ProjectService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import DateTimePicker from "react-native-modal-datetime-picker";
 
 const AddWorkModal = ({
@@ -31,8 +31,6 @@ const AddWorkModal = ({
   type,
   tagId,
 }) => {
-  const [workName, setWorkName] = useState(null);
-  const [pomodoroEstimate, setPomodoroEstimate] = useState(1);
   const [selectedClockIndex, setSelectedClockIndex] = useState(-1);
   const [listproject, setListProject] = useState([]);
   const [tag, setListTag] = useState(null);
@@ -49,6 +47,15 @@ const AddWorkModal = ({
   const [showPicker, setShowPicker] = useState(false);
   const [onDateChange, setOnDateChange] = useState(false);
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    const fetchDataOnFocus = async () => {
+      if (isFocused) {
+        await fetchData();
+      }
+    };
+    fetchDataOnFocus();
+  }, [isFocused]);
   const fetchData = async () => {
     const id = await AsyncStorage.getItem("id");
     const response = await GetAllTagOfUser(id);
@@ -100,7 +107,8 @@ const AddWorkModal = ({
     const selectedDateWithoutTime = new Date(
       selectedDate.getFullYear(),
       selectedDate.getMonth(),
-      selectedDate.getDate() + 1
+      selectedDate.getDate(),
+      23, 59, 59, 999
     );
     if (!prioritSelect) {
       setPriority("NONE");
@@ -118,7 +126,7 @@ const AddWorkModal = ({
       onDone(
         selectedProject.id,
         prioritSelect,
-        selectedDateWithoutTime.getTime() - 1,
+        selectedDateWithoutTime.getTime(),
         selectedDate.getTime(),
         selectedClockIndex == -1 ? 0 : selectedClockIndex,
         selectedTag.map((tag) => tag.id)
@@ -132,11 +140,6 @@ const AddWorkModal = ({
 
   const handleClockSelect = (index) => {
     setSelectedClockIndex(index);
-  };
-
-  const handlePrioritySelect = (selectedPriority) => {
-    setPriority(selectedPriority);
-    setIsPriorityModalVisible(false);
   };
 
   const handleProjectListPress = () => {
@@ -216,6 +219,7 @@ const AddWorkModal = ({
         <TouchableOpacity
           style={[styles.priorityButton, { backgroundColor }]}
           onPress={() => {
+            setIsPriorityModalVisible(false);
             setPriority(text);
           }}
         >
@@ -236,7 +240,7 @@ const AddWorkModal = ({
   };
 
   const renderProjectListModal = () => {
-    if (isProjectListModalVisible && listproject && listproject.length > 0) {
+    if (isProjectListModalVisible) {
       return (
         <Modal
           transparent={true}
@@ -314,7 +318,7 @@ const AddWorkModal = ({
   };
 
   const renderTagModal = () => {
-    if (isTagListModalVisible && tag && tag.length > 0) {
+    if (isTagListModalVisible) {
       return (
         <Modal
           transparent={true}
@@ -383,7 +387,7 @@ const AddWorkModal = ({
     setOnDateChange(true);
     setSelectedDate(dateTime);
     hideDateTimePicker();
-    setOnDateChange(true)
+    setOnDateChange(true);
   };
 
   return (

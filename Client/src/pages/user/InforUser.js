@@ -37,12 +37,12 @@ const InforUser = ({ navigation }) => {
   const isFocused = useIsFocused();
   const fetchData = async () => {
     const response = await getUserInfor();
-    if (response.success) {
+    if (response?.success) {
       setInfor(response.data);
       setNewFirstName(response.data.firstName);
       setNewLastName(response.data.lastName);
+      await AsyncStorage.setItem('img',response.data.imageUrl)
     } else {
-      console.log("fetch data error!: ", response.message);
       Alert.alert("Error", "Wrong or expired token, please log in again", [
         ,
         { text: "OK", onPress: () => handleLogin() },

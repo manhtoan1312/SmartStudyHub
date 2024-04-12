@@ -30,11 +30,9 @@ const All = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [closeKeyboard, setCloseKeyboard] = useState(false);
-  const [preName, setPreName] = useState(null);
   const isFocused = useIsFocused();
   const [sortModalVisible, setSortModalVisible] = useState(false);
   const [sortType, setSortType] = useState("");
-  
   useEffect(() => {
     const fetchDataOnFocus = async () => {
       if (isFocused) {

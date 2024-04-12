@@ -64,7 +64,7 @@ export default function Home({ navigation }) {
     "https://res.cloudinary.com/dnj5purhu/image/upload/v1701175788/SmartStudyHub/USER/default-avatar_c2ruot.png"
   );
   const [deleted, setDeleted] = useState(true);
-  const [prenium, setPrenium] = useState(true);
+  const [PREMIUM, setPREMIUM] = useState(true);
   const [project, setProject] = useState([]);
   const [folder, setFolder] = useState([]);
   const [tag, setTag] = useState([]);
@@ -114,68 +114,72 @@ export default function Home({ navigation }) {
     pomodoro: "0",
   });
 
+  const fetchData = async () => {
+    try {
+      const storedData = await AsyncStorage.getItem("projectData");
+      const settings = await AsyncStorage.getItem("settings");
+      const id = await AsyncStorage.getItem("id");
+      const avatar = await AsyncStorage.getItem("img");
+      const name = await AsyncStorage.getItem("accountName");
+      setAvt(
+        avatar
+          ? avatar
+          : "https://res.cloudinary.com/dnj5purhu/image/upload/v1701175788/SmartStudyHub/USER/default-avatar_c2ruot.png"
+      );
+      if (settings) {
+        const parsedData = JSON.parse(settings);
+        setGroup(parsedData.group);
+        setPlan(parsedData.plan);
+        setRating(parsedData.ratings);
+      }
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        setOutOfDate(parsedData.outOfDate);
+        setTomorow(parsedData.tomorow);
+        setThisWeek(parsedData.thisWeek);
+        setnext7Day(parsedData.next7Day);
+        sethighPriority(parsedData.highPriority);
+        setMediumPriority(parsedData.mediumPriority);
+        setLowPriority(parsedData.lowPriority);
+        setPlaned(parsedData.planed);
+        setAll(parsedData.all);
+        setSomeDay(parsedData.someDay);
+        setEvent(parsedData.event);
+        setDone(parsedData.done);
+        setDeleted(parsedData.deleted);
+      }
+      if (name) {
+        setEmail(name);
+      } else {
+        getRole().then((role) => {
+          if (role) {
+            setEmail(role.name);
+            console.log(role.token);
+            const setName = async () => {
+              await AsyncStorage.setItem("accountName", role.name);
+            };
+            setName();
+          }
+        });
+      }
+      if (!id) {
+        const fetchDataId = async () => {
+          const rs = await CreateGuest();
+          if (!rs?.success) {
+            Alert.alert("Creating id error", rs.message);
+          }
+        };
+        fetchDataId();
+      } else {
+        console.log(id);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useFocusEffect(
     React.useCallback(() => {
-      const fetchData = async () => {
-        try {
-          const storedData = await AsyncStorage.getItem("projectData");
-          const settings = await AsyncStorage.getItem("settings");
-          const id = await AsyncStorage.getItem("id");
-          const avt = await AsyncStorage.getItem("img");
-          const name = await AsyncStorage.getItem("accountName");
-          setAvt(avt ? avt : null);
-          if (settings) {
-            const parsedData = JSON.parse(settings);
-            setGroup(parsedData.group);
-            setPlan(parsedData.plan);
-            setRating(parsedData.ratings);
-          }
-          if (storedData) {
-            const parsedData = JSON.parse(storedData);
-            setOutOfDate(parsedData.outOfDate);
-            setTomorow(parsedData.tomorow);
-            setThisWeek(parsedData.thisWeek);
-            setnext7Day(parsedData.next7Day);
-            sethighPriority(parsedData.highPriority);
-            setMediumPriority(parsedData.mediumPriority);
-            setLowPriority(parsedData.lowPriority);
-            setPlaned(parsedData.planed);
-            setAll(parsedData.all);
-            setSomeDay(parsedData.someDay);
-            setEvent(parsedData.event);
-            setDone(parsedData.done);
-            setDeleted(parsedData.deleted);
-          }
-          if (name) {
-            setEmail(name);
-          } else {
-            getRole().then((role) => {
-              if (role) {
-                setEmail(role.name);
-                console.log(role.token);
-                const setName = async () => {
-                  await AsyncStorage.setItem("accountName", role.name);
-                };
-                setName();
-              }
-            });
-          }
-          if (!id) {
-            const fetchDataId = async () => {
-              const rs = await CreateGuest();
-              if (!rs.success) {
-                Alert.alert("Creating id error", rs.message);
-              }
-            };
-            fetchDataId();
-          } else {
-            console.log(id);
-          }
-        } catch (error) {
-          console.log(error);
-        }
-      };
-
       fetchData();
       fetchDataFPT();
       return () => {
@@ -187,7 +191,7 @@ export default function Home({ navigation }) {
   useEffect(() => {
     const fetchDataOnFocus = async () => {
       if (isFocused) {
-        await fetchDataFPT();
+        await fetchData();
       }
     };
     fetchDataOnFocus();
@@ -235,14 +239,14 @@ export default function Home({ navigation }) {
           mediumPriority && GetWorkByPriority("NORMAL", id),
           highPriority && GetWorkByPriority("HIGH", id),
         ]);
-        if (rsToday.success) {
+        if (rsToday?.success) {
           setTodayTime({
             time: convertMinutesToHoursAndMinutes(rsToday.data.totalTimeWork),
             pomodoro: rsToday.data.totalWorkActive,
           });
         }
 
-        if (rsOutOfDate.success) {
+        if (rsOutOfDate?.success) {
           setOutOfDateData({
             time: convertMinutesToHoursAndMinutes(
               rsOutOfDate.data.totalTimeWork
@@ -251,7 +255,7 @@ export default function Home({ navigation }) {
           });
         }
 
-        if (rsTomorrow.success) {
+        if (rsTomorrow?.success) {
           setTomorrowTime({
             time: convertMinutesToHoursAndMinutes(
               rsTomorrow.data.totalTimeWork
@@ -259,7 +263,7 @@ export default function Home({ navigation }) {
             pomodoro: rsTomorrow.data.totalWorkActive,
           });
         }
-        if (rsThisWeek.success) {
+        if (rsThisWeek?.success) {
           setThisWeekData({
             time: convertMinutesToHoursAndMinutes(
               rsThisWeek.data.totalTimeWork
@@ -267,7 +271,7 @@ export default function Home({ navigation }) {
             pomodoro: rsThisWeek.data.totalWorkActive,
           });
         }
-        if (rsNext7Day.success) {
+        if (rsNext7Day?.success) {
           setNext7DayData({
             time: convertMinutesToHoursAndMinutes(
               rsNext7Day.data.totalTimeWork
@@ -276,27 +280,27 @@ export default function Home({ navigation }) {
           });
         }
 
-        if (rsSomeDay.success) {
+        if (rsSomeDay?.success) {
           setSomeDayData({
             time: convertMinutesToHoursAndMinutes(rsSomeDay.data.totalTimeWork),
             pomodoro: rsSomeDay.data.totalWorkActive,
           });
         }
 
-        if (rsAll.success) {
+        if (rsAll?.success) {
           setAllData({
             time: convertMinutesToHoursAndMinutes(rsAll.data.totalTimeWork),
             pomodoro: rsAll.data.totalWorkActive,
           });
         }
-        if (rsTaskDefault.success) {
+        if (rsTaskDefault?.success) {
           setTaskDefaultData({
             time: convertMinutesToHoursAndMinutes(
               rsTaskDefault.data.totalTimeWork
             ),
             pomodoro: rsTaskDefault.data.totalWorkActive,
           });
-          if (rsPlanned.success) {
+          if (rsPlanned?.success) {
             setPlannedData({
               time: convertMinutesToHoursAndMinutes(
                 rsPlanned.data.totalTimeWork
@@ -304,7 +308,7 @@ export default function Home({ navigation }) {
               pomodoro: rsPlanned.data.totalWorkActive,
             });
           }
-          if (rsLowPriority.success) {
+          if (rsLowPriority?.success) {
             setLowPriorityData({
               time: convertMinutesToHoursAndMinutes(
                 rsLowPriority.data.totalTimeWork
@@ -312,7 +316,7 @@ export default function Home({ navigation }) {
               pomodoro: rsLowPriority.data.totalWorkActive,
             });
           }
-          if (rsMediumPriority.success) {
+          if (rsMediumPriority?.success) {
             setMediumPriorityData({
               time: convertMinutesToHoursAndMinutes(
                 rsMediumPriority.data.totalTimeWork
@@ -320,7 +324,7 @@ export default function Home({ navigation }) {
               pomodoro: rsMediumPriority.data.totalWorkActive,
             });
           }
-          if (rsHighPriority.success) {
+          if (rsHighPriority?.success) {
             setHighPriorityData({
               time: convertMinutesToHoursAndMinutes(
                 rsHighPriority.data.totalTimeWork
@@ -328,18 +332,21 @@ export default function Home({ navigation }) {
               pomodoro: rsHighPriority.data.totalWorkActive,
             });
           }
-          if (!rsFolder.success) {
+          if (!rsFolder?.success) {
             setFolder(null);
           } else {
             setFolder(rsFolder.data);
           }
-          if (rsProject.success) {
+          if (rsProject?.success) {
             setProject(rsProject.data);
           } else {
             setProject(null);
           }
-          if (rsTag.success) {
+          if (rsTag?.success) {
             setTag(rsTag.data);
+          }
+          else{
+            setTag(null)
           }
         }
       } catch (error) {
@@ -355,9 +362,9 @@ export default function Home({ navigation }) {
   const handleAddProject = async () => {
     const id = await AsyncStorage.getItem("id");
     const rs = await CheckMaxProject(id);
-    if (rs.success) {
+    if (rs?.success) {
       if (rs.isMax) {
-        navigation.navigate("Prenium");
+        navigation.navigate("PREMIUM");
       } else {
         navigation.navigate("AddProject");
       }
@@ -369,9 +376,9 @@ export default function Home({ navigation }) {
   const handleAddFolder = async () => {
     const id = await AsyncStorage.getItem("id");
     const rs = await CheckMaxFolder(id);
-    if (rs.success) {
+    if (rs?.success) {
       if (rs.isMax) {
-        navigation.navigate("Prenium");
+        navigation.navigate("PREMIUM");
       } else {
         navigation.navigate("AddFolder");
       }
@@ -446,12 +453,14 @@ export default function Home({ navigation }) {
               />
             )}
             {rating && (
-              <EvilIcons
-                name="trophy"
-                style={styles.itemRow}
-                size={20}
-                color="black"
-              />
+              <TouchableOpacity onPress={() => navigation.navigate("Ranking")}>
+                <EvilIcons
+                  name="trophy"
+                  style={styles.itemRow}
+                  size={20}
+                  color="black"
+                />
+              </TouchableOpacity>
             )}
             <AntDesign
               name="barschart"
@@ -780,7 +789,7 @@ export default function Home({ navigation }) {
                 reload={reload}
               />
             ))}
-          <View style={styles.headers}>
+          <TouchableOpacity onPress={() => handleAddProject()} style={styles.headers}>
             <View style={styles.row}>
               <AntDesign
                 name="plus"
@@ -794,21 +803,24 @@ export default function Home({ navigation }) {
               </Text>
             </View>
             <View style={styles.row}>
-              <MaterialCommunityIcons
-                style={styles.itemRow}
-                name="tag-plus-outline"
-                size={24}
-                color="red"
+              <TouchableOpacity
+                style={{ paddingHorizontal: 10, }}
                 onPress={() => navigation.navigate("AddTag")}
-              />
-              <AntDesign
-                name="addfolder"
-                size={24}
-                color="red"
+              >
+                <MaterialCommunityIcons
+                  name="tag-plus-outline"
+                  size={24}
+                  color="red"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ paddingHorizontal: 10,  }}
                 onPress={() => handleAddFolder()}
-              />
+              >
+                <AntDesign name="addfolder" size={24} color="red" />
+              </TouchableOpacity>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
       </ScrollView>
       <ImageFocus />

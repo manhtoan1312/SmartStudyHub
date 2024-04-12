@@ -160,8 +160,8 @@ export default function Setting({ navigation }) {
   const toInfor = () => {
     navigate("Infor");
   };
-  const toPrenium = () => {
-    navigate("Prenium");
+  const toPREMIUM = () => {
+    navigate("PREMIUM");
   };
   const toProject = () => {
     navigate("Project");
@@ -171,10 +171,10 @@ export default function Setting({ navigation }) {
     setIsPomodoroTimePickerVisible(false);
     setPomodoroTime(index);
     // getRole().then((role) => {
-    //   if (role && role.role === "PRENIUM") {
+    //   if (role && role.role === "PREMIUM") {
     //     setPomodoroTime(index);
     //   } else {
-    //     navigation.navigate("Prenium");
+    //     navigation.navigate("PREMIUM");
     //   }
     // });
   };
@@ -320,9 +320,9 @@ export default function Setting({ navigation }) {
             <TouchableOpacity  style={s`flex flex-row items-center`}>
               <View style={s`mr-2`} >
                 {!email ? (
-                  <Text style={s` text-lg font-medium`}>Sign In | Sign Up</Text>
+                  <TouchableOpacity onPress={() => handleHeader()}><Text style={s` text-lg font-medium`}>Sign In | Sign Up</Text></TouchableOpacity>
                 ) : (
-                  <Text style={s` text-lg font-medium`}>{email}</Text>
+                  <TouchableOpacity onPress={() => handleHeader()}><Text style={s` text-lg font-medium`}>{email}</Text></TouchableOpacity>
                 )}
               </View>
             </TouchableOpacity>
@@ -336,7 +336,7 @@ export default function Setting({ navigation }) {
 
       <View
         style={s`flex flex-row justify-between px-2 mt-6 bg-white py-4`}
-        onTouchEnd={() => toPrenium()}
+        onTouchEnd={() => toPREMIUM()}
       >
         <View style={s`flex flex-row`}>
           <FontAwesome5
@@ -538,6 +538,10 @@ export default function Setting({ navigation }) {
           <AntDesign style={s`text-lg`} name="right" />
         </TouchableOpacity>
 
+        <TouchableOpacity style={s`flex flex-row justify-between py-2`}>
+          <Text style={s`text-lg font-medium`}>Application Reviews</Text>
+          <AntDesign style={s`text-lg`} name="right" />
+        </TouchableOpacity>
         <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Application information</Text>
           <AntDesign style={s`text-lg`} name="right" />

@@ -1,12 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Swipeable } from "react-native-gesture-handler";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { DeleteTag } from "../services/Guest/TagService";
+import { Audio } from "expo-av";
 
-const TagComponent = ({ id, tagName, colorCode, reload, totalTimeWork, TotalWorkActive }) => {
+const TagComponent = ({
+  id,
+  tagName,
+  colorCode,
+  reload,
+  totalTimeWork,
+  TotalWorkActive,
+}) => {
   const navigation = useNavigation();
+  const swipeableRef = useRef(null);
   const renderRightActions = (progress, dragX) => {
     const trans = dragX.interpolate({
       inputRange: [0, 50, 100, 101],
@@ -31,12 +40,17 @@ const TagComponent = ({ id, tagName, colorCode, reload, totalTimeWork, TotalWork
     );
   };
 
+  async function playSound() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../sound/Done.mp3")
+    );
+    await sound.playAsync();
+  }
 
   const handleEditTag = () => {
+    swipeableRef.current && swipeableRef.current.close();
     navigation.navigate("EditTag", { tagId: id });
   };
-
-  
 
   const handleDeleteTag = async (key) => {
     const response = await DeleteTag(id);
@@ -49,6 +63,7 @@ const TagComponent = ({ id, tagName, colorCode, reload, totalTimeWork, TotalWork
   };
 
   const toDetail = () => {
+    swipeableRef.current && swipeableRef.current.close();
     navigation.navigate("TagDetail", { id: id });
   };
   const convertMinutesToHoursAndMinutes = (totalMinutes) => {
@@ -57,18 +72,21 @@ const TagComponent = ({ id, tagName, colorCode, reload, totalTimeWork, TotalWork
     return `${hours}h ${minutes}m`;
   };
 
+  const closeSwipeable = () => {
+    setSwipeableOpen(false);
+  };
+
   return (
     <Swipeable
       renderRightActions={renderRightActions}
       containerStyle={styles.swipeableContainer}
-      friction={2} // Điều chỉnh friction để tùy chỉnh animation
-      rightThreshold={40}
+      ref={swipeableRef}
     >
       <TouchableOpacity
         style={styles.projectContainer}
         onPress={() => toDetail()}
       >
-        <AntDesign name="tag" size={20} color={colorCode}/>
+        <AntDesign name="tag" size={20} color={colorCode} />
         <Text style={styles.projectName}>{tagName}</Text>
         <View style={styles.totalTimeContainer}>
           <Text style={styles.totalTimeText}>
@@ -85,8 +103,8 @@ const styles = StyleSheet.create({
   projectContainer: {
     flexDirection: "row",
     alignItems: "center",
-    margin:10,
-    paddingVertical:5
+    margin: 10,
+    paddingVertical: 5,
   },
   colorPreview: {
     width: 20,
@@ -97,7 +115,7 @@ const styles = StyleSheet.create({
   projectName: {
     fontSize: 16,
     color: "black",
-    marginLeft:10
+    marginLeft: 10,
   },
   rightActions: {
     flexDirection: "row",
@@ -120,11 +138,11 @@ const styles = StyleSheet.create({
     backgroundColor: "green",
   },
   totalTimeContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 3,
     right: -5,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   totalTimeText: {
     fontSize: 14,

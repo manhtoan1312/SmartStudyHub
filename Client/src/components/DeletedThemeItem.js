@@ -1,4 +1,4 @@
-// ThemeItem.js
+// DeletedThemeItem.js
 import React from "react";
 import {
   StyleSheet,
@@ -6,31 +6,46 @@ import {
   ImageBackground,
   Text,
   Dimensions,
-  TouchableOpacity,
   Pressable,
 } from "react-native";
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 
-const AvtItem = ({ avt, url, navigation , onSelect, onDelete }) => {
-  
-  const handleChoose = () => {
-    onSelect(avt);
-  };
+const DeletedThemeItem = ({ theme, id, navigation , onSelect, onDelete }) => {
+  const screenWidth = Dimensions.get("window").width;
+  const imageWidth = screenWidth / 2 - 30;
+  const imageHeight = imageWidth * 2;
 
+  const renderText = () => {
+    if (theme.statusTheme === "PREMIUM") {
+      return (
+        <Text style={{ color: "#e27602" }}>
+          {theme.nameTheme}{" "}
+          <FontAwesome5 name="crown" size={16} color="#e27602" />
+        </Text>
+      );
+    } else {
+      return <Text style={{ color: "#3b3f44" }}>{theme.nameTheme}</Text>;
+    }
+  };
+  const handleChoose = () => {
+    onSelect(theme);
+  };
+  
   return (
-    <Pressable onLongPress={() => onDelete(avt)} onPress={handleChoose}  style={styles.container}>
-      <View style={[styles.imageContainer, avt.secureUrl === url && styles.selected]}>
+    <Pressable onLongPress={() => onDelete(theme)} onPress={handleChoose} style={styles.container}>
+      <View style={[styles.imageContainer, theme.id === id && styles.selected]}>
         <ImageBackground
-          source={{ uri: avt.secureUrl }}
+          source={{ uri: theme.url }}
           resizeMode="cover"
-          style={styles.image}
+          style={[styles.image, { width: imageWidth, height: imageHeight }]}
         >
-          {avt.secureUrl === url && (
+          {theme.id === id && (
             <View style={styles.checkContainer}>
               <AntDesign name="checkcircle" size={24} color="#e27602" />
             </View>
           )}
         </ImageBackground>
+        <View style={styles.bodyText}>{renderText()}</View>
       </View>
     </Pressable>
   );
@@ -53,8 +68,6 @@ const styles = StyleSheet.create({
     margin: 10,
     borderRadius: 20,
     overflow: "hidden",
-    width:150,
-    height:150
   },
   checkContainer: {
     position: "absolute",
@@ -72,4 +85,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AvtItem;
+export default DeletedThemeItem;

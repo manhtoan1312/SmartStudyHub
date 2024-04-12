@@ -13,8 +13,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import getRole from "../../services/RoleService";
 import {
   deleteSoundDone,
-  getAllSoundDonePrenium,
-} from "../../services/Prenium/SoundDoneService";
+  getAllSoundDonePREMIUM,
+} from "../../services/PREMIUM/SoundDoneService";
 import { getAllSoundDoneOfGuest } from "../../services/Guest/getDataService";
 import SoundItem from "../../components/SoundItem";
 import { Audio } from "expo-av";
@@ -32,8 +32,8 @@ const SoundDone = ({ navigation }) => {
     }
     let response;
     const role = getRole();
-    if (role?.role === "PRENIUM") {
-      response = await getAllSoundDonePrenium();
+    if (role?.role === "PREMIUM") {
+      response = await getAllSoundDonePREMIUM();
     } else {
       response = await getAllSoundDoneOfGuest();
     }

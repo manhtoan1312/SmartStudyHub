@@ -37,7 +37,6 @@ const green = "#4aec8c";
 
 const Focus = () => {
   const navigation = useNavigation();
-  const [checkedTask, setCheckedTask] = useState(false);
   const [choose, setChoose] = useState(false);
   const [countWork, setCountWork] = useState(0);
   const [minutes, setMinutes] = useState(25);

@@ -13,8 +13,6 @@ import {
   MaterialCommunityIcons,
   Feather,
   EvilIcons,
-  AntDesign,
-  Entypo,
 } from "@expo/vector-icons";
 import { login } from "../../services/AccountService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -75,7 +73,6 @@ function Login({ navigation }) {
         const subArray = role.sub.split("-");
         const id = subArray[0];
         await AsyncStorage.setItem("id", id);
-
         navigation.navigate("Home");
       } else {
         if (response.status === "2_4_f") {

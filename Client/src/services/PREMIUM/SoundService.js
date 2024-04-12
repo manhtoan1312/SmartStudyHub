@@ -1,11 +1,11 @@
 const uri =
   "https://api-smart-study-hub.onrender.com/mobile/v1/user/premium/soundconcentration";
 
-  const getAllSoundPrenium = async () => {
+  const getAllSoundPREMIUM = async () => {
     try {
       const role = await getRole();
   
-      if (role && role.role === "PRENIUM") {
+      if (role && role.role === "PREMIUM") {
         const { token } = role;
   
         const response = await fetch(`${uri}/get`, {
@@ -39,7 +39,7 @@ const uri =
       try {
         const role = await getRole();
     
-        if (role && role.role === "PRENIUM") {
+        if (role && role.role === "PREMIUM") {
           const { token } = role;
     
           const response = await fetch(`${uri}/get-deleted`, {
@@ -73,7 +73,7 @@ const uri =
     try {
       const role = await getRole();
   
-      if (role && role.role === "PRENIUM") {
+      if (role && role.role === "PREMIUM") {
         const { token } = role;
   
         const response = await fetch(`${uri}/insert`, {
@@ -111,7 +111,7 @@ const uri =
       try {
         const role = await getRole();
     
-        if (role && role.role === "PRENIUM") {
+        if (role && role.role === "PREMIUM") {
           const { token } = role;
     
           const response = await fetch(`${uri}/update`, {
@@ -150,7 +150,7 @@ const uri =
       try {
         const role = await getRole();
     
-        if (role && role.role === "PRENIUM") {
+        if (role && role.role === "PREMIUM") {
           const { token } = role;
     
           const response = await fetch(`${uri}/mark-deleted/${id}`, {
@@ -184,7 +184,7 @@ const uri =
       try {
         const role = await getRole();
     
-        if (role && role.role === "PRENIUM") {
+        if (role && role.role === "PREMIUM") {
           const { token } = role;
     
           const response = await fetch(`${uri}/delete/${id}`, {
@@ -218,7 +218,7 @@ const uri =
       try {
         const role = await getRole();
     
-        if (role && role.role === "PRENIUM") {
+        if (role && role.role === "PREMIUM") {
           const { token } = role;
     
           const response = await fetch(`${uri}/recover/${id}`, {
@@ -249,4 +249,4 @@ const uri =
     };
     
   
-    export {getAllSoundPrenium, getAllSoundDelete, addSound, updateSound, markDeleteSound, deleteSound,recoverSound}
+    export {getAllSoundPREMIUM, getAllSoundDelete, addSound, updateSound, markDeleteSound, deleteSound,recoverSound}

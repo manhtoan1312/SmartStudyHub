@@ -8,7 +8,7 @@ import {
 } from "@expo/vector-icons";
 import { s } from "react-native-wind";
 
-function Prenium({ navigation }) {
+function PREMIUM({ navigation }) {
   return (
     <SafeAreaView>
       <View
@@ -21,7 +21,9 @@ function Prenium({ navigation }) {
           color="#000000" // Thay đổi màu cho icon angle-left
           onPress={() => navigation.goBack()}
         />
-        <Text style={s`font-medium text-2xl text-yellow-400`}>Upgrade to Premium</Text>
+        <Text style={s`font-medium text-2xl text-yellow-400`}>
+          Upgrade to Premium
+        </Text>
       </View>
       <View style={s`flex flex-col bg-white px-3`}>
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
@@ -39,13 +41,17 @@ function Prenium({ navigation }) {
 
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
-            <MaterialCommunityIcons
-              name="backup-restore"
-              size={24}
-              color="#00FF00" // Thay đổi màu cho icon backup-restore
-            />
+          <MaterialCommunityIcons name="more" size={24} color="lightblue" />
             <Text style={s`h-full flex items-center pl-2`}>
-              Backup data to Cloud.
+              More Theme and Sound
+            </Text>
+          </View>
+        </View>
+        <View style={s`flex flex-row justify-between py-2 mt-2`}>
+          <View style={s`flex flex-row`}>
+            <MaterialIcons name="dashboard-customize" size={24} color="black" />
+            <Text style={s`h-full flex items-center pl-2`}>
+              Customize Theme and Sound
             </Text>
           </View>
         </View>
@@ -156,11 +162,7 @@ function Prenium({ navigation }) {
 
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
-            <MaterialCommunityIcons
-              name="sync"
-              size={24}
-              color="#778899" 
-            />
+            <MaterialCommunityIcons name="sync" size={24} color="#778899" />
             <Text style={s`h-full flex items-center pl-2`}>
               Sync data across all devices.
             </Text>
@@ -171,4 +173,4 @@ function Prenium({ navigation }) {
   );
 }
 
-export default Prenium;
+export default PREMIUM;

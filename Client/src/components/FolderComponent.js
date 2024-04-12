@@ -1,11 +1,11 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState, useRef } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { FontAwesome, AntDesign } from "@expo/vector-icons";
 import ProjectComponent from "./ProjectComponent";
 import { Swipeable } from "react-native-gesture-handler";
 import { DeleteFolder } from "../services/Guest/FolderService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 
 const FolderComponent = ({
   id,
@@ -17,6 +17,8 @@ const FolderComponent = ({
   const [done, setDone] = useState(false);
   const [showProjects, setShowProjects] = useState(false);
   const navigation = useNavigation();
+  const swipeableRef = useRef(null);
+
   const handleToggleProjects = () => {
     setShowProjects(!showProjects);
   };
@@ -45,6 +47,8 @@ const FolderComponent = ({
   };
 
   const handleEditFolder = () => {
+    swipeableRef.current && swipeableRef.current.close();
+    setShowProjects(false)
     navigation.navigate("EditFolder", { id: id });
   };
 
@@ -67,10 +71,18 @@ const FolderComponent = ({
     }
   };
 
+  const handleFolderDetail = () => {
+    swipeableRef.current && swipeableRef.current.close();
+    setShowProjects(false)
+    navigation.navigate("FolderDetail", { id: id })
+  }
   return (
-    <Swipeable renderRightActions={renderRightActions}>
+    <Swipeable
+      renderRightActions={renderRightActions}
+      ref={swipeableRef}
+    >
       <TouchableOpacity
-        onPress={() => navigation.navigate("FolderDetail", { id: id })}
+        onPress={() => handleFolderDetail()}
         style={styles.container}
       >
         <View style={styles.folderContainer}>

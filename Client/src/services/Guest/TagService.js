@@ -52,7 +52,7 @@ const UpdateTag = async (id, tagName, colorCode, status) => {
 
 const DeleteTag = async (id) => {
   try {
-    const response = await fetch(`${uri}/tag/delete/${id}`, {
+    const response = await fetch(`${uri}/delete/${id}`, {
       method: "delete",
       headers: {
         "Content-Type": "application/json",

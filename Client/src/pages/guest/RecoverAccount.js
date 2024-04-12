@@ -19,7 +19,6 @@ function RecoverAccount({ navigation }) {
 
   const handleRecover = async () => {
     const rs = await AuthenToRecover(email, password)
-    console.log(rs)
     if(rs.success){
         const id = rs.message.id
         const response = await recoverAccount(id)
@@ -32,7 +31,7 @@ function RecoverAccount({ navigation }) {
         }
     }
     else{
-        Alert.alert('Login fail', rs
+        Alert.alert('Login fail', rs.message
         )
     }
   };

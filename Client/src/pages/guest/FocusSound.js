@@ -10,15 +10,14 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import getRole from "../../services/RoleService";
-import { deleteSoundDone } from "../../services/Prenium/SoundDoneService";
 import { getAllSoundConcentrationOfGuest } from "../../services/Guest/getDataService";
 import SoundItem from "../../components/SoundItem";
 import { Audio } from "expo-av";
 import {
-  getAllSoundPrenium,
+  getAllSoundPREMIUM,
   markDeleteSound,
-} from "../../services/Prenium/SoundService";
-
+} from "../../services/PREMIUM/SoundService";
+import * as DocumentPicker from "expo-document-picker";
 const FocusSound = ({ navigation }) => {
   const [soundList, setSoundList] = useState([]);
   const [selectedSound, setSelectedSound] = useState({});
@@ -30,10 +29,13 @@ const FocusSound = ({ navigation }) => {
     if (sound) {
       setSelectedSound(JSON.parse(sound));
     }
+    else{
+      setNoneSelected(true)
+    }
     let response;
     const role = getRole();
-    if (role?.role === "PRENIUM") {
-      response = await getAllSoundPrenium();
+    if (role?.role === "PREMIUM") {
+      response = await getAllSoundPREMIUM();
     } else {
       response = await getAllSoundConcentrationOfGuest();
     }
@@ -67,8 +69,8 @@ const FocusSound = ({ navigation }) => {
     if (soundObject) {
       await soundObject.stopAsync();
     }
-    setSelectedSound({}); 
-    setNoneSelected(true); 
+    setSelectedSound({});
+    setNoneSelected(true);
     await AsyncStorage.removeItem("focusSound");
   };
 
@@ -91,14 +93,41 @@ const FocusSound = ({ navigation }) => {
     Alert.alert("Smart Study Hub announced", response.message);
   };
 
-  const handleAddSound = async () => {};
+  const handleAddSound = async () => {
+    try {
+      const file = await DocumentPicker.getDocumentAsync({
+        type: "audio/*",
+      });
 
-  const handleBack = async ()=> {
+      if (file.type === "success") {
+        if (
+          file.name.endsWith(".mp3") ||
+          file.name.endsWith(".wav") ||
+          file.name.endsWith(".ogg")
+        ) {
+          const { sound: soundObject } = await Audio.Sound.createAsync({
+            uri: file.uri,
+          });
+          await soundObject.playAsync();
+        } else {
+          Alert.alert(
+            "Error",
+            "Please select an audio file (mp3, wav, or ogg)."
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error picking sound:", error);
+      Alert.alert("Error", "Failed to pick sound.");
+    }
+  };
+
+  const handleBack = async () => {
     if (soundObject) {
       await soundObject.stopAsync();
     }
-    navigation.goBack()
-  }
+    navigation.goBack();
+  };
   return (
     <View style={{ backgroundColor: "#eeeeee" }}>
       {/* Header */}
@@ -132,7 +161,9 @@ const FocusSound = ({ navigation }) => {
           style={[styles.addItem, noneSelected && styles.selectedItem]}
         >
           <Text style={[styles.bodyText]}>None</Text>
-          {noneSelected && <MaterialIcons name="check" size={24} color="orange" />}
+          {noneSelected && (
+            <MaterialIcons name="check" size={24} color="orange" />
+          )}
         </TouchableOpacity>
         <FlatList
           data={soundList}
@@ -173,9 +204,9 @@ const styles = StyleSheet.create({
   },
   selectedItem: {
     backgroundColor: "#fee4d4",
-    flexDirection:'row',
-    justifyContent:'space-between',
-    alignItems:'center'
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 });
 

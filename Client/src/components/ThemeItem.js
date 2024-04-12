@@ -7,10 +7,11 @@ import {
   Text,
   Dimensions,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 
-const ThemeItem = ({ theme, id, navigation , onSelect }) => {
+const ThemeItem = ({ theme, id, navigation , onSelect, onDelete }) => {
   const screenWidth = Dimensions.get("window").width;
   const imageWidth = screenWidth / 2 - 30;
   const imageHeight = imageWidth * 2;
@@ -30,9 +31,9 @@ const ThemeItem = ({ theme, id, navigation , onSelect }) => {
   const handleChoose = () => {
     onSelect(theme);
   };
-
+  
   return (
-    <TouchableOpacity onPress={handleChoose}  style={styles.container}>
+    <Pressable onLongPress={() => onDelete(theme)} onPress={handleChoose} style={styles.container}>
       <View style={[styles.imageContainer, theme.id === id && styles.selected]}>
         <ImageBackground
           source={{ uri: theme.url }}
@@ -47,7 +48,7 @@ const ThemeItem = ({ theme, id, navigation , onSelect }) => {
         </ImageBackground>
         <View style={styles.bodyText}>{renderText()}</View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

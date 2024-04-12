@@ -3,11 +3,11 @@ import getRole from "../RoleService";
 const uri =
   "https://api-smart-study-hub.onrender.com/mobile/v1/user/premium/theme";
 
-const getAllThemePrenium = async () => {
+const getAllThemePREMIUM = async () => {
   try {
     const role = await getRole();
 
-    if (role && role.role === "PRENIUM") {
+    if (role && role.role === "PREMIUM") {
       const { token } = role;
 
       const response = await fetch(`${uri}/get`, {
@@ -41,7 +41,7 @@ const getAllThemeDelete = async () => {
     try {
       const role = await getRole();
   
-      if (role && role.role === "PRENIUM") {
+      if (role && role.role === "PREMIUM") {
         const { token } = role;
   
         const response = await fetch(`${uri}/get-deleted`, {
@@ -75,7 +75,7 @@ const addTheme = async (nameTheme, url) => {
   try {
     const role = await getRole();
 
-    if (role && role.role === "PRENIUM") {
+    if (role && role.role === "PREMIUM") {
       const { token } = role;
 
       const response = await fetch(`${uri}/insert`, {
@@ -113,7 +113,7 @@ const updateTheme = async (id, nameTheme, url) => {
     try {
       const role = await getRole();
   
-      if (role && role.role === "PRENIUM") {
+      if (role && role.role === "PREMIUM") {
         const { token } = role;
   
         const response = await fetch(`${uri}/update`, {
@@ -152,7 +152,7 @@ const updateTheme = async (id, nameTheme, url) => {
     try {
       const role = await getRole();
   
-      if (role && role.role === "PRENIUM") {
+      if (role && role.role === "PREMIUM") {
         const { token } = role;
   
         const response = await fetch(`${uri}/mark-deleted/${id}`, {
@@ -186,7 +186,7 @@ const updateTheme = async (id, nameTheme, url) => {
     try {
       const role = await getRole();
   
-      if (role && role.role === "PRENIUM") {
+      if (role && role.role === "PREMIUM") {
         const { token } = role;
   
         const response = await fetch(`${uri}/delete/${id}`, {
@@ -220,7 +220,7 @@ const updateTheme = async (id, nameTheme, url) => {
     try {
       const role = await getRole();
   
-      if (role && role.role === "PRENIUM") {
+      if (role && role.role === "PREMIUM") {
         const { token } = role;
   
         const response = await fetch(`${uri}/recover/${id}`, {
@@ -251,4 +251,4 @@ const updateTheme = async (id, nameTheme, url) => {
   };
   
 
-  export {getAllThemePrenium, getAllThemeDelete, addTheme, updateTheme, markDeleteTheme, deleteTheme,recoverTheme}
+  export {getAllThemePREMIUM, getAllThemeDelete, addTheme, updateTheme, markDeleteTheme, deleteTheme,recoverTheme}

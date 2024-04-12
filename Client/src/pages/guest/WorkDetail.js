@@ -58,7 +58,7 @@ const WorkDetail = ({ route, navigation }) => {
   const [dateTimePickerVisible, setDateTimePickerVisible] = useState(false);
   const [extraWorkName, setExtraWorkName] = useState("");
   const [note, setNote] = useState(work?.note || "");
- 
+
   useEffect(() => {
     fetchData();
 
@@ -82,7 +82,6 @@ const WorkDetail = ({ route, navigation }) => {
           setWork(workResponse.data);
           setListTagSelected(workResponse.data.tags);
           setNote(workResponse.data?.note || "");
-          
         }
 
         if (listProjectResponse.success) {
@@ -189,21 +188,31 @@ const WorkDetail = ({ route, navigation }) => {
     const today = new Date();
     const tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
-
     let statusWork = "PLANNED";
-
-    if (selectedDateObject.toDateString() === today.toDateString()) {
+    if (
+      selectedDateObject.getFullYear() === today.getFullYear() &&
+      selectedDateObject.getMonth() === today.getMonth() &&
+      selectedDateObject.getDate() === today.getDate()
+    ) {
       statusWork = "TODAY";
-    } else if (selectedDateObject.toDateString() === tomorrow.toDateString()) {
+    } else if (
+      selectedDateObject.getFullYear() === tomorrow.getFullYear() &&
+      selectedDateObject.getMonth() === tomorrow.getMonth() &&
+      selectedDateObject.getDate() === tomorrow.getDate()
+    ) {
       statusWork = "TOMORROW";
     }
-    selectedDateObject.setDate(selectedDateObject.getDate() + 1);
-    selectedDateObject.setTime(selectedDateObject.getTime() - 1);
+    
+    selectedDateObject.setHours(23);
+    selectedDateObject.setMinutes(59);
+    selectedDateObject.setSeconds(59);
+    selectedDateObject.setMilliseconds(999);
     const updateWork = { ...work };
     updateWork.dueDate = selectedDateObject.getTime();
     updateWork.statusWork = statusWork;
     setWork(updateWork);
   };
+  
 
   const handleSelectPriority = (priority) => {
     const updateWork = { ...work };
@@ -272,7 +281,7 @@ const WorkDetail = ({ route, navigation }) => {
     const dueDate = work.statusWork;
     const options = { weekday: "short", month: "numeric", day: "numeric" };
     let dateStart = new Date(work.dueDate);
-    dateStart.setDate(dateStart.getDate() - 1);
+    dateStart.setDate(dateStart.getDate());
     let date = dateStart.toLocaleDateString("en-US", options);
 
     if (dueDate === "TODAY") {
@@ -282,13 +291,16 @@ const WorkDetail = ({ route, navigation }) => {
     }
 
     return (
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <TouchableOpacity
+        onPress={() => deleteDueDate()}
+        style={{ flexDirection: "row", alignItems: "center" }}
+      >
         <FontAwesome5 name="calendar-alt" size={14} color="gray" />
         <Text style={{ padding: 5 }}>{date}</Text>
-        <TouchableOpacity onPress={() => deleteDueDate()}>
+        <View>
           <AntDesign name="closecircle" size={20} color="gray" />
-        </TouchableOpacity>
-      </View>
+        </View>
+      </TouchableOpacity>
     );
   };
   function renderTime() {
@@ -307,23 +319,28 @@ const WorkDetail = ({ route, navigation }) => {
       .padStart(2, "0")}`;
     const result = `${formattedTime}, ${dayOfWeek}, ${formattedDate}`;
     return (
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <TouchableOpacity
+        onPress={() => deleteTimeRemindered()}
+        style={{ flexDirection: "row", alignItems: "center" }}
+      >
         <Text style={{ padding: 5 }}>{result}</Text>
-        <TouchableOpacity onPress={() => deleteTimeRemindered()}>
+        <View>
           <AntDesign name="closecircle" size={20} color="gray" />
-        </TouchableOpacity>
-      </View>
+        </View>
+      </TouchableOpacity>
     );
   }
   const updateWork = async () => {
-    if(work.workName){
+    if (work.workName) {
       try {
         const updatedWorkdata = { ...work };
         updatedWorkdata.note = note;
         updatedWorkdata.tags = listTagSelected.map((tag) => ({ id: tag.id }));
-        updatedWorkdata.extraWorks = updatedWorkdata.extraWorks.map((extra) => ({
-          id: extra.id,
-        }));
+        updatedWorkdata.extraWorks = updatedWorkdata.extraWorks.map(
+          (extra) => ({
+            id: extra.id,
+          })
+        );
         const response = await UpdateWork(
           updatedWorkdata.id,
           updatedWorkdata.userId,
@@ -332,7 +349,6 @@ const WorkDetail = ({ route, navigation }) => {
           updatedWorkdata.workName,
           updatedWorkdata.priority,
           updatedWorkdata.dueDate,
-          updatedWorkdata.timeWillStart,
           updatedWorkdata.timeWillAnnounce
             ? updatedWorkdata.timeWillAnnounce
             : null,
@@ -345,35 +361,34 @@ const WorkDetail = ({ route, navigation }) => {
           updatedWorkdata.tags,
           updatedWorkdata.extraWorks
         );
-        
+
         if (response.success) {
-          console.log(response.data);
+          setWork(response.data)
         } else {
           Alert.alert("Update Work Error", response.message);
         }
       } catch (error) {
         console.error("Error updating work:", error);
       }
-    }
-    else{
-      Alert.alert('Warnning','Workname can not be null')
+    } else {
+      Alert.alert("Warnning", "Workname can not be null");
     }
   };
 
   const addExtraWork = async () => {
-    await updateWork();
-    if(work.workName){
-    const response = await CreateExtraWork(work.id, extraWorkName);
-    if (response.success) {
-      fetchData();
-    } else {
-      Alert.alert("Create Extra Work Error", response.message);
-    }
+    if (work.workName) {
+      const response = await CreateExtraWork(work.id, extraWorkName);
+      if (response.success) {
+        setExtraWorkName('')
+        await updateWork();
+      } else {
+        Alert.alert("Create Extra Work Error", response.message);
+      }
     }
   };
   const changeWorkState = async () => {
     await updateWork();
-    if(work.workName) {
+    if (work.workName) {
       if (work.status === "ACTIVE") {
         const response = await MarkCompleted(work.id);
         if (response.success) {
@@ -394,7 +409,7 @@ const WorkDetail = ({ route, navigation }) => {
 
   const playExtra = async (item) => {
     await updateWork();
-    if(work.workName){
+    if (work.workName) {
       if (item.status === "ACTIVE") {
         try {
           await AsyncStorage.setItem("work", JSON.stringify(item));
@@ -410,7 +425,7 @@ const WorkDetail = ({ route, navigation }) => {
 
   const CompletedExtraWork = async (id, status) => {
     await updateWork();
-    if(work.workName){
+    if (work.workName) {
       if (status === "ACTIVE") {
         const response = await ExtraMarkCompleted(id);
         if (response.success) {
@@ -430,9 +445,8 @@ const WorkDetail = ({ route, navigation }) => {
   };
 
   return (
-    <View  style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <ScrollView>
-        
         {/* WorkHeader Component */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => handleBack()}>
@@ -465,7 +479,7 @@ const WorkDetail = ({ route, navigation }) => {
                   Choose Project
                 </Text>
               </View>
-  
+
               <TouchableOpacity
                 style={[
                   styles.projectItem,
@@ -522,7 +536,7 @@ const WorkDetail = ({ route, navigation }) => {
           onSelectTime={handleDateTimePicked}
           onClose={hideDateTimePicker}
         />
-  
+
         <Modal
           animationType="slide"
           transparent={true}
@@ -560,7 +574,11 @@ const WorkDetail = ({ route, navigation }) => {
                     {work.status === "ACTIVE" ? (
                       <View style={styles.cirle}></View>
                     ) : (
-                      <Ionicons name="checkmark-circle" size={24} color="green" />
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={24}
+                        color="green"
+                      />
                     )}
                   </TouchableOpacity>
                   <View>
@@ -580,10 +598,13 @@ const WorkDetail = ({ route, navigation }) => {
                         <TouchableOpacity
                           onPress={() => DeleteTag(tag.id)}
                           key={tag.id}
-                          style={[styles.tag, { backgroundColor: tag.colorCode }]}
+                          style={[
+                            styles.tag,
+                            { backgroundColor: tag.colorCode },
+                          ]}
                         >
                           <Text style={styles.tagText}>{tag.tagName} </Text>
-  
+
                           <View style={{ justifyContent: "center" }}>
                             <Ionicons name="close" size={12} color="#fff" />
                           </View>
@@ -603,7 +624,7 @@ const WorkDetail = ({ route, navigation }) => {
                 <Ionicons name="ios-flag" size={24} color={colorflag()} />
               </TouchableOpacity>
             </View>
-  
+
             <View style={styles.bodycontainer}>
               <View>
                 <TouchableOpacity
@@ -687,16 +708,18 @@ const WorkDetail = ({ route, navigation }) => {
                 </View>
               </TouchableOpacity>
             </View>
-            <View style={[styles.namecontainer, {flex:1}]}>
-              <View>
+            <View style={styles.namecontainer}>
+              <View style={{flex:1}}>
                 {work.extraWorks.length > 0 &&
                   work.extraWorks.map((item) => (
-                    <View style={styles.content} key={item.id}>
+                    <View style={styles.extra} key={item.id}>
                       <View
                         style={{ flexDirection: "row", alignItems: "center" }}
                       >
                         <TouchableOpacity
-                          onPress={() => CompletedExtraWork(item.id, item.status)}
+                          onPress={() =>
+                            CompletedExtraWork(item.id, item.status)
+                          }
                         >
                           {item.status === "COMPLETED" ? (
                             <AntDesign
@@ -785,7 +808,9 @@ const WorkDetail = ({ route, navigation }) => {
                 value={note}
                 onChangeText={(text) => setNote(text)}
               />
+              
             </View>
+            <View style={{height:120}}></View>
           </View>
         )}
       </ScrollView>
@@ -906,7 +931,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     marginTop: 5,
     width: 320,
-    paddingLeft:10
+    paddingLeft: 10,
   },
   content: {
     flexDirection: "row",
@@ -959,6 +984,13 @@ const styles = StyleSheet.create({
   extraWorkInput: {
     paddingLeft: 10,
   },
+  extra:{
+    flex:1, 
+    flexDirection:'row',
+    width:'100%',
+    justifyContent:'space-between',
+    paddingVertical:10
+  }
 });
 
 export default WorkDetail;

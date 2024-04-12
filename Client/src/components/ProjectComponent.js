@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Swipeable } from "react-native-gesture-handler";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { MarkCompleteProject } from "../services/Guest/ProjectService";
 import { Audio } from "expo-av";
-import { useNavigation } from "@react-navigation/native";
 
 const ProjectComponent = ({
   id,
@@ -15,12 +15,13 @@ const ProjectComponent = ({
   TotalWorkActive,
 }) => {
   const navigation = useNavigation();
+  const swipeableRef = useRef(null);
+
   const renderRightActions = (progress, dragX) => {
     const trans = dragX.interpolate({
       inputRange: [0, 50, 100, 101],
       outputRange: [0, 0, 0, 1],
     });
-
     return (
       <View style={styles.rightActions}>
         <TouchableOpacity
@@ -47,6 +48,7 @@ const ProjectComponent = ({
   }
 
   const handleEditProject = () => {
+    swipeableRef.current && swipeableRef.current.close();
     navigation.navigate("EditProject", { id: id });
   };
 
@@ -54,15 +56,17 @@ const ProjectComponent = ({
     const response = await MarkCompleteProject(id);
     if (response.success) {
       playSound();
-      reload()
+      reload();
     } else {
       Alert.alert("Error", response.message);
     }
   };
 
   const toDetail = () => {
+    swipeableRef.current && swipeableRef.current.close();
     navigation.navigate("ProjectDetail", { id: id });
   };
+
   const convertMinutesToHoursAndMinutes = (totalMinutes) => {
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
@@ -71,8 +75,8 @@ const ProjectComponent = ({
 
   return (
     <Swipeable
+      ref={swipeableRef}
       renderRightActions={renderRightActions}
-      containerStyle={styles.swipeableContainer}
     >
       <TouchableOpacity
         style={styles.projectContainer}
@@ -95,8 +99,8 @@ const styles = StyleSheet.create({
   projectContainer: {
     flexDirection: "row",
     alignItems: "center",
-    margin:10,
-    paddingVertical:5
+    margin: 10,
+    paddingVertical: 5,
   },
   colorPreview: {
     width: 20,
@@ -129,11 +133,11 @@ const styles = StyleSheet.create({
     backgroundColor: "green",
   },
   totalTimeContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 3,
     right: -5,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   totalTimeText: {
     fontSize: 14,

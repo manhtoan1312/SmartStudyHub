@@ -10,8 +10,8 @@ async function getRole() {
       const id = subArray[0];
       const email = subArray[1];
       const name = subArray[3];
-      const { Role: role } = decodedToken;
-      const userInfo = { token, id, email, name, role };
+      const role = decodedToken.Role;
+      const userInfo = { id, email, name, role, token };
       return userInfo;
     }
     else {
@@ -21,5 +21,6 @@ async function getRole() {
     return null;
   }
 }
+
 
 export default getRole;

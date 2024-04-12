@@ -3,7 +3,6 @@ import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import Home from "../pages/guest/home";
 import Setting from "../pages/guest/Setting";
-import Prenium from "../pages/guest/Prenium";
 import Project from "../pages/guest/Project";
 import Login from "../pages/guest/Login";
 import Register from "../pages/guest/Register";
@@ -23,7 +22,6 @@ import AddTag from "../pages/guest/AddTag";
 import EditTag from "../pages/guest/EditTag";
 import EditFolder from "../pages/guest/EditFolder";
 import SearchWork from "../pages/guest/SearchWork";
-import { UpdateWork } from "../services/Guest/WorkService";
 import Today from "../pages/guest/Today";
 import Tomorror from "../pages/guest/Tomorrow";
 import ThisWeek from "../pages/guest/ThisWeek";
@@ -49,6 +47,8 @@ import Theme from "../pages/guest/Theme";
 import AvatarUploaded from "../pages/user/AvatarUploaded";
 import SoundDone from "../pages/guest/SoundDone";
 import FocusSound from "../pages/guest/FocusSound";
+import PREMIUM from "../pages/guest/Premium";
+import RankingUser from "../pages/guest/RankingUser";
 
 const Stack = createStackNavigator();
 
@@ -56,7 +56,7 @@ const Navigator = () => (
   <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
     <Stack.Screen name="Home" component={Home} />
     <Stack.Screen name="Setting" component={Setting} />
-    <Stack.Screen name="Prenium" component={Prenium} />
+    <Stack.Screen name="PREMIUM" component={PREMIUM} />
     <Stack.Screen name="Project" component={Project} />
     <Stack.Screen name="Login" component={Login} />
     <Stack.Screen name="Register" component={Register} />
@@ -101,6 +101,7 @@ const Navigator = () => (
     <Stack.Screen name="AvtUploaded" component={AvatarUploaded} />
     <Stack.Screen name="SoundDone" component={SoundDone} />
     <Stack.Screen name="FocusSound" component={FocusSound} />
+    <Stack.Screen name="Ranking" component={RankingUser} />
   </Stack.Navigator>
 );
 
