@@ -20,14 +20,14 @@ const RankingItem = ({ user }) => {
   return (
     <View style={styles.container}>
       <View style={styles.body}>
-        <View style={{flexDirection:"row"}}>
+        <View style={{ flexDirection: "row" }}>
           <View style={styles.rank}>{renderRank()}</View>
-          <Image style={styles.image} source={{ uri: user.imageUrl }} /> 
+          <Image style={styles.image} source={{ uri: user.imageUrl }} />
           <Text>{`${user.firstName} ${user.lastName}`}</Text>
         </View>
         <View>
           <Text style={styles.time}>
-            {user.totalTimeFocus===0 ? (user.totalTimeFocus / 60).toFixed(1): '0' } Hours
+            {user?.totalTimeFocus || "0"} Minute
           </Text>
         </View>
       </View>
@@ -43,8 +43,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   rank: {
-    width:50,
-    alignItems:'center'
+    width: 50,
+    alignItems: "center",
   },
   image: {
     width: 24,
@@ -56,8 +56,8 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     justifyContent: "space-between",
-    flexDirection:'row',
-    marginRight:10
+    flexDirection: "row",
+    marginRight: 10,
   },
   time: {
     fontWeight: "bold",

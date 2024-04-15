@@ -3,6 +3,7 @@ import React from "react";
 import { TouchableOpacity, View, Text, StyleSheet, Alert } from "react-native";
 import { AntDesign, EvilIcons, Ionicons } from "@expo/vector-icons";
 import {
+  DeleteExtraWork,
   ExtraMarkCompleted,
   MarkDelete,
   RecoverExtraWork,
@@ -20,7 +21,7 @@ const ExtraActive = ({ extra, reload, navigation }) => {
   };
 
   const deleteEx = async () => {
-    const response = await MarkDelete(extra.id);
+    const response = await DeleteExtraWork(extra.id);
     if (response.success) {
       reload();
     } else {

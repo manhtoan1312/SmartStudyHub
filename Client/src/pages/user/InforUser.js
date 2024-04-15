@@ -87,7 +87,7 @@ const InforUser = ({ navigation }) => {
 
   const handleLogin = async () => {
     await AsyncStorage.clear();
-    navigation.navigate("Login");
+    navigation.goBack()
   };
   const closeEditNameModal = () => {
     setEditNameModalVisible(false);

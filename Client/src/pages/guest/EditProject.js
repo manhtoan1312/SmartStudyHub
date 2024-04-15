@@ -71,13 +71,26 @@ const EditProjectPage = ({ route, navigation }) => {
   };
 
   const handleDelete = async () => {
+    Alert.alert(
+      "Confirm action",
+      "All data related to this item will be deleted, are you sure you want to delete it?",[
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {text: 'OK', onPress: () => confirmDeleteProject()},
+      ]
+    );
+    
+  };
+  const confirmDeleteProject = async () => {
     const response = await DeleteProject(projectId);
     if (response.success) {
       navigation.navigate("Home");
     } else {
       Alert.alert("Error!", response.message);
     }
-  };
+  }
 
   const handleUpdate = async () => {
     console.log(project.id, name, color, null, project.status);

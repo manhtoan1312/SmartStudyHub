@@ -30,10 +30,7 @@ const RankingUserItem = ({ user }) => {
           </View>
           <View>
             <Text style={styles.time}>
-              {user.totalTimeFocus === 0
-                ? (user.totalTimeFocus / 60).toFixed(1)
-                : "0"}{" "}
-              Hours
+            {user?.totalTimeFocus || "0"} Minute
             </Text>
           </View>
         </View>

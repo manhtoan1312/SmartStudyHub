@@ -82,7 +82,7 @@ function RecoverAccount({ navigation }) {
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={handleRecover}>
-            <Text style={styles.buttonText}>Recover</Text>
+            <Text style={styles.buttonText}>Check Account</Text>
           </TouchableOpacity>
         </View>
       </View>

@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, FontAwesome5, MaterialIcons, Octicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GetWorkCompleted, GetWorkDeleted } from "../../services/Guest/WorkService";
 import { GetPomodoro } from "../../services/Guest/PomodoroService";
@@ -113,25 +113,28 @@ const DeletedDetail = ({ navigation }) => {
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Work")}
           >
+            <FontAwesome5 name="tasks" style={styles.icon} size={18} color="black" />
             <Text style={styles.modalText}>Work</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Folder")}
           >
+            <AntDesign name="folderopen" style={styles.icon} size={18} color="black" />
             <Text style={styles.modalText}>Folder</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Project")}
           >
-            <Text style={styles.modalText}>Project</Text>
+            <Octicons name="project" style={styles.icon} size={18} color="black" />
+            <Text style={styles.modalText }>Project</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => toggleModal()}
           >
-            <Text style={styles.modalText}>Cancel</Text>
+            <Text style={[styles.modalText, {paddingLeft:30}]}>Cancel</Text>
           </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
@@ -209,10 +212,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     width: "100%",
+    flexDirection:'row'
   },
   modalText: {
     fontSize: 18,
   },
+  icon:{
+    paddingRight:15
+  }
 });
 
 export default DeletedDetail;

@@ -4,25 +4,17 @@ import { AntDesign, EvilIcons } from "@expo/vector-icons";
 import { DeleteExtraWork, MarkDelete, RecoverExtraWork } from "../services/Guest/ExtraWork";
 
 const ExtraCompleted = ({ extra, reload }) => {
-  const recover = async () => {
-    const response = await RecoverExtraWork(extra.id);
-    if (response.success) {
-      reload();
-    } else {
-      Alert.alert("Recover Extra Work Fail", response.message);
-    }
-  };
   const deleteEx = async () => {
-    const response = await MarkDelete(extra.id);
+    const response = await DeleteExtraWork(extra.id);
     if (response.success) {
       reload();
     } else {
-      Alert.alert("Recover Extra Work Fail", response.message);
+      Alert.alert("Delete Extra Work Fail", response.message);
     }
   };
 
   return (
-    <TouchableOpacity onPress={recover} style={styles.container}>
+    <TouchableOpacity style={styles.container}>
       <View style={styles.extraCompletedItem}>
         <View style={{ flexDirection: "row" }}>
           <AntDesign name="checkcircle" size={20} color="#00cc00" />

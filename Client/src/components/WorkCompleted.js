@@ -20,7 +20,6 @@ import {
 import { DeleteWork, RecoverWork } from "../services/Guest/WorkService";
 import { Swipeable } from "react-native-gesture-handler";
 import ExtraActive from "./ExtraActive";
-import ExtraDeleted from "./ExtraDeleted";
 import ExtraCompleted from "./ExtraCompleted";
 
 const WorkCompleted = ({ workItem, reload, navigation }) => {
@@ -88,12 +87,24 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
     );
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
+    Alert.alert(
+      "Confirm action",
+      "All data related to this item will be deleted, are you sure you want to delete it?",[
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {text: 'OK', onPress: () => confirmDeleteWork()},
+      ]
+    );
+  };
+  const confirmDeleteWork = async () => {
     const response = await DeleteWork(workItem.id);
     if (response.success) {
       reload();
     } else {
-      Alert("Error when delele work", response.message);
+      Alert.alert("Error when delele work", response.message);
     }
   };
   return (

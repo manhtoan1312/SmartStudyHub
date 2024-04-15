@@ -5,14 +5,6 @@ import { Swipeable } from "react-native-gesture-handler";
 import { DeleteExtraWork, RecoverExtraWork } from "../services/Guest/ExtraWork";
 
 const ExtraDeleted = ({ extra, reload }) => {
-  const recover = async () => {
-    const response = await RecoverExtraWork(extra.id);
-    if (response.success) {
-      reload();
-    } else {
-      Alert.alert("Recover Extra Work Fail", response.message);
-    }
-  };
 
   const deleteEx = async () => {
     const response = await DeleteExtraWork(extra.id);
@@ -48,9 +40,6 @@ const ExtraDeleted = ({ extra, reload }) => {
           <View>
             <Text style={styles.extraWorkText}>{extra.extraWorkName}</Text>
           </View>
-          <TouchableOpacity onPress={() => recover()} style={styles.actionButton}>
-            <Feather name="refresh-ccw" size={24} color="gray" />
-          </TouchableOpacity>
         </View>
       </View>
     </Swipeable>

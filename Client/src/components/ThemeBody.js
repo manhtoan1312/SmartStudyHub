@@ -80,7 +80,7 @@ const ThemeBody = ({navigation}) => {
     setSelectedTheme(theme);
   };
   const handleDeleteTheme = (theme) => {
-    if(theme.statusTheme!=="PREMIUM" && theme.id !== selectedTheme.id) {
+    if(theme.statusTheme!=="PREMIUM" && theme?.id !== selectedTheme?.id) {
         Alert.alert(
             "Confirm Action",
             "Do you want to change this theme?",
@@ -97,7 +97,7 @@ const ThemeBody = ({navigation}) => {
 
   } 
   const confirmDelete = async (theme) => {
-    const response = await markDeleteTheme(theme.id)
+    const response = await markDeleteTheme(theme?.id)
     if(response.success) {
         fetchData()
     }
@@ -125,6 +125,7 @@ const ThemeBody = ({navigation}) => {
   const handleAddTheme = async () => {
     try {
       const role = await getRole();
+      console.log(role.token)
       if (role) {
         if (role.role === "PREMIUM") {
           const { status } =
@@ -192,10 +193,10 @@ const ThemeBody = ({navigation}) => {
       <FlatList
         data={themeList}
         numColumns={2}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item?.id.toString()}
         renderItem={({ item }) => (
           <View>
-            {item.id === -1 ? (
+            {item?.id === -1 ? (
               <TouchableOpacity
                 style={[
                   styles.addThemeContainer,

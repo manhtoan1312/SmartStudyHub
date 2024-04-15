@@ -64,7 +64,7 @@ const WorkCompletedDL = ({ workItem, reload, navigation }) => {
       console.log("done");
       reload();
     } else {
-      Alert.alert("Recover Extrawork Error!", response.message);
+      Alert.alert("Recover Work Error!", response.message);
     }
   };
   const updateWork = () => {
@@ -88,12 +88,24 @@ const WorkCompletedDL = ({ workItem, reload, navigation }) => {
     );
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
+    Alert.alert(
+      "Confirm action",
+      "All data related to this item will be deleted, are you sure you want to delete it?",[
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {text: 'OK', onPress: () => confirmDeleteWork()},
+      ]
+    );
+  };
+  const confirmDeleteWork = async () => {
     const response = await DeleteWork(workItem.id);
     if (response.success) {
       reload();
     } else {
-      Alert("Error when delele work", response.message);
+      Alert.alert("Error when delele work", response.message);
     }
   };
   return (

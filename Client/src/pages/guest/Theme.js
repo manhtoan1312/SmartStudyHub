@@ -10,14 +10,24 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import ThemeBody from "../../components/ThemeBody";
+import DeletedThemeBody from "../../components/DeletedThemeBody";
+import getRole from "../../services/RoleService";
 
 const Theme = ({ navigation }) => {
   const [selectedMode, setSelectedMode] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [slideAnim] = useState(new Animated.Value(0));
-
+  const [checkRole, setCheckRole] = useState(false);
   const screenWidth = Dimensions.get("window").width;
-
+  useEffect(() => {
+    const fetchRole = async () => {
+      const role = await getRole();
+      if (role.role === "PREMIUM") {
+        setCheckRole(true);
+      }
+    };
+    fetchRole();
+  }, []);
   const handleModeChange = (mode) => {
     setSelectedMode(mode);
     setModalVisible(false);
@@ -31,6 +41,11 @@ const Theme = ({ navigation }) => {
     }).start();
   }, [selectedMode]);
 
+  const handleShowChoose = () => {
+    if (checkRole) {
+      setModalVisible(!modalVisible);
+    }
+  };
   return (
     <View style={{ backgroundColor: "#eeeeee", flex: 1 }}>
       <View style={styles.header}>
@@ -38,8 +53,12 @@ const Theme = ({ navigation }) => {
           <MaterialIcons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Theme</Text>
-        <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
-          <MaterialIcons name="more-vert" size={24} color="black" />
+        <TouchableOpacity onPress={() => handleShowChoose()}>
+          <MaterialIcons
+            name="more-vert"
+            size={24}
+            color={checkRole ? "black" : "white"}
+          />
         </TouchableOpacity>
       </View>
       <Modal
@@ -70,11 +89,11 @@ const Theme = ({ navigation }) => {
           </View>
         </TouchableOpacity>
       </Modal>
-
-      <ThemeBody navigation={navigation} />
-      {/* <Animated.View style={{ transform: [{ translateX: slideAnim }] }}>
+      {selectedMode === 0 ? (
         <ThemeBody navigation={navigation} />
-      </Animated.View> */}
+      ) : (
+        <DeletedThemeBody />
+      )}
     </View>
   );
 };

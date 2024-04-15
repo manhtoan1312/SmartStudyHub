@@ -134,10 +134,10 @@ const Today = ({ navigation }) => {
         time,
         timeWillStart
       );
-      console.log(response);
       if (!response.success) {
         Alert.alert("Create Work Error", response.message);
       } else {
+        console.log(response)
         fetchData();
       }
       setWorkName("");
@@ -146,7 +146,6 @@ const Today = ({ navigation }) => {
     }
   };
 
-  
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}

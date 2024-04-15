@@ -53,6 +53,18 @@ const FolderComponent = ({
   };
 
   const handleDeleteFolder = async () => {
+    Alert.alert(
+      "Confirm action",
+      "All data related to this item will be deleted, are you sure you want to delete it?",[
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {text: 'OK', onPress: () => confirmDeleteWork()},
+      ]
+    );
+  };
+  const confirmDeleteWork = async () => {
     const transformedList = listProjects.map(({ id }) => ({ id }));
     const userId = await AsyncStorage.getItem("id");
     const response = await DeleteFolder(

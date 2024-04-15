@@ -118,8 +118,24 @@ const EditFolder = ({ route, navigation }) => {
   };
 
   const handleDelete = async () => {
+    
     if (folderId) {
-      const id = await AsyncStorage.getItem('id')
+      Alert.alert(
+        "Confirm action",
+        "All data related to this item will be deleted, are you sure you want to delete it?",[
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {text: 'OK', onPress: () => confirmDeleteFolder()},
+        ]
+      );
+      
+    }
+  };
+
+  const confirmDeleteFolder = async () => {
+    const id = await AsyncStorage.getItem('id')
       const transformedList = projectSelected.map((id) => ({ id }));
       const response = await DeleteFolder(id, folderId,name, color, transformedList, null);
       if (response.success) {
@@ -127,8 +143,17 @@ const EditFolder = ({ route, navigation }) => {
       } else {
         Alert.alert("Error!", response.message);
       }
-    }
-  };
+  }
+  Alert.alert(
+    "Confirm action",
+    "All data related to this item will be deleted, are you sure you want to delete it?",[
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {text: 'OK', onPress: () => confirmDeleteWork()},
+    ]
+  );
 
   return (
     <ScrollView style={styles.container}>

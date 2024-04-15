@@ -17,8 +17,6 @@ import { Audio } from "expo-av";
 import {
   DeleteExtraWork,
   ExtraMarkCompleted,
-  MarkDelete,
-  RecoverExtraWork,
 } from "../services/Guest/ExtraWork";
 import { DeleteWork, RecoverWork } from "../services/Guest/WorkService";
 import { Swipeable } from "react-native-gesture-handler";
@@ -69,14 +67,7 @@ const WorkDone = ({ workItem, reload, navigation }) => {
       } else {
         Alert.alert("Mark complete work Error!", response.message);
       }
-    } else {
-      const response = await RecoverExtraWork(id);
-      if (response.success) {
-        reload();
-      } else {
-        Alert.alert("Recover Extrawork Error!", response.message);
-      }
-    }
+    } 
   };
   const handleRecoverWork = async () => {
     const response = await RecoverWork(workItem.id);
@@ -121,7 +112,7 @@ const WorkDone = ({ workItem, reload, navigation }) => {
   };
 
   const handleDeleteExtraWork = async (id) => {
-    const response = await MarkDelete(id)
+    const response = await DeleteExtraWork(id)
     if(response.success){
       console.log(response.data)
       reload()
@@ -130,7 +121,19 @@ const WorkDone = ({ workItem, reload, navigation }) => {
       Alert.alert("Error when delele extra work", response.message);
     }
   }
-  const handleDelete = async () => {
+  const handleDelete = () => {
+    Alert.alert(
+      "Confirm action",
+      "All data related to this item will be deleted, are you sure you want to delete it?",[
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {text: 'OK', onPress: () => confirmDeleteWork()},
+      ]
+    );
+  };
+  const confirmDeleteWork = async () => {
     const response = await DeleteWork(workItem.id);
     if (response.success) {
       reload();

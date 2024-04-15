@@ -12,7 +12,7 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, FontAwesome5, MaterialIcons, Octicons } from "@expo/vector-icons";
 import WorkCompleted from "../../components/WorkCompleted";
 import ImageFocus from "../../components/Image_Focus";
 import PomodoroCompleted from "../../components/PomodoroCompleted";
@@ -143,25 +143,28 @@ const DoneDetail = ({ navigation }) => {
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Work")}
           >
+            <FontAwesome5 name="tasks" style={styles.icon} size={18} color="black" />
             <Text style={styles.modalText}>Work</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Pomodoro")}
           >
+            <AntDesign name="clockcircleo" style={styles.icon} size={18} color="black" />
             <Text style={styles.modalText}>Pomodoro</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Project")}
           >
+            <Octicons name="project" style={styles.icon} size={18} color="black" />
             <Text style={styles.modalText}>Project</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => toggleModal()}
           >
-            <Text style={styles.modalText}>Cancel</Text>
+            <Text style={[styles.modalText, {paddingLeft:30}]}>Cancel</Text>
           </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
@@ -240,10 +243,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     width: "100%",
+    flexDirection:'row'
   },
   modalText: {
     fontSize: 18,
   },
+  icon:{
+    paddingRight:15
+  }
 });
 
 export default DoneDetail;

@@ -18,6 +18,7 @@ import { useState } from "react";
 import { DeleteWork, MarkCompleted } from "../services/Guest/WorkService";
 import { Audio } from "expo-av";
 import {
+  DeleteExtraWork,
   ExtraMarkCompleted,
   MarkDelete,
   RecoverExtraWork,
@@ -139,7 +140,7 @@ const WorkactiveDL = ({ workItem, reload, navigation }) => {
   };
 
   const handleDeleteExtraWork = async (id) => {
-    const response = await MarkDelete(id);
+    const response = await DeleteExtraWork(id);
     if (response.success) {
       console.log(response.data);
       reload();
@@ -170,12 +171,24 @@ const WorkactiveDL = ({ workItem, reload, navigation }) => {
       }
     }
   };
-  const handleDelete = async () => {
+  const handleDelete = () => {
+    Alert.alert(
+      "Confirm action",
+      "All data related to this item will be deleted, are you sure you want to delete it?",[
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {text: 'OK', onPress: () => confirmDeleteWork()},
+      ]
+    );
+  };
+  const confirmDeleteWork = async () => {
     const response = await DeleteWork(workItem.id);
     if (response.success) {
       reload();
     } else {
-      Alert("Error when delele work", response.message);
+      Alert.alert("Error when delele work", response.message);
     }
   };
   return (
