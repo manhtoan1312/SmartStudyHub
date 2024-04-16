@@ -144,17 +144,6 @@ const EditFolder = ({ route, navigation }) => {
         Alert.alert("Error!", response.message);
       }
   }
-  Alert.alert(
-    "Confirm action",
-    "All data related to this item will be deleted, are you sure you want to delete it?",[
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-      {text: 'OK', onPress: () => confirmDeleteWork()},
-    ]
-  );
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -167,7 +156,7 @@ const EditFolder = ({ route, navigation }) => {
             style={[styles.headerText, { color: name ? "black" : "gray" }]}
             onPress={() => handleDone()}
           >
-            Done
+            Update
           </Text>
         </TouchableOpacity>
       </View>
@@ -233,12 +222,10 @@ const EditFolder = ({ route, navigation }) => {
       </View>
       {folderId && (
         <View style={styles.actionsContainer}>
-          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-            <Text style={[styles.buttonText, styles.deleteButtonText]}>
-              Delete
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={styles.doneButton} onPress={() => handleDelete()}>
+          <Text style={[styles.buttonText, styles.doneButtonText]}>Delete</Text>
+        </TouchableOpacity>
+      </View>
       )}
     </ScrollView>
   );
@@ -259,6 +246,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 18,
+    fontWeight:'600'
   },
   content: {
     flexDirection: "row",
@@ -339,22 +327,32 @@ const styles = StyleSheet.create({
   selectedAddProjectButton: {
     backgroundColor: "lightcoral",
   },
+  actionsContainer: {
+    flexDirection: "column",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    marginTop: 15,
+    backgroundColor: "white",
+    paddingVertical: 5,
+  },
+  doneButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 5,
+    paddingVertical: 12,
+  },
   deleteButton: {
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 5,
-    marginBottom: 6,
-    paddingVertical: 15,
-    marginHorizontal: 50,
-
-    backgroundColor: "red",
+    paddingVertical: 8,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 18,
     color: "white",
   },
   doneButtonText: {
-    color: "blue",
+    color: "red",
   },
   deleteButtonText: {
     color: "white",

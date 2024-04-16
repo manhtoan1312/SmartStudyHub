@@ -44,7 +44,7 @@ function InputOTP({ route, navigation }) {
           otpInput,
           id
         );
-        Alert.alert("Announce", response.message);
+        Alert.alert("An Error when register", response.message);
         navigation.navigate("Login");
       } else {
         Alert.alert("Invalid OTP", "Please enter the correct OTP.");

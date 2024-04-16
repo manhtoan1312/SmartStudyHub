@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   StyleSheet,
@@ -29,9 +29,10 @@ const Out = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [closeKeyboard, setCloseKeyboard] = useState(false);
-  const [preName, setPreName] = useState(null);
   const [sortModalVisible, setSortModalVisible] = useState(false);
   const [sortType, setSortType] = useState("");
+  const inputRef = useRef(null);
+
   const isFocused = useIsFocused();
   useEffect(() => {
     const fetchDataOnFocus = async () => {
@@ -103,7 +104,6 @@ const Out = ({ navigation }) => {
     projectId,
     priority,
     dueDate,
-    timeWillStart,
     numberOfPomodoros,
     tags
   ) => {
@@ -127,7 +127,6 @@ const Out = ({ navigation }) => {
         dueDate,
         numberOfPomodoros,
         time,
-        timeWillStart
       );
 
       if (!response.success) {
@@ -167,9 +166,10 @@ const Out = ({ navigation }) => {
                   totalWorkCompleted={project.totalWorkCompleted}
                 />
               </View>
-              <TouchableOpacity style={styles.input}>
+              <TouchableOpacity style={styles.input} onPress={() => inputRef.current.focus()}>
                 <AntDesign name="plus" size={24} color="black" />
                 <TextInput
+                  ref={inputRef} 
                   style={{ paddingLeft: 10 }}
                   placeholder="Add a Work..."
                   value={workName}

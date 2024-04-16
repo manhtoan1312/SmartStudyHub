@@ -41,7 +41,7 @@ function Login({ navigation }) {
         navigation.navigate("Home");
       } else if (url.includes("account-deleted")) {
         Alert.alert(
-          "Your account has been deleted",
+          "Your account was deleted",
           "Do you want to recover your account?",
           [
             { text: "No", style: "cancel" },
@@ -50,7 +50,7 @@ function Login({ navigation }) {
         );
       } else if (url.includes("account-banned")) {
         Alert.alert(
-          "Your account has been banned",
+          "Your account was banned",
           "Please create a new account."
         );
       }

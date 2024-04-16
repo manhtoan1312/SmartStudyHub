@@ -6,7 +6,8 @@ import {
   ScrollView,
   Image,
   Alert,
-  TouchableOpacity,StyleSheet
+  TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import { s } from "react-native-wind";
 import { AntDesign, FontAwesome5, Feather } from "@expo/vector-icons";
@@ -35,7 +36,7 @@ export default function Setting({ navigation }) {
   const [plan, setPlan] = useState(true);
   const [email, setEmail] = useState("");
   const [img, setImg] = useState(null);
-  const isFocused = useIsFocused()
+  const isFocused = useIsFocused();
   const [isPomodoroTimePickerVisible, setIsPomodoroTimePickerVisible] =
     useState(false);
   const [isShortBreakTimePickerVisible, setIsShortBreakTimePickerVisible] =
@@ -50,19 +51,19 @@ export default function Setting({ navigation }) {
   }
   const fetchSettings = async () => {
     try {
-      const nameAcc = await AsyncStorage.getItem('accountName')
-      setEmail(nameAcc ? nameAcc : '')
+      const nameAcc = await AsyncStorage.getItem("accountName");
+      setEmail(nameAcc ? nameAcc : "");
       const storedImg = await AsyncStorage.getItem("img");
       setImg(storedImg ? storedImg : null);
       const workingSound = await AsyncStorage.getItem("focusSound");
-      if(workingSound){
-        const parse = JSON.parse(workingSound)
-        setWorkSound(parse?.nameSound)
+      if (workingSound) {
+        const parse = JSON.parse(workingSound);
+        setWorkSound(parse?.nameSound);
       }
       const breakSound = await AsyncStorage.getItem("soundDone");
-      if(breakSound){
-        const parse = JSON.parse(breakSound)
-        setBreakSound(parse?.nameSound)
+      if (breakSound) {
+        const parse = JSON.parse(breakSound);
+        setBreakSound(parse?.nameSound);
       }
       const storedSettings = await AsyncStorage.getItem("settings");
       if (storedSettings) {
@@ -135,7 +136,6 @@ export default function Setting({ navigation }) {
   const navigate = async (to) => {
     try {
       await updateData();
-      
     } catch (e) {
       console.log(e);
       Alert.alert(
@@ -263,26 +263,43 @@ export default function Setting({ navigation }) {
   };
 
   const deleteData = () => {
-    Alert.alert(
-      "Smart Study Hub Announcement",
-      "Are you sure to delete this data?",
-      [
+    if (!email) {
+      Alert.alert(
+        "Smart Study Hub Announcement",
+        "Are you sure to delete this data?",
+        [
+          {
+            text: "Cancel",
+          },
+          {
+            text: "OK",
+            onPress: () => submitDelete(),
+          },
+        ]
+      );
+    } else {
+      Alert.alert("Smart Study Hub Announcement", "Do you wanna log out?", [
         {
           text: "Cancel",
         },
         {
           text: "OK",
-          onPress: () => submitDelete(),
+          onPress: () => submitLogOut(),
         },
-      ]
-    );
+      ]);
+    }
+  };
+
+  const submitLogOut = async () => {
+    await AsyncStorage.clear();
+    navigation.navigate("Home");
   };
   const submitDelete = async () => {
     const id = await AsyncStorage.getItem("id");
     const rs = await DeleteGuest(id);
     if (!rs.success) {
-      navigation.navigate("Home");
       await AsyncStorage.clear();
+      navigation.navigate("Home");
     } else {
       Alert.alert("Smart Study Hub Announcement", "Delete data successfully");
       await AsyncStorage.clear();
@@ -290,7 +307,7 @@ export default function Setting({ navigation }) {
     }
   };
 
-  const   handleHeader = () => {
+  const handleHeader = () => {
     if (email) {
       toInfor();
     } else {
@@ -309,7 +326,7 @@ export default function Setting({ navigation }) {
         <Text style={s`font-medium text-2xl`}>Setting</Text>
       </View>
       <TouchableOpacity onPress={() => handleHeader()}>
-        <View style={s`flex-1 flex-row py-4 pl-4 bg-white`}>
+        <View style={s`flex flex-row h-auto py-4 pl-4 bg-white`}>
           <View>
             <Image
               source={img ? { uri: img } : require("../../images/avt.jpg")}
@@ -317,16 +334,22 @@ export default function Setting({ navigation }) {
             />
           </View>
           <TouchableOpacity style={s`flex flex-col px-2`}>
-            <TouchableOpacity  style={s`flex flex-row items-center`}>
-              <View style={s`mr-2`} >
+            <TouchableOpacity style={s`flex flex-row items-center`}>
+              <View style={s`mr-2`}>
                 {!email ? (
-                  <TouchableOpacity onPress={() => handleHeader()}><Text style={s` text-lg font-medium`}>Sign In | Sign Up</Text></TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleHeader()}>
+                    <Text style={s` text-lg font-medium`}>
+                      Sign In | Sign Up
+                    </Text>
+                  </TouchableOpacity>
                 ) : (
-                  <TouchableOpacity onPress={() => handleHeader()}><Text style={s` text-lg font-medium`}>{email}</Text></TouchableOpacity>
+                  <TouchableOpacity onPress={() => handleHeader()}>
+                    <Text style={s` text-lg font-medium`}>{email}</Text>
+                  </TouchableOpacity>
                 )}
               </View>
             </TouchableOpacity>
-  
+
             <View style={s`mt-1`}>
               <Text>Sync all devices</Text>
             </View>
@@ -363,7 +386,10 @@ export default function Setting({ navigation }) {
       </View>
 
       <View style={s`flex flex-col px-2 mt-6 bg-white py-2`}>
-        <TouchableOpacity onPress={() => navigate('FocusSound')} style={s`flex flex-row justify-between py-2`}>
+        <TouchableOpacity
+          onPress={() => navigate("FocusSound")}
+          style={s`flex flex-row justify-between py-2`}
+        >
           <Text style={s` text-lg font-medium`}>Working sound</Text>
           <View style={s`flex flex-row`}>
             <Text style={s`text-gray-500 text-lg `}>{workSound}</Text>
@@ -371,7 +397,10 @@ export default function Setting({ navigation }) {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={s`flex flex-row justify-between py-2`} onPress={() => navigate('SoundDone')}>
+        <TouchableOpacity
+          style={s`flex flex-row justify-between py-2`}
+          onPress={() => navigate("SoundDone")}
+        >
           <Text style={s` text-lg font-medium`}>Break bell</Text>
           <View style={s`flex flex-row`}>
             <Text style={s`text-gray-500 text-lg`}>{breakSound}</Text>
@@ -472,7 +501,7 @@ export default function Setting({ navigation }) {
       </View>
 
       <View style={s`flex flex-col justify-between px-2 mt-6 bg-white py-4`}>
-        <TouchableOpacity onPress={() => navigate('Theme')}>
+        <TouchableOpacity onPress={() => navigate("Theme")}>
           <View style={s` py-2`}>
             <Text style={s`text-lg font-medium`}>Theme</Text>
           </View>
@@ -533,7 +562,10 @@ export default function Setting({ navigation }) {
           <AntDesign style={s`text-lg`} name="right" />
         </View>
 
-        <TouchableOpacity onPress={()=> navigate('HelpAndFeedBack')} style={s`flex flex-row justify-between py-2`}>
+        <TouchableOpacity
+          onPress={() => navigate("HelpAndFeedBack")}
+          style={s`flex flex-row justify-between py-2`}
+        >
           <Text style={s`text-lg font-medium`}>Help and feedback</Text>
           <AntDesign style={s`text-lg`} name="right" />
         </TouchableOpacity>
@@ -548,40 +580,41 @@ export default function Setting({ navigation }) {
         </View>
       </View>
 
-      <View style={s`flex flex-col justify-between px-2 mt-6 bg-white py-4`}>
-        <View
-          style={s`flex flex-row justify-between  py-2`}
-          onTouchEnd={() => toSignIn()}
-        >
-          <Text style={s`text-lg font-medium `}>Sync now</Text>
-          <AntDesign style={s`text-lg`} name="right" />
-        </View>
-      </View>
-
-      
-        <View
-          style={s`flex flex-col justify-between px-2 mt-6 bg-white py-2 mb-4`}
-        >
+      {!email && (
+        <View style={s`flex flex-col justify-between px-2 mt-6 bg-white py-4`}>
           <View
-            style={s`flex flex-row justify-center items-center py-2`}
-            onTouchEnd={() => deleteData()}
+            style={s`flex flex-row justify-between  py-2`}
+            onTouchEnd={() => toSignIn()}
           >
-            <Text style={s`text-lg font-medium text-red-500`}>{email ? 'Log Out' : 'Delete Data'} </Text>
+            <Text style={s`text-lg font-medium `}>Sync now</Text>
+            <AntDesign style={s`text-lg`} name="right" />
           </View>
         </View>
-      
+      )}
+
+      <View
+        style={s`flex flex-col justify-between px-2 mt-6 bg-white py-2 mb-4`}
+      >
+        <View
+          style={s`flex flex-row justify-center items-center py-2`}
+          onTouchEnd={() => deleteData()}
+        >
+          <Text style={s`text-lg font-medium text-red-500`}>
+            {email ? "Log Out" : "Delete Data"}{" "}
+          </Text>
+        </View>
+      </View>
     </ScrollView>
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
-    paddingVertical:10
+    paddingVertical: 10,
   },
   pickerButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingVertical: 2,
   },
   labelText: {
@@ -589,7 +622,7 @@ const styles = StyleSheet.create({
     fontWeight: 900,
   },
   selectedValueText: {
-    color: 'gray',
+    color: "gray",
     fontSize: 18,
   },
   pickerIcon: {
@@ -597,8 +630,8 @@ const styles = StyleSheet.create({
   },
   picker: {
     height: 200,
-    width: '100%',
-    color: 'black',
-    backgroundColor:"white"
+    width: "100%",
+    color: "black",
+    backgroundColor: "white",
   },
 });

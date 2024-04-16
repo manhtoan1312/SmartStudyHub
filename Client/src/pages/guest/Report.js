@@ -46,7 +46,6 @@ const Report = ({ navigation }) => {
             name: `${result.assets[0].fileName}`,
             type: "image/png",
           });
-          
         }
       }
     } catch (error) {
@@ -61,26 +60,25 @@ const Report = ({ navigation }) => {
     }
 
     const id = await AsyncStorage.getItem("id");
-    if(file){
-        const response = await UploadReportFile(file, id);
-    if (response.success) {
-      const rs = await CreateReport(
-        id,
-        email,
-        phoneNumber,
-        title,
-        content,
-        typeReport,
-        response.data
-      );
-      if (rs.success) {
-        Alert.alert("Success", "send report successfully!!");
-      } else {
-        Alert.alert("Error", "send report Fail!!");
+    if (file) {
+      const response = await UploadReportFile(file, id);
+      if (response.success) {
+        const rs = await CreateReport(
+          id,
+          email,
+          phoneNumber,
+          title,
+          content,
+          typeReport,
+          response.data
+        );
+        if (rs.success) {
+          Alert.alert("Success", "send report successfully!!");
+        } else {
+          Alert.alert("Error", "send report Fail!!");
+        }
       }
-    }
-    }
-    else{
+    } else {
       const rs = await CreateReport(
         id,
         email,
@@ -105,7 +103,7 @@ const Report = ({ navigation }) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.goBack()}
@@ -125,14 +123,14 @@ const Report = ({ navigation }) => {
           style={styles.additionalInput}
         />
         <View style={styles.inputContainer}>
-        <TextInput
-          placeholder="Content"
-          multiline
-          numberOfLines={6}
-          value={content}
-          onChangeText={(text) => setContent(text)}
-          style={styles.input}
-        />
+          <TextInput
+            placeholder="Content"
+            multiline
+            numberOfLines={6}
+            value={content}
+            onChangeText={(text) => setContent(text)}
+            style={styles.input}
+          />
         </View>
         <TextInput
           placeholder="Email"
@@ -149,46 +147,45 @@ const Report = ({ navigation }) => {
           keyboardType="numeric"
         />
 
-        
-        <View style={styles.pickerContainer}>
-          <Text style={styles.pickerLabel}>Select Type of Report: </Text>
-          <PickerSelect
-            value={typeReport}
-            onValueChange={(value) => setTypeReport(value)}
-            items={[
-              { label: "Help", value: "HELP" },
-              { label: "Report Problem", value: "REPORTPROBLEM" },
-              { label: "Report User", value: "REPORTUSER" },
-              { label: "Feedback", value: "FEEDBACK" },
-            ]}
-            style={styles.picker}
-          />
-        </View>
-        {selectedImage && (
-          <Image source={{ uri: selectedImage }} style={styles.selectedImage} />
-        )}
-        <TouchableOpacity
-          style={styles.imageButton}
-          onPress={handleChooseImage}
-        >
-          <Text style={styles.buttonText}>Choose Image</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.submitButton}
-          onPress={handleSubmitReport}
-        >
-          <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
+          <View style={styles.pickerContainer}>
+            <Text style={styles.pickerLabel}>Select Type of Report: </Text>
+            <PickerSelect
+              value={typeReport}
+              onValueChange={(value) => setTypeReport(value)}
+              items={[
+                { label: "Help", value: "HELP" },
+                { label: "Report Problem", value: "REPORTPROBLEM" },
+                { label: "Report User", value: "REPORTUSER" },
+                { label: "Feedback", value: "FEEDBACK" },
+              ]}
+              style={styles.picker}
+            />
+          </View>
+          {selectedImage && (
+            <Image source={{ uri: selectedImage }} style={styles.selectedImage} />
+          )}
+          <TouchableOpacity
+            style={styles.imageButton}
+            onPress={handleChooseImage}
+          >
+            <Text style={styles.buttonText}>Choose Image</Text>
+          </TouchableOpacity>
+  
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={handleSubmitReport}
+          >
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    paddingBottom: 200,
+    justifyContent: "center",
   },
   backButton: {
     position: "absolute",
@@ -197,9 +194,9 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   content: {
-    flex: 5,
     paddingHorizontal: 60,
-    paddingTop: 100,
+    justifyContent: "center",
+    height: "100%",
   },
   titleContainer: {
     alignItems: "center",

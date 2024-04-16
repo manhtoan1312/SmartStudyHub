@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   StyleSheet,
@@ -35,6 +35,7 @@ const Today = ({ navigation }) => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [closeKeyboard, setCloseKeyboard] = useState(false);
   const [sortModalVisible, setSortModalVisible] = useState(false);
+  const inputRef = useRef(null);
   const [sortType, setSortType] = useState("");
 
   const isFocused = useIsFocused();
@@ -108,7 +109,6 @@ const Today = ({ navigation }) => {
     projectId,
     priority,
     dueDate,
-    timeWillStart,
     numberOfPomodoros,
     tags
   ) => {
@@ -132,12 +132,11 @@ const Today = ({ navigation }) => {
         dueDate,
         numberOfPomodoros,
         time,
-        timeWillStart
       );
       if (!response.success) {
         Alert.alert("Create Work Error", response.message);
       } else {
-        console.log(response)
+        console.log(response);
         fetchData();
       }
       setWorkName("");
@@ -172,9 +171,10 @@ const Today = ({ navigation }) => {
                   totalWorkCompleted={project.totalWorkCompleted}
                 />
               </View>
-              <TouchableOpacity style={styles.input}>
+              <TouchableOpacity style={styles.input} onPress={() => inputRef.current.focus()}>
                 <AntDesign name="plus" size={24} color="black" />
                 <TextInput
+                  ref={inputRef} 
                   style={{ paddingLeft: 10 }}
                   placeholder="Add a Work..."
                   value={workName}

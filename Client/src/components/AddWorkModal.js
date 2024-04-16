@@ -20,7 +20,8 @@ import { GetAllTagOfUser } from "../services/Guest/TagService";
 import { GetProjectByStatus } from "../services/Guest/ProjectService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
-import DateTimePicker from "react-native-modal-datetime-picker";
+import DateTimePicker from "./DateTimePicker";
+// import DateTimePicker from "react-native-modal-datetime-picker";
 
 const AddWorkModal = ({
   onDone,
@@ -39,7 +40,7 @@ const AddWorkModal = ({
   const [isProjectListModalVisible, setIsProjectListModalVisible] =
     useState(false);
   const [selectedProject, setSelectedProject] = useState(
-    project ? project : { id: null, projectName: "Mission" }
+    project ? project : { id: null, projectName: "Task" }
   );
   const [selectedTag, setSelectedTag] = useState(tagId ? [tagId] : []);
   const [isTagListModalVisible, setIsTagListModalVisible] = useState(false);
@@ -80,36 +81,30 @@ const AddWorkModal = ({
     defaultTime.setMilliseconds(0);
 
     if (type === "TODAY") {
-      defaultTime.setHours(8);
-      defaultTime.setMinutes(30);
+      defaultTime.setHours(23);
+      defaultTime.setMinutes(59);
     } else if (type === "TOMORROW") {
       defaultTime.setDate(defaultTime.getDate() + 1);
-      defaultTime.setHours(8);
-      defaultTime.setMinutes(30);
+      defaultTime.setHours(23);
+      defaultTime.setMinutes(59);
     } else if (type === "NEXT7DAY") {
       defaultTime.setDate(defaultTime.getDate() + 7);
-      defaultTime.setHours(8);
-      defaultTime.setMinutes(30);
+      defaultTime.setHours(23);
+      defaultTime.setMinutes(59);
     } else if (type === "THISWEEK") {
       defaultTime.setDate(defaultTime.getDate() + (7 - defaultTime.getDay()));
-      defaultTime.setHours(8);
-      defaultTime.setMinutes(30);
+      defaultTime.setHours(23);
+      defaultTime.setMinutes(59);
     } else {
       defaultTime.setDate(defaultTime.getDate() + 1);
-      defaultTime.setHours(8);
-      defaultTime.setMinutes(30);
+      defaultTime.setHours(23);
+      defaultTime.setMinutes(59);
     }
 
-    return defaultTime;
+    return defaultTime.getTime();
   };
 
   const handleDonePress = () => {
-    const selectedDateWithoutTime = new Date(
-      selectedDate.getFullYear(),
-      selectedDate.getMonth(),
-      selectedDate.getDate(),
-      23, 59, 59, 999
-    );
     if (!prioritSelect) {
       setPriority("NONE");
     }
@@ -118,7 +113,6 @@ const AddWorkModal = ({
         selectedProject.id,
         prioritSelect,
         null,
-        selectedDate.getTime(),
         selectedClockIndex == -1 ? 0 : selectedClockIndex,
         selectedTag.map((tag) => tag.id)
       );
@@ -126,8 +120,7 @@ const AddWorkModal = ({
       onDone(
         selectedProject.id,
         prioritSelect,
-        selectedDateWithoutTime.getTime(),
-        selectedDate.getTime(),
+        selectedDate,
         selectedClockIndex == -1 ? 0 : selectedClockIndex,
         selectedTag.map((tag) => tag.id)
       );
@@ -233,7 +226,7 @@ const AddWorkModal = ({
   const selectMission = () => {
     setSelectedProject({
       id: null,
-      projectName: "Mission",
+      projectName: "Task",
       colorCode: "#0000FF",
     });
     setIsProjectListModalVisible(false);
@@ -257,7 +250,7 @@ const AddWorkModal = ({
                 <View
                   style={[styles.cirleSmall, { backgroundColor: "blue" }]}
                 ></View>
-                <Text style={styles.projectListItemText}>Mission</Text>
+                <Text style={styles.projectListItemText}>Task</Text>
               </TouchableOpacity>
               <FlatList
                 data={listproject}
@@ -458,7 +451,7 @@ const AddWorkModal = ({
                 <Text style={styles.projectNameText}>
                   {selectedProject?.projectName
                     ? selectedProject?.projectName
-                    : "Mission"}
+                    : "Task"}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -474,7 +467,12 @@ const AddWorkModal = ({
         {renderProjectListModal()}
         {renderTagModal()}
 
-        {showPicker && (
+        <DateTimePicker
+          visible={showPicker}
+          onSelectTime={(value) => handleDateTimeConfirm(value)}
+          onClose={hideDateTimePicker}
+        />
+        {/* {showPicker && (
           <DateTimePicker
             isVisible={true}
             mode="datetime"
@@ -482,7 +480,7 @@ const AddWorkModal = ({
             onConfirm={(value) => handleDateTimeConfirm(value)}
             onCancel={hideDateTimePicker}
           />
-        )}
+        )} */}
       </View>
     </TouchableWithoutFeedback>
   );

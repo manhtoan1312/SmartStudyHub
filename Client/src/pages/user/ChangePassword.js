@@ -98,6 +98,7 @@ function ChangePassword({ route, navigation }) {
             keyboardType="numeric"
             value={otpInput}
             onChangeText={(text) => setOtpInput(text)}
+            placeholderTextColor={'#686868'}
             style={styles.input}
           />
         </View>
@@ -107,6 +108,7 @@ function ChangePassword({ route, navigation }) {
             value={password}
             onChangeText={(text) => setPassword(text)}
             secureTextEntry={!passwordVisible}
+            placeholderTextColor={'#686868'}
             style={styles.input}
           />
           <TouchableOpacity
@@ -126,6 +128,7 @@ function ChangePassword({ route, navigation }) {
             value={rePassword}
             onChangeText={(text) => setRePassword(text)}
             secureTextEntry={!rePasswordVisible}
+            placeholderTextColor={'#686868'}
             style={styles.input}
           />
           <TouchableOpacity

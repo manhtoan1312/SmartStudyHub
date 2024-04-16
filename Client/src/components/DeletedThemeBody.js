@@ -30,12 +30,15 @@ const DeletedThemeBody = () => {
 
   const fetchData = async () => {
     try {
-      const response = await getAllThemeDelete();
-      
-      if (response.success) {
-        setThemeList(response.data);
-      } else {
-        Alert.alert("Error", response.message);
+      const role = await getRole();
+      if (role.role === "PREMIUM") {
+        const response = await getAllThemeDelete();
+
+        if (response.success) {
+          setThemeList(response.data);
+        } else {
+          Alert.alert("Error!!", response.message);
+        }
       }
     } catch (error) {
       console.log("Error fetching role or theme:", error);
@@ -107,10 +110,7 @@ const DeletedThemeBody = () => {
         <ImageBackground
           source={{ uri: item?.url }}
           resizeMode="cover"
-          style={[
-            styles.image,
-            { width: imageWidth, height: imageHeight },
-          ]}
+          style={[styles.image, { width: imageWidth, height: imageHeight }]}
         ></ImageBackground>
         <View style={styles.bodyText}>{renderText(item)}</View>
       </View>
@@ -118,21 +118,23 @@ const DeletedThemeBody = () => {
   );
 
   return (
-    <View style={{ marginHorizontal: 5, marginTop: 40 }}>
-      <FlatList
-        data={themeList}
-        numColumns={2}
-        keyExtractor={(theme) => theme?.id.toString()}
-        renderItem={renderItem}
-        ListFooterComponent={<View style={{ height: 150 }} />}
-      />
-    </View>
+    themeList && (
+      <View style={{ marginHorizontal: 5, marginTop: 40 }}>
+        <FlatList
+          data={themeList}
+          numColumns={2}
+          keyExtractor={(theme) => theme?.id.toString()}
+          renderItem={renderItem}
+          ListFooterComponent={<View style={{ height: 150 }} />}
+        />
+      </View>
+    )
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    width:'auto'
+    width: "auto",
   },
   imageContainer: {
     borderWidth: 2,

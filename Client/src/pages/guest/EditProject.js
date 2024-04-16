@@ -162,7 +162,7 @@ const EditProjectPage = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.actionsContainer}>
-        <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+        <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete()}>
           <Text style={[styles.buttonText, styles.deleteButtonText]}>
             Delete
           </Text>
@@ -187,6 +187,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 18,
+    fontWeight:'500'
   },
   content: {
     flexDirection: "row",
@@ -245,15 +246,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 5,
-    marginBottom: 6,
-    paddingVertical: 8,
+    paddingVertical: 12,
   },
   deleteButton: {
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 5,
-    marginBottom: 6,
-    paddingVertical: 8,
+    paddingVertical: 12,
   },
   buttonText: {
     fontSize: 16,
@@ -261,7 +260,7 @@ const styles = StyleSheet.create({
     fontWeight:600
   },
   doneButtonText: {
-    color: "blue",
+    color: "#4EE508",
   },
   deleteButtonText: {
     color: "red",

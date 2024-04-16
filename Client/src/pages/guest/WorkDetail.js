@@ -202,7 +202,7 @@ const WorkDetail = ({ route, navigation }) => {
     ) {
       statusWork = "TOMORROW";
     }
-    
+
     selectedDateObject.setHours(23);
     selectedDateObject.setMinutes(59);
     selectedDateObject.setSeconds(59);
@@ -212,7 +212,6 @@ const WorkDetail = ({ route, navigation }) => {
     updateWork.statusWork = statusWork;
     setWork(updateWork);
   };
-  
 
   const handleSelectPriority = (priority) => {
     const updateWork = { ...work };
@@ -363,7 +362,7 @@ const WorkDetail = ({ route, navigation }) => {
         );
 
         if (response.success) {
-          setWork(response.data)
+          setWork(response.data);
         } else {
           Alert.alert("Update Work Error", response.message);
         }
@@ -379,7 +378,7 @@ const WorkDetail = ({ route, navigation }) => {
     if (work.workName) {
       const response = await CreateExtraWork(work.id, extraWorkName);
       if (response.success) {
-        setExtraWorkName('')
+        setExtraWorkName("");
         await updateWork();
       } else {
         Alert.alert("Create Extra Work Error", response.message);
@@ -457,7 +456,7 @@ const WorkDetail = ({ route, navigation }) => {
             onPress={() => setModalVisible(true)}
           >
             <Text style={styles.projectName}>
-              {work?.projectName || "Mission"}
+              {work?.projectName || "Task"}
             </Text>
             <AntDesign name="down" size={15} color="white" />
           </TouchableOpacity>
@@ -488,7 +487,7 @@ const WorkDetail = ({ route, navigation }) => {
                 onPress={() => handleUpdateProject(null)}
               >
                 <MaterialIcons name="home-work" size={24} color="#7f7fff" />
-                <Text>Mission</Text>
+                <Text>Task</Text>
               </TouchableOpacity>
               <FlatList
                 data={listProject}
@@ -709,7 +708,7 @@ const WorkDetail = ({ route, navigation }) => {
               </TouchableOpacity>
             </View>
             <View style={styles.namecontainer}>
-              <View style={{flex:1}}>
+              <View style={{ flex: 1 }}>
                 {work.extraWorks.length > 0 &&
                   work.extraWorks.map((item) => (
                     <View style={styles.extra} key={item.id}>
@@ -808,9 +807,8 @@ const WorkDetail = ({ route, navigation }) => {
                 value={note}
                 onChangeText={(text) => setNote(text)}
               />
-              
             </View>
-            <View style={{height:120}}></View>
+            <View style={{ height: 120 }}></View>
           </View>
         )}
       </ScrollView>
@@ -984,13 +982,13 @@ const styles = StyleSheet.create({
   extraWorkInput: {
     paddingLeft: 10,
   },
-  extra:{
-    flex:1, 
-    flexDirection:'row',
-    width:'100%',
-    justifyContent:'space-between',
-    paddingVertical:10
-  }
+  extra: {
+    flex: 1,
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+  },
 });
 
 export default WorkDetail;

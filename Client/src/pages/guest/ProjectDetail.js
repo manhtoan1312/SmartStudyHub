@@ -71,7 +71,6 @@ const ProjectDetail = ({ route, navigation }) => {
     projectId,
     priority,
     dueDate,
-    timeWillStart,
     numberOfPomodoros,
     tags
   ) => {
@@ -88,15 +87,6 @@ const ProjectDetail = ({ route, navigation }) => {
     console.log(numberOfPomodoros)
     if (workName) {
       const tagslist = tags.map((id) => ({ "id": id }))
-      console.log(id,
-        projectId,
-        tagslist,
-        workName,
-        priority,
-        dueDate,
-        numberOfPomodoros,
-        time,
-        timeWillStart,)
       const response = await CreateWork(
         id,
         projectId ? projectId: null,
@@ -106,7 +96,6 @@ const ProjectDetail = ({ route, navigation }) => {
         dueDate,
         numberOfPomodoros,
         time,
-        timeWillStart,
       );
       
       if(!response.success){

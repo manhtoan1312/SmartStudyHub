@@ -104,6 +104,8 @@ function ChangeEmail({ route, navigation }) {
             value={otpInput}
             onChangeText={(text) => setOtpInput(text)}
             style={styles.input}
+            placeholderTextColor={'#686868'}
+
           />
         </View>
 

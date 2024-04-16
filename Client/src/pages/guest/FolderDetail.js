@@ -75,7 +75,6 @@ const FolderDetail = ({ route, navigation }) => {
     projectId,
     priority,
     dueDate,
-    timeWillStart,
     numberOfPomodoros,
     tags
   ) => {
@@ -99,7 +98,6 @@ const FolderDetail = ({ route, navigation }) => {
         dueDate,
         numberOfPomodoros,
         time,
-        timeWillStart
       );
       const response = await CreateWork(
         id,
@@ -110,7 +108,6 @@ const FolderDetail = ({ route, navigation }) => {
         dueDate,
         numberOfPomodoros,
         time,
-        timeWillStart
       );
 
       if (!response.success) {

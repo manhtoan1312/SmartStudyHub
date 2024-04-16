@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   StyleSheet,
@@ -32,6 +32,7 @@ const TaskDefault = ({ navigation }) => {
   const [closeKeyboard, setCloseKeyboard] = useState(false);
   const [preName, setPreName] = useState(null);
   const [sortModalVisible, setSortModalVisible] = useState(false);
+  const inputRef = useRef(null);
   const [sortType, setSortType] = useState("");
   const isFocused = useIsFocused();
   useEffect(() => {
@@ -104,7 +105,6 @@ const TaskDefault = ({ navigation }) => {
     projectId,
     priority,
     dueDate,
-    timeWillStart,
     numberOfPomodoros,
     tags
   ) => {
@@ -128,7 +128,6 @@ const TaskDefault = ({ navigation }) => {
         dueDate,
         numberOfPomodoros,
         time,
-        timeWillStart
       );
 
       if (!response.success) {
@@ -170,9 +169,10 @@ const TaskDefault = ({ navigation }) => {
                   totalWorkCompleted={project.totalWorkCompleted}
                 />
               </View>
-              <TouchableOpacity style={styles.input}>
+              <TouchableOpacity style={styles.input} onPress={() => inputRef.current.focus()}>
                 <AntDesign name="plus" size={24} color="black" />
                 <TextInput
+                  ref={inputRef} 
                   style={{ paddingLeft: 10 }}
                   placeholder="Add a Work..."
                   value={workName}

@@ -6,8 +6,8 @@ import DatePickerModal from "react-native-modal-datetime-picker";
 const DateTimePicker = ({ visible, onSelectTime, onClose }) => {
   const [selectedDate, setSelectedDate] = useState(getToday);
   const defaultTime = new Date();
-  defaultTime.setHours(8);
-  defaultTime.setMinutes(30);
+  defaultTime.setHours(23);
+  defaultTime.setMinutes(59);
 
   const [selectedTime, setSelectedTime] = useState(defaultTime);
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
@@ -57,7 +57,7 @@ const DateTimePicker = ({ visible, onSelectTime, onClose }) => {
       <View style={styles.modalContainer}>
         <View style={{ backgroundColor: "white", padding: 16 }}>
           <View style={{ alignItems: "center", paddingTop: 16 }}>
-            <Text style={styles.title}>Select Time Remindered</Text>
+            <Text style={styles.title}>Select Time</Text>
           </View>
 
           <Calendar

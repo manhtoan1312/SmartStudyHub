@@ -46,10 +46,10 @@ const ThemeBody = ({navigation}) => {
             name: "Add Theme",
             icon: "plus-circle",
           };
-          const updatedThemeList = [addThemeItem, ...response.message];
+          const updatedThemeList = [addThemeItem, ...response.data];
           setThemeList(updatedThemeList);
         } else {
-          Alert.alert("Error", response.message);
+          Alert.alert("Error!!!", response.message);
         }
       } else {
         const response = await getAllThemeOfGuest();
@@ -59,14 +59,14 @@ const ThemeBody = ({navigation}) => {
             name: "Add Theme",
             icon: "plus-circle",
           };
-          const updatedThemeList = [addThemeItem, ...response.message];
+          const updatedThemeList = [addThemeItem, ...response.data];
           setThemeList(updatedThemeList);
         } else {
           Alert.alert("Error", response.message);
         }
       }
     } catch (error) {
-      console.log("Error fetching role or theme:", error);
+      console.log("Error fetching role or themes:", error);
       Alert.alert("Error", "Failed to fetch themes. Please try again later.");
     }
   };

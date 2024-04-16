@@ -70,7 +70,7 @@ const PomodoroCompleted = ({ pomoItem, reload, navigation }) => {
             Focus time: {pomoItem?.timeFocus} Minute
           </Text>
           <Text style={{ color: "gray" }}>
-            WorkCompleted: {pomoItem.totalWorkCompleted} {pomoItem.totalWorkCompleted> 1? 'Missions': 'Mission' }
+            Work Completed: {pomoItem.totalWorkCompleted} {pomoItem.totalWorkCompleted> 1? 'Missions': 'Mission' }
           </Text>
         </View>
 

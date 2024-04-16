@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   StyleSheet,
@@ -10,7 +10,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
-  TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import WorkActive from "../../components/WorkActive";
@@ -33,6 +32,7 @@ const All = ({ navigation }) => {
   const isFocused = useIsFocused();
   const [sortModalVisible, setSortModalVisible] = useState(false);
   const [sortType, setSortType] = useState("");
+  const inputRef = useRef(null);
   useEffect(() => {
     const fetchDataOnFocus = async () => {
       if (isFocused) {
@@ -75,7 +75,6 @@ const All = ({ navigation }) => {
     projectId,
     priority,
     dueDate,
-    timeWillStart,
     numberOfPomodoros,
     tags
   ) => {
@@ -96,10 +95,9 @@ const All = ({ navigation }) => {
         tagslist,
         workName,
         priority,
-        dueDate,
+        dueDate, 
         numberOfPomodoros,
         time,
-        timeWillStart
       );
 
       if (!response.success) {
@@ -168,9 +166,10 @@ const All = ({ navigation }) => {
                   totalWorkCompleted={project.totalWorkCompleted}
                 />
               </View>
-              <TouchableOpacity style={styles.input}>
+              <TouchableOpacity style={styles.input} onPress={() => inputRef.current.focus()}>
                 <AntDesign name="plus" size={24} color="black" />
                 <TextInput
+                  ref={inputRef} 
                   style={{ paddingLeft: 10 }}
                   placeholder="Add a Work..."
                   value={workName}
