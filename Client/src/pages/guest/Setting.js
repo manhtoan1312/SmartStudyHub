@@ -296,18 +296,24 @@ export default function Setting({ navigation }) {
   };
 
   const submitLogOut = async () => {
-    await AsyncStorage.clear();
+    const allKeys = await AsyncStorage.getAllKeys();
+    const keysToRemove = allKeys.filter(key => key !== '2FA');
+    await AsyncStorage.multiRemove(keysToRemove);
     navigation.navigate("Home");
   };
   const submitDelete = async () => {
     const id = await AsyncStorage.getItem("id");
     const rs = await DeleteGuest(id);
     if (!rs.success) {
-      await AsyncStorage.clear();
+      const allKeys = await AsyncStorage.getAllKeys();
+    const keysToRemove = allKeys.filter(key => key !== '2FA');
+    await AsyncStorage.multiRemove(keysToRemove);
       navigation.navigate("Home");
     } else {
       Alert.alert("Smart Study Hub Announcement", "Delete data successfully");
-      await AsyncStorage.clear();
+      const allKeys = await AsyncStorage.getAllKeys();
+    const keysToRemove = allKeys.filter(key => key !== '2FA');
+    await AsyncStorage.multiRemove(keysToRemove);
       navigation.navigate("Home");
     }
   };

@@ -10,7 +10,7 @@ import {
 import { ResendOTP } from "../../services/AccountService";
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import jwtDecode from "jwt-decode";
 const TFAOTP = ({ route, navigation }) => {
   const { otpCode, time, email, token} = route.params;
   const [otpInput, setOtpInput] = useState("");
@@ -34,10 +34,9 @@ const TFAOTP = ({ route, navigation }) => {
     const currentTime = new Date().getTime();
     if (currentTime < expiredTime) {
       if (otpInput === otp) {
-        console.log('dung')
         await AsyncStorage.setItem("token", token);
         navigation.navigate("Home");
-        const role = jwt_decode(token);
+        const role = jwtDecode(token);
         const subArray = role.sub.split("-");
         const id = subArray[0];
         await AsyncStorage.setItem("id", id);

@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
-import { Swipeable } from "react-native-gesture-handler";
+import { AntDesign, EvilIcons } from "@expo/vector-icons";
+import { Swipeable, progress, dragX } from "react-native-gesture-handler";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
-import { MarkCompleteProject } from "../services/Guest/ProjectService";
+import {
+  DeleteProject,
+  MarkCompleteProject,
+} from "../services/Guest/ProjectService";
 import { Audio } from "expo-av";
 
 const ProjectComponent = ({
@@ -19,25 +22,55 @@ const ProjectComponent = ({
 
   const renderRightActions = (progress, dragX) => {
     const trans = dragX.interpolate({
-      inputRange: [0, 50, 100, 101],
+      inputRange: [0, 50, 150, 151],
       outputRange: [0, 0, 0, 1],
     });
     return (
       <View style={styles.rightActions}>
+        
+        <TouchableOpacity
+          onPress={() => handleDoneProject(id)}
+          style={[styles.doneButton, { transform: [{ translateX: trans }] }]}
+        >
+          <AntDesign name="check" size={20} color="white" />
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => handleEditProject()}
-          style={styles.editButton}
+          style={[styles.editButton, { transform: [{ translateX: trans }] }]}
         >
           <AntDesign name="edit" size={20} color="white" />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => handleDoneProject(id)}
-          style={styles.doneButton}
+          onPress={() => handleDelete(id)}
+          style={[styles.delButton, { transform: [{ translateX: trans }] }]}
         >
-          <AntDesign name="check" size={20} color="white" />
+          <EvilIcons name="trash" size={24} color="white" />
         </TouchableOpacity>
       </View>
     );
+  };
+
+  const handleDelete = (id) => {
+    Alert.alert(
+      "Confirm action",
+      "All data related to this item will be deleted, are you sure you want to delete it?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        { text: "OK", onPress: () => confirmDeleteProject(id) },
+      ]
+    );
+  };
+
+  const confirmDeleteProject = async (id) => {
+    const response = await DeleteProject(id);
+    if (response.success) {
+      reload();
+    } else {
+      Alert.alert("Error!", response.message);
+    }
   };
 
   async function playSound() {
@@ -77,6 +110,8 @@ const ProjectComponent = ({
     <Swipeable
       ref={swipeableRef}
       renderRightActions={renderRightActions}
+      progress={progress}
+      dragX={dragX}
     >
       <TouchableOpacity
         style={styles.projectContainer}
@@ -116,7 +151,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: 80,
+    width: 120,
   },
   editButton: {
     width: 40,
@@ -131,6 +166,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "green",
+  },
+  delButton: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "red",
   },
   totalTimeContainer: {
     position: "absolute",

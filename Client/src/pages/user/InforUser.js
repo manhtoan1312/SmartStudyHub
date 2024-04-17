@@ -80,7 +80,7 @@ const InforUser = ({ navigation }) => {
       infor.country ? infor.country : null,
       avt
         ? avt
-        : '"https://res.cloudinary.com/dnj5purhu/image/upload/v1701175788/SmartStudyHub/USER/default-avatar_c2ruot.png"',
+        : '"https://res.cloudinary.com/dnj5purhu/image/upload/v1701175788/SmartStudyHub/USER/default-avatar_c2ruot.png"'
     );
     if (!response.success) {
       Alert.alert("Change User Information fail", response.message);
@@ -93,7 +93,9 @@ const InforUser = ({ navigation }) => {
   };
 
   const handleLogin = async () => {
-    await AsyncStorage.clear();
+    const allKeys = await AsyncStorage.getAllKeys();
+    const keysToRemove = allKeys.filter((key) => key !== "2FA");
+    await AsyncStorage.multiRemove(keysToRemove);
     navigation.goBack();
   };
   const closeEditNameModal = () => {
@@ -183,7 +185,9 @@ const InforUser = ({ navigation }) => {
       {
         text: "OK",
         onPress: async () => {
-          await AsyncStorage.clear();
+          const allKeys = await AsyncStorage.getAllKeys();
+          const keysToRemove = allKeys.filter((key) => key !== "2FA");
+          await AsyncStorage.multiRemove(keysToRemove);
           navigation.navigate("Home");
         },
       },
@@ -236,7 +240,7 @@ const InforUser = ({ navigation }) => {
     if (add) {
       setInfor({
         ...infor,
-        address:add
+        address: add,
       });
     }
     setAddressVisible(false);
@@ -322,7 +326,7 @@ const InforUser = ({ navigation }) => {
                     />
                   </View>
                 </TouchableOpacity>
-                
+
                 <TouchableOpacity
                   style={styles.infoItem}
                   onPress={() => setPhoneInputModalVisible(true)}
@@ -345,7 +349,7 @@ const InforUser = ({ navigation }) => {
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <Text style={styles.infoValue}>
                       {infor?.dateOfBirth
-                        ? new Date(infor?.dateOfBirth).toDateString() 
+                        ? new Date(infor?.dateOfBirth).toDateString()
                         : null}
                     </Text>
                     <MaterialIcons
@@ -358,7 +362,7 @@ const InforUser = ({ navigation }) => {
 
                 <TouchableOpacity
                   style={styles.infoItem}
-                  onPress={() => setAddressVisible(true)} 
+                  onPress={() => setAddressVisible(true)}
                 >
                   <Text style={styles.infoLabel}>Address</Text>
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -602,11 +606,11 @@ const InforUser = ({ navigation }) => {
               onClose={() => setDateOfBirthVisibl(false)}
               onDateChange={handleDateChange}
             />
-            <AddressPicker 
-            isVisible={isAddressVisible}
-            add={infor?.address ? infor?.address : ""}
-            onClose={() => setAddressVisible(false)}
-            onSubmit={handleAddressChange}
+            <AddressPicker
+              isVisible={isAddressVisible}
+              add={infor?.address ? infor?.address : ""}
+              onClose={() => setAddressVisible(false)}
+              onSubmit={handleAddressChange}
             />
           </View>
         </TouchableWithoutFeedback>

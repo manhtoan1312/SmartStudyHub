@@ -75,7 +75,9 @@ function ChangeEmail({ route, navigation }) {
   };
 
   const handleLogin = async () => {
-    await AsyncStorage.clear();
+    const allKeys = await AsyncStorage.getAllKeys();
+    const keysToRemove = allKeys.filter(key => key !== '2FA');
+    await AsyncStorage.multiRemove(keysToRemove);
     navigation.navigate("Login");
   };
   const handleResendOTP = async () => {
