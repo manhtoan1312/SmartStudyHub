@@ -22,7 +22,8 @@ const Theme = ({ navigation }) => {
   useEffect(() => {
     const fetchRole = async () => {
       const role = await getRole();
-      if (role.role === "PREMIUM") {
+      console.log(role)
+      if (role && role?.role === "PREMIUM") {
         setCheckRole(true);
       }
     };

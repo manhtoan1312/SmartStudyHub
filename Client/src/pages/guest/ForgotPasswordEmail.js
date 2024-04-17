@@ -48,6 +48,7 @@ function ForgotPasswordEmail({ navigation }) {
             keyboardType="email-address"
             value={email}
             onChangeText={(text) => setEmail(text)}
+            placeholderTextColor={'#686868'}
             style={styles.input}
           />
         </View>

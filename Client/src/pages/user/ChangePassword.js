@@ -67,10 +67,17 @@ function ChangePassword({ route, navigation }) {
           
         } else {
           Alert.alert("Invalid OTP", "Please enter the correct OTP.");
+          setOtpInput('')
         }
       } else {
         Alert.alert("OTP Expired", "The OTP has expired. Please resend OTP.");
+        setOtpInput('')
       }
+    }
+    else{
+      Alert.alert('Warning',"passwords are not the same")
+      setPassword('')
+      setRePassword('')
     }
   };
 

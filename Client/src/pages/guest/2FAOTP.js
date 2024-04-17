@@ -7,14 +7,13 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { ResendOTP } from "../../services/AccountService";
 import { FontAwesome } from "@expo/vector-icons";
-import { ResendOTP, ForgotPassword } from "../../services/AccountService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-function ForgotPasswordOTP({ route, navigation }) {
-  const { email, otpCode, time } = route.params;
+const TFAOTP = ({ route, navigation }) => {
+  const { otpCode, time, email, token} = route.params;
   const [otpInput, setOtpInput] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [rePassword, setRePassword] = useState("");
   const [resendDisabled, setResendDisabled] = useState(true);
   const [countdown, setCountdown] = useState(60);
   let expiredTime = time;
@@ -31,88 +30,59 @@ function ForgotPasswordOTP({ route, navigation }) {
 
     return () => clearInterval(interval);
   }, [countdown, resendDisabled]);
+  const handleNext = async () => {
+    const currentTime = new Date().getTime();
+    if (currentTime < expiredTime) {
+      if (otpInput === otp) {
+        console.log('dung')
+        await AsyncStorage.setItem("token", token);
+        navigation.navigate("Home");
+        const role = jwt_decode(token);
+        const subArray = role.sub.split("-");
+        const id = subArray[0];
+        await AsyncStorage.setItem("id", id);
+      } else {
+        Alert.alert("Invalid OTP", "Please enter the correct OTP.");
+      }
+    } else {
+      Alert.alert("OTP Expired", "The OTP has expired. Please resend OTP.");
+    }
+  };
 
   const handleResendOTP = async () => {
     if (!resendDisabled) {
       const newResponse = await ResendOTP(email);
       if (newResponse.success) {
-        setOtpInput("");
-        setNewPassword("");
-        setCountdown(60);
-        setResendDisabled(true);
         otp = newResponse.data.otpCode;
         expiredTime = newResponse.data.otpTimeExpiration;
+        setCountdown(60);
+        setResendDisabled(true);
       } else {
         Alert.alert("Resend OTP Failed", "Please try again.");
       }
     }
   };
 
-  const handleNext = async () => {
-    if(rePassword !== newPassword) {
-      const currentTime = new Date().getTime();
-    if (currentTime < expiredTime) {
-      if (otpInput === otp) {
-        const response = await ForgotPassword(email, newPassword, otpInput);
-        if (response.success) {
-          Alert.alert("Announce", response.message);
-          navigation.navigate("Login");
-        } else {
-          Alert.alert("Invalid OTP", "Please enter the correct OTP.");
-          setOtpInput('')
-        }
-      }
-    } else {
-          setOtpInput('')
-          Alert.alert("OTP Expired", "The OTP has expired. Please resend OTP.");
-    }
-    }
-    else{
-      Alert.alert('Warning',"passwords are not the same")
-      setRePassword('')
-      setNewPassword('')
-    }
-  };
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={{paddingLeft:15, paddingTop:10}}
+        style={styles.backButton}
         onPress={() => navigation.goBack()}
       >
         <FontAwesome name="angle-left" size={24} color="black" />
       </TouchableOpacity>
       <View style={styles.content}>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>SMART STUDY HUB</Text>
+          <Text style={styles.title}>Smart Study Hub</Text>
         </View>
-        <Text style={styles.subTitle}>Enter OTP and New Password</Text>
+        <Text style={styles.subTitle}>Enter OTP</Text>
         <View style={styles.inputContainer}>
           <TextInput
             placeholder="Enter OTP"
             keyboardType="numeric"
             value={otpInput}
             onChangeText={(text) => setOtpInput(text)}
-            style={styles.input}
-            placeholderTextColor={'#686868'}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Enter New Password"
-            secureTextEntry={true}
-            value={newPassword}
-            onChangeText={(text) => setNewPassword(text)}
-            placeholderTextColor={'#686868'}
-            style={styles.input}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Re-Enter New Password"
-            secureTextEntry={true}
-            value={rePassword}
-            onChangeText={(text) => setRePassword(text)}
-            placeholderTextColor={'#686868'}
+            placeholderTextColor={"#686868"}
             style={styles.input}
           />
         </View>
@@ -122,25 +92,23 @@ function ForgotPasswordOTP({ route, navigation }) {
             : "Resend OTP"}
         </Text>
         <TouchableOpacity style={styles.button} onPress={handleNext}>
-          <Text style={styles.buttonText}>Reset Password</Text>
+          <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
   },
-  header: {
-    padding: 10,
-    backgroundColor: "white",
-    justifyContent: "flex-end",
-  },
-  backIcon: {
-    paddingLeft: 10,
+  backButton: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    zIndex: 1,
   },
   content: {
     flex: 5,
@@ -149,12 +117,18 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     alignItems: "center",
-    paddingBottom: 50,
+    paddingBottom: 20,
   },
   title: {
     fontSize: 24,
     color: "#e27602",
     fontWeight: "bold",
+  },
+  subTitle: {
+    fontSize: 20,
+    color: "#e27602",
+    fontWeight: "bold",
+    marginBottom: 20,
   },
   inputContainer: {
     flexDirection: "row",
@@ -163,21 +137,9 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     alignItems: "center",
     marginBottom: 20,
-    marginTop: 30,
-  },
-  inputIcon: {
-    marginRight: 10,
   },
   input: {
     flex: 1,
-  },
-  showPasswordIcon: {
-    position: "absolute",
-    right: 10,
-  },
-  buttonContainer: {
-    justifyContent: "center",
-    alignItems: "center",
   },
   button: {
     backgroundColor: "#FFA500",
@@ -191,24 +153,23 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
   },
-  textMin: {
-    fontSize: 14,
-    marginTop: 10,
-    color: "gray",
-  },
-  registerBtn: {
-    marginTop: 20,
-    borderColor: "#FFA500",
-    borderWidth: 2,
-    padding: 15,
-    borderRadius: 25,
-    width: 300,
-    alignItems: "center",
+  disabledButton: {
+    backgroundColor: "#ccc",
   },
   resendText: {
     marginTop: 20,
     color: "#007bff",
   },
+  registerButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    zIndex: 1,
+  },
+  registerButtonText: {
+    fontSize: 16,
+    color: "#007bff",
+  },
 });
 
-export default ForgotPasswordOTP;
+export default TFAOTP;

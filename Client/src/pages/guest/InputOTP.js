@@ -88,6 +88,7 @@ function InputOTP({ route, navigation }) {
             keyboardType="numeric"
             value={otpInput}
             onChangeText={(text) => setOtpInput(text)}
+            placeholderTextColor={'#686868'}
             style={styles.input}
           />
         </View>

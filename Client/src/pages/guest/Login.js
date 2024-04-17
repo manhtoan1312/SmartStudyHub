@@ -14,7 +14,7 @@ import {
   Feather,
   EvilIcons,
 } from "@expo/vector-icons";
-import { login } from "../../services/AccountService";
+import { ResendOTP, login } from "../../services/AccountService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import jwt_decode from "jwt-decode";
 
@@ -23,7 +23,17 @@ function Login({ navigation }) {
   const [password, setPassword] = useState("");
   const [hide, setHide] = useState(true);
   const unsubscribeRef = useRef(null);
+  const [tfa, setTfa] = useState(false);
 
+  useEffect(() => {
+    const getSettings = async () => {
+      const storage2FA = await AsyncStorage.getItem("2FA");
+      if (storage2FA && storage2FA == "true") {
+        setTfa(true);
+      }
+    };
+    getSettings();
+  });
   useEffect(() => {
     const handleUrlChange = async ({ url }) => {
       const tokenIndex = url.indexOf("token=");
@@ -49,10 +59,7 @@ function Login({ navigation }) {
           ]
         );
       } else if (url.includes("account-banned")) {
-        Alert.alert(
-          "Your account was banned",
-          "Please create a new account."
-        );
+        Alert.alert("Your account was banned", "Please create a new account.");
       }
     };
 
@@ -68,12 +75,27 @@ function Login({ navigation }) {
       e.preventDefault();
       const response = await login(email, password);
       if (response.success) {
-        await AsyncStorage.setItem("token", response.token);
-        const role = jwt_decode(response.token);
-        const subArray = role.sub.split("-");
-        const id = subArray[0];
-        await AsyncStorage.setItem("id", id);
-        navigation.navigate("Home");
+        if (tfa) {
+          const res = await ResendOTP(email);
+        
+      if (res.success) {
+        navigation.navigate("2FA", {
+          otpCode: res.data.otpCode,
+          time: res.data.otpTimeExpiration,
+          email: email,
+          token:response.token
+        });
+      } else {
+        Alert.alert("Register failed", response.message);
+      }
+        } else {
+          await AsyncStorage.setItem("token", response.token);
+          const role = jwt_decode(response.token);
+          const subArray = role.sub.split("-");
+          const id = subArray[0];
+          await AsyncStorage.setItem("id", id);
+          navigation.navigate("Home");
+        }
       } else {
         if (response.status === "2_4_f") {
           Alert.alert(
@@ -87,7 +109,7 @@ function Login({ navigation }) {
               { text: "Yes", onPress: () => navigation.navigate("Recover") },
             ]
           );
-        } else if(response.status==='2_3_f') {
+        } else if (response.status === "2_3_f") {
           Alert.alert(
             "Account was banned",
             "Do you want to reportt this problem?",
@@ -99,9 +121,8 @@ function Login({ navigation }) {
               { text: "Yes", onPress: () => navigation.navigate("Report") },
             ]
           );
-        }
-        else{
-          Alert.alert('Error',response.message)
+        } else {
+          Alert.alert("Error", response.message);
         }
       }
     } else {
@@ -188,7 +209,7 @@ function Login({ navigation }) {
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Log in</Text>
+            <Text style={styles.buttonText}>{tfa ? "Next" : "Log in"}</Text>
           </TouchableOpacity>
         </View>
 

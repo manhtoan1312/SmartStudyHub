@@ -49,6 +49,7 @@ import SoundDone from "../pages/guest/SoundDone";
 import FocusSound from "../pages/guest/FocusSound";
 import PREMIUM from "../pages/guest/Premium";
 import RankingUser from "../pages/guest/RankingUser";
+import TFAOTP from "../pages/guest/2FAOTP";
 
 const Stack = createStackNavigator();
 
@@ -102,6 +103,7 @@ const Navigator = () => (
     <Stack.Screen name="SoundDone" component={SoundDone} />
     <Stack.Screen name="FocusSound" component={FocusSound} />
     <Stack.Screen name="Ranking" component={RankingUser} />
+    <Stack.Screen name="2FA" component={TFAOTP} />
   </Stack.Navigator>
 );
 

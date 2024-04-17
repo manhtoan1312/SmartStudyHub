@@ -36,6 +36,7 @@ export default function Setting({ navigation }) {
   const [plan, setPlan] = useState(true);
   const [email, setEmail] = useState("");
   const [img, setImg] = useState(null);
+  const [tfa, setTfa] = useState(false);
   const isFocused = useIsFocused();
   const [isPomodoroTimePickerVisible, setIsPomodoroTimePickerVisible] =
     useState(false);
@@ -66,6 +67,10 @@ export default function Setting({ navigation }) {
         setBreakSound(parse?.nameSound);
       }
       const storedSettings = await AsyncStorage.getItem("settings");
+      const storage2FA = await AsyncStorage.getItem('2FA')
+      if(storage2FA && storage2FA=='true') {
+        setTfa(true)
+      }
       if (storedSettings) {
         const parsedSettings = JSON.parse(storedSettings);
         setPreTime(parsedSettings.preTime);
@@ -128,7 +133,7 @@ export default function Setting({ navigation }) {
       notifyEveryday,
       group,
       ratings,
-      plan,
+      plan
     };
     await AsyncStorage.setItem("settings", JSON.stringify(settings));
   };
@@ -306,6 +311,11 @@ export default function Setting({ navigation }) {
       navigation.navigate("Home");
     }
   };
+
+  const Change2Fa = async () => {
+    await AsyncStorage.setItem('2FA', String(!tfa))
+    setTfa(!tfa)
+  }
 
   const handleHeader = () => {
     if (email) {
@@ -576,6 +586,20 @@ export default function Setting({ navigation }) {
         </TouchableOpacity>
         <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Application information</Text>
+          <AntDesign style={s`text-lg`} name="right" />
+        </View>
+
+        <View style={s`flex flex-row justify-between py-2`}>
+          <Text style={s`text-lg font-medium`}>Two-Factor Authentication</Text>
+          <Switch
+            trackColor={{ false: "gray", true: "red" }}
+            thumbColor={"white"}
+            value={tfa}
+            onValueChange={() => Change2Fa()}
+          />
+        </View>
+        <View style={s`flex flex-row justify-between py-2`}>
+          <Text style={s`text-lg font-medium`}>Ratings App</Text>
           <AntDesign style={s`text-lg`} name="right" />
         </View>
       </View>
