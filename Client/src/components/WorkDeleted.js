@@ -113,9 +113,9 @@ const WorkDeleted = ({ workItem, reload, navigation }) => {
                 {workItem.workName}
               </Text>
               <View
-                style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
+                style={{flexDirection: "row", alignItems: "center" }}
               >
-                {workItem.numberOfPomodoros !== 0 && (
+                {workItem.numberOfPomodoros !== 0 || workItem.statusWork !== "SOMEDAY" && (
                   <View style={styles.pomodoroContainer}>
                     <MaterialCommunityIcons
                       name="clock-check"

@@ -28,9 +28,9 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
     const options = { weekday: "short", month: "numeric", day: "numeric" };
     let color = "gray";
     let dateStart = new Date(workItem.endTime);
-    dateStart.setDate(dateStart.getDate()+1);
+    dateStart.setDate(dateStart.getDate() + 1);
     let date = dateStart.toLocaleDateString("en-US", options);
-    console.log(date)
+    console.log(date);
     if (dueDate === "TODAY") {
       color = "green";
       date = "Today";
@@ -90,12 +90,13 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
   const handleDelete = () => {
     Alert.alert(
       "Confirm action",
-      "All data related to this item will be deleted, are you sure you want to delete it?",[
+      "All data related to this item will be deleted, are you sure you want to delete it?",
+      [
         {
-          text: 'Cancel',
-          style: 'cancel',
+          text: "Cancel",
+          style: "cancel",
         },
-        {text: 'OK', onPress: () => confirmDeleteWork()},
+        { text: "OK", onPress: () => confirmDeleteWork() },
       ]
     );
   };
@@ -148,12 +149,12 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
                 </View>
                 <View
                   style={{
-                    flex: 1,
                     flexDirection: "row",
                     alignItems: "center",
                   }}
                 >
-                  {workItem.numberOfPomodoros !== 0 && (
+                  {( workItem.numberOfPomodoros !== 0 ||
+                    workItem.statusWork !== "SOMEDAY") && (
                     <View style={styles.pomodoroContainer}>
                       <MaterialCommunityIcons
                         name="clock-check"
@@ -199,6 +200,7 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
           </TouchableOpacity>
         </View>
       </Swipeable>
+
       {workItem?.extraWorks.length > 0 &&
         workItem.extraWorks?.map((item) => (
           <View

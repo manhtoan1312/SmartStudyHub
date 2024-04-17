@@ -67,7 +67,7 @@ const WorkDone = ({ workItem, reload, navigation }) => {
       } else {
         Alert.alert("Mark complete work Error!", response.message);
       }
-    } 
+    }
   };
   const handleRecoverWork = async () => {
     const response = await RecoverWork(workItem.id);
@@ -112,24 +112,24 @@ const WorkDone = ({ workItem, reload, navigation }) => {
   };
 
   const handleDeleteExtraWork = async (id) => {
-    const response = await DeleteExtraWork(id)
-    if(response.success){
-      console.log(response.data)
-      reload()
-    }
-    else{
+    const response = await DeleteExtraWork(id);
+    if (response.success) {
+      console.log(response.data);
+      reload();
+    } else {
       Alert.alert("Error when delele extra work", response.message);
     }
-  }
+  };
   const handleDelete = () => {
     Alert.alert(
       "Confirm action",
-      "All data related to this item will be deleted, are you sure you want to delete it?",[
+      "All data related to this item will be deleted, are you sure you want to delete it?",
+      [
         {
-          text: 'Cancel',
-          style: 'cancel',
+          text: "Cancel",
+          style: "cancel",
         },
-        {text: 'OK', onPress: () => confirmDeleteWork()},
+        { text: "OK", onPress: () => confirmDeleteWork() },
       ]
     );
   };
@@ -197,9 +197,11 @@ const WorkDone = ({ workItem, reload, navigation }) => {
                 ))}
               </View>
               <View
-                style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
+                style={{ flexDirection: "row", alignItems: "center" }}
               >
-                {workItem.numberOfPomodoros !== 0 && (
+                {(hasExtraWorks ||
+                  workItem.numberOfPomodoros !== 0 ||
+                  workItem.statusWork !== "SOMEDAY") && (
                   <View style={styles.pomodoroContainer}>
                     <MaterialCommunityIcons
                       name="clock-check"
@@ -290,7 +292,6 @@ const WorkDone = ({ workItem, reload, navigation }) => {
               <View key={item.id}>
                 <Swipeable
                   renderRightActions={renderRightActionsForExtraWork(item.id)}
-                  
                 >
                   <TouchableOpacity
                     onPress={() => playExtra(workItem)}
@@ -299,7 +300,9 @@ const WorkDone = ({ workItem, reload, navigation }) => {
                     <View style={styles.extraWorkItem} key={item.id}>
                       <View style={{ flexDirection: "row" }}>
                         <TouchableOpacity
-                          onPress={() => CompletedExtraWork(item.id, item.status)}
+                          onPress={() =>
+                            CompletedExtraWork(item.id, item.status)
+                          }
                         >
                           {item.status === "COMPLETED" ? (
                             <AntDesign

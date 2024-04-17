@@ -438,21 +438,21 @@ const AddWorkModal = ({
                 style={styles.projectTextContainer}
                 onPress={handleProjectListPress}
               >
-                <View
-                  style={[
-                    styles.cirle,
-                    {
-                      backgroundColor: selectedProject?.colorCode
-                        ? selectedProject?.colorCode
-                        : "blue",
-                    },
-                  ]}
-                ></View>
-                <Text style={styles.projectNameText}>
-                  {selectedProject?.projectName
-                    ? selectedProject?.projectName
-                    : "Task"}
-                </Text>
+                  <View
+                    style={[
+                      styles.cirle,
+                      {
+                        backgroundColor: selectedProject?.colorCode
+                          ? selectedProject?.colorCode
+                          : "blue",
+                      },
+                    ]}
+                  ></View>
+                  <Text style={styles.projectNameText}>
+                    {selectedProject?.projectName
+                      ? selectedProject?.projectName
+                      : "Task"}
+                  </Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity
@@ -515,9 +515,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   projectTextContainer: {
-    marginLeft: 35,
+    alignContent:'center',
     flexDirection: "row",
     justifyContent: "center",
+    paddingLeft:65
   },
   projectNameText: {
     marginLeft: 10,
@@ -602,7 +603,7 @@ const styles = StyleSheet.create({
     height: 15,
     width: 15,
     borderRadius: 7,
-    marginRight: 5,
+    marginRight: 10,
     alignItems: "center",
   },
 });

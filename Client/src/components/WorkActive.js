@@ -160,12 +160,13 @@ const WorkActive = ({ workItem, reload, navigation }) => {
   const handleDelete = () => {
     Alert.alert(
       "Confirm action",
-      "All data related to this item will be deleted, are you sure you want to delete it?",[
+      "All data related to this item will be deleted, are you sure you want to delete it?",
+      [
         {
-          text: 'Cancel',
-          style: 'cancel',
+          text: "Cancel",
+          style: "cancel",
         },
-        {text: 'OK', onPress: () => confirmDeleteWork()},
+        { text: "OK", onPress: () => confirmDeleteWork() },
       ]
     );
   };
@@ -197,59 +198,65 @@ const WorkActive = ({ workItem, reload, navigation }) => {
                   </Text>
                 ))}
               </View>
-              <View
-                style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
-              >
-                {workItem.numberOfPomodoros !== 0 && (
-                  <View style={styles.pomodoroContainer}>
-                    <MaterialCommunityIcons
-                      name="clock-check"
-                      size={14}
-                      color="#ff3232"
-                    />
-                    <Text style={styles.pomodoroText}>
-                      {workItem.numberOfPomodorosDone}/
-                    </Text>
-                    <MaterialCommunityIcons
-                      name="clock"
-                      size={14}
-                      color="#ff9999"
-                    />
-                    <Text style={[styles.pomodoroText, { marginRight: 5 }]}>
-                      {workItem.numberOfPomodoros}
-                    </Text>
-                  </View>
-                )}
-                {workItem.statusWork !== "SOMEDAY" && renderDay()}
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingLeft: 5,
-                  }}
-                >
-                  {hasExtraWorks && (
-                    <>
-                      <Ionicons
-                        name="md-git-branch-outline"
-                        style={{ transform: [{ rotate: "90deg" }] }}
+              {(hasExtraWorks ||
+                workItem.numberOfPomodoros !== 0 ||
+                workItem.statusWork !== "SOMEDAY") && (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  {workItem.numberOfPomodoros !== 0 && (
+                    <View style={styles.pomodoroContainer}>
+                      <MaterialCommunityIcons
+                        name="clock-check"
                         size={14}
-                        color="gray"
+                        color="#ff3232"
                       />
-                      <Text
-                        style={{ marginLeft: 5, fontSize: 12, color: "gray" }}
-                      >
-                        {`${
-                          workItem.extraWorks.filter(
-                            (extraWork) => extraWork.status === "COMPLETED"
-                          ).length
-                        }/${workItem.extraWorks.length}`}
+                      <Text style={styles.pomodoroText}>
+                        {workItem.numberOfPomodorosDone}/
                       </Text>
-                    </>
+                      <MaterialCommunityIcons
+                        name="clock"
+                        size={14}
+                        color="#ff9999"
+                      />
+                      <Text style={[styles.pomodoroText, { marginRight: 5 }]}>
+                        {workItem.numberOfPomodoros}
+                      </Text>
+                    </View>
                   )}
+                  {workItem.statusWork !== "SOMEDAY" && renderDay()}
+                  <View
+                    style={{
+                      flex: 1,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingLeft: 5,
+                    }}
+                  >
+                    {hasExtraWorks && (
+                      <>
+                        <Ionicons
+                          name="md-git-branch-outline"
+                          style={{ transform: [{ rotate: "90deg" }] }}
+                          size={14}
+                          color="gray"
+                        />
+                        <Text
+                          style={{
+                            marginLeft: 5,
+                            fontSize: 12,
+                            color: "gray",
+                          }}
+                        >
+                          {`${
+                            workItem.extraWorks.filter(
+                              (extraWork) => extraWork.status === "COMPLETED"
+                            ).length
+                          }/${workItem.extraWorks.length}`}
+                        </Text>
+                      </>
+                    )}
+                  </View>
                 </View>
-              </View>
+              )}
             </View>
             <View
               style={{
