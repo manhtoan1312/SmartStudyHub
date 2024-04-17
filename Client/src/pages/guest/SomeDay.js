@@ -22,6 +22,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CreateWork, GetWorkByType, SortWork } from "../../services/Guest/WorkService";
 import ImageFocus from "../../components/Image_Focus";
 import { useIsFocused } from "@react-navigation/native";
+import SortWorkModal from "../../components/SortWorkModal";
 const SomeDay = ({ navigation }) => {
   const [project, setProject] = useState(null);
   const [workName, setWorkName] = useState(null);
@@ -231,6 +232,7 @@ const SomeDay = ({ navigation }) => {
       {sortModalVisible && (
         <SortWorkModal
           isVisible={sortModalVisible}
+          page={'duedate'}
           onChoose={(type) => {
             handleSortWork(type);
           }}

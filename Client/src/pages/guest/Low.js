@@ -233,6 +233,7 @@ const Low = ({ navigation }) => {
       {sortModalVisible && (
         <SortWorkModal
           isVisible={sortModalVisible}
+          page={'priority'}
           onChoose={(type) => {
             handleSortWork(type);
           }}

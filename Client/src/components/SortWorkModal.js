@@ -1,8 +1,13 @@
-import { AntDesign, Feather, MaterialIcons, Octicons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Feather,
+  MaterialIcons,
+  Octicons,
+} from "@expo/vector-icons";
 import React from "react";
 import { View, Modal, TouchableOpacity, Text, StyleSheet } from "react-native";
 
-const SortWorkModal = ({ isVisible, onChoose, onClose, type }) => {
+const SortWorkModal = ({ isVisible, onChoose, onClose, type, page }) => {
   return (
     <Modal
       isVisible={isVisible}
@@ -12,42 +17,60 @@ const SortWorkModal = ({ isVisible, onChoose, onClose, type }) => {
     >
       <TouchableOpacity style={styles.largeContainer} onPress={onClose}>
         <View style={styles.modalContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => onChoose("DUEDATE")}
-          >
-            <View style={styles.body}>
-              <View style={styles.content}>
-              <MaterialIcons name="date-range" size={26} color="black" />
-                <Text style={styles.buttonText}>Sort by due date</Text>
+          {page !== "duedate" && (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => onChoose("DUEDATE")}
+            >
+              <View style={styles.body}>
+                <View style={styles.content}>
+                  <MaterialIcons name="date-range" size={26} color="black" />
+                  <Text style={styles.buttonText}>Sort by due date</Text>
+                </View>
+                {type === "DUEDATE" && (
+                  <View style={styles.icon}>
+                    <AntDesign name="check" size={24} color="#FF3232" />
+                  </View>
+                )}
               </View>
-              {type==='DUEDATE' && <View style={styles.icon}><AntDesign name="check" size={24} color="#FF3232" /></View>}
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => onChoose("PROJECT")}
-          >
-            <View style={styles.body}>
-              <View style={styles.content}>
-              <Octicons name="project" size={24} color="black" />
-                <Text style={styles.buttonText}>Sort by project</Text>
+            </TouchableOpacity>
+          )}
+          {page !== "project" && (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => onChoose("PROJECT")}
+            >
+              <View style={styles.body}>
+                <View style={styles.content}>
+                  <Octicons name="project" size={24} color="black" />
+                  <Text style={styles.buttonText}>Sort by project</Text>
+                </View>
+                {type === "PROJECT" && (
+                  <View style={styles.icon}>
+                    <AntDesign name="check" size={24} color="#FF3232" />
+                  </View>
+                )}
               </View>
-              {type==='PROJECT' && <View style={styles.icon}><AntDesign name="check" size={24} color="#FF3232" /></View>}
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => onChoose("PRIORITY")}
-          >
-            <View style={styles.body}>
-              <View style={styles.content}>
-              <Feather name="flag" size={24} color="black" />
-                <Text style={styles.buttonText}>Sort by priority</Text>
+            </TouchableOpacity>
+          )}
+          {page !== "priority" && (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => onChoose("PRIORITY")}
+            >
+              <View style={styles.body}>
+                <View style={styles.content}>
+                  <Feather name="flag" size={24} color="black" />
+                  <Text style={styles.buttonText}>Sort by priority</Text>
+                </View>
+                {type === "PRIORITY" && (
+                  <View style={styles.icon}>
+                    <AntDesign name="check" size={24} color="#FF3232" />
+                  </View>
+                )}
               </View>
-              {type==='PRIORITY' && <View style={styles.icon}><AntDesign name="check" size={24} color="#FF3232" /></View>}
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          )}
         </View>
       </TouchableOpacity>
     </Modal>
@@ -58,19 +81,19 @@ const styles = StyleSheet.create({
   modalContainer: {
     backgroundColor: "white",
     paddingVertical: 30,
-    paddingHorizontal:40,
-    borderTopRightRadius:40,
-    borderTopLeftRadius: 40
+    paddingHorizontal: 40,
+    borderTopRightRadius: 40,
+    borderTopLeftRadius: 40,
   },
   button: {
-    paddingVertical:10
+    paddingVertical: 10,
   },
   buttonText: {
     fontWeight: "400",
     textAlign: "center",
-    paddingLeft:15,
-    fontSize:16,
-    color:'#666666'
+    paddingLeft: 15,
+    fontSize: 16,
+    color: "#666666",
   },
   closeButton: {
     backgroundColor: "red",
@@ -89,17 +112,17 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
-  body:{
-    justifyContent:'space-between'
+  body: {
+    justifyContent: "space-between",
   },
-  content:{
-    flexDirection:'row',
-    alignItems:'center'
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
   },
-  icon:{
-    position:"absolute",
-    right:0
-  }
+  icon: {
+    position: "absolute",
+    right: 0,
+  },
 });
 
 export default SortWorkModal;

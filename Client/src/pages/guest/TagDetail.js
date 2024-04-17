@@ -239,6 +239,7 @@ const TagDetail = ({ route, navigation }) => {
       {sortModalVisible && (
         <SortWorkModal
           isVisible={sortModalVisible}
+          page={''}
           onChoose={(type) => {
             handleSortWork(type);
           }}

@@ -24,6 +24,24 @@ import ExtraDeleted from "./ExtraDeleted";
 import ExtraCompleted from "./ExtraCompleted";
 
 const WorkCompletedDL = ({ workItem, reload, navigation }) => {
+  const renderDoneTime = () => {
+    if(workItem.startTime=== workItem.endTime) {
+      return(
+        <View style={{justifyContent:'center', alignItems:'center', paddingRight:5}}>
+          <Text>{renderTime(workItem.startTime)}</Text>
+          <Text>|</Text>
+          <Text>{renderTime(workItem.endTime)}</Text>
+        </View>
+      )
+    }
+    else{
+      return(
+        <View style={{justifyContent:'center', alignItems:'center', paddingRight:5}}>
+          <Text>{renderTime(workItem.endTime)}</Text>
+        </View>
+      )
+    }
+  }
   const renderDay = () => {
     const dueDate = workItem.statusWork;
     const options = { weekday: "short", month: "numeric", day: "numeric" };
@@ -192,7 +210,7 @@ const WorkCompletedDL = ({ workItem, reload, navigation }) => {
                 }}
               >
                 <TouchableOpacity style={styles.playButton}>
-                  <Text>{renderTime()}</Text>
+                <View style={{justifyContent:'center'}}>{renderDoneTime()}</View>
                 </TouchableOpacity>
               </View>
             </View>

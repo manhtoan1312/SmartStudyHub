@@ -19,8 +19,11 @@ import AddWorkModal from "../../components/AddWorkModal";
 import HeaderDetail from "../../components/HeaderDetail";
 import { GetDetailProject } from "../../services/Guest/ProjectService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CreateWork } from "../../services/Guest/WorkService";
+import { CreateWork, SortWork } from "../../services/Guest/WorkService";
 import { useIsFocused } from "@react-navigation/native";
+import SortWorkModal from "../../components/SortWorkModal";
+import ImageFocus from "../../components/Image_Focus";
+import { useRef } from "react";
 const ProjectDetail = ({ route, navigation }) => {
   const id = route.params.id;
   const [project, setProject] = useState(null);
@@ -29,6 +32,9 @@ const ProjectDetail = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [closeKeyboard, setCloseKeyboard] = useState(false);
+  const [sortModalVisible, setSortModalVisible] = useState(false);
+  const [sortType, setSortType] = useState("");
+  const inputRef = useRef(null);
   const isFocused = useIsFocused();
   useEffect(() => {
     const fetchDataOnFocus = async () => {
@@ -60,6 +66,35 @@ const ProjectDetail = ({ route, navigation }) => {
       Alert.alert("Error when get project detail!", response.message);
       navigation.navigate("Home");
     }
+  };
+
+  const handleSortWork = async (type) => {
+    setSortModalVisible(false);
+
+    const body1 = JSON.stringify(project?.listWorkActive);
+    const body2 = JSON.stringify(project?.listWorkCompleted);
+    const response = await SortWork(body1, type);
+    const response2 = await SortWork(body2, type);
+
+    if (response.success) {
+      const worksSortedArray = response.data || [];
+      const updatedList = worksSortedArray
+        .map((item) => item.worksSorted)
+        .flat();
+      setProject((prev) => ({ ...prev, listWorkActive: updatedList }));
+    } else {
+      console.log(response.message);
+    }
+    if (response2.success) {
+      const worksSortedArray = response2.data || [];
+      const updatedList = worksSortedArray
+        .map((item) => item.worksSorted)
+        .flat();
+      setProject((prev) => ({ ...prev, listWorkCompleted: updatedList }));
+    } else {
+      console.log(response2.message);
+    }
+    setSortType(type);
   };
 
   const handleClosekeyboard = () => {
@@ -126,7 +161,7 @@ const ProjectDetail = ({ route, navigation }) => {
               <Text style={{ fontSize: 18, fontWeight: "400" }}>
                 {project.projectName}
               </Text>
-              <AntDesign name="filter" size={24} color="gray" />
+              <TouchableOpacity onPress={() => setSortModalVisible(true)}><AntDesign name="filter" size={24} color="gray" /></TouchableOpacity>
             </View>
             <View style={styles.body}>
               <View style={styles.detail}>
@@ -137,9 +172,10 @@ const ProjectDetail = ({ route, navigation }) => {
                   totalWorkCompleted={project.totalWorkCompleted}
                 />
               </View>
-              <TouchableOpacity style={styles.input}>
+              <TouchableOpacity style={styles.input} onPress={() => inputRef.current.focus()}>
                 <AntDesign name="plus" size={24} color="black" />
                 <TextInput
+                  ref={inputRef} 
                   style={{ paddingLeft: 10 }}
                   placeholder="Add a Work..."
                   value={workName}
@@ -197,6 +233,18 @@ const ProjectDetail = ({ route, navigation }) => {
           type="SOMEDAY"
         />
       )}
+      {sortModalVisible && (
+        <SortWorkModal
+          isVisible={sortModalVisible}
+          page={'project'}
+          onChoose={(type) => {
+            handleSortWork(type);
+          }}
+          onClose={() => setSortModalVisible(false)}
+          type={sortType}
+        />
+      )}
+      <ImageFocus />
     </KeyboardAvoidingView>
   );
   x;

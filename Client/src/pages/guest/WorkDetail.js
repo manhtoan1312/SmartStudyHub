@@ -264,7 +264,6 @@ const WorkDetail = ({ route, navigation }) => {
   };
   const changePomodoro = (time, pomo) => {
     const updateWork = { ...work };
-    console.log(time, pomo);
     updateWork.numberOfPomodoros = time;
     updateWork.timeOfPomodoro = pomo;
     setWork(updateWork);

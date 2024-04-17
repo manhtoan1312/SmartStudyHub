@@ -233,6 +233,7 @@ const Next7Day = ({ navigation }) => {
       {sortModalVisible && (
         <SortWorkModal
           isVisible={sortModalVisible}
+          page={''}
           onChoose={(type) => {
             handleSortWork(type);
           }}

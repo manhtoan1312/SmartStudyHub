@@ -21,8 +21,29 @@ import { DeleteWork, RecoverWork } from "../services/Guest/WorkService";
 import { Swipeable } from "react-native-gesture-handler";
 import ExtraActive from "./ExtraActive";
 import ExtraCompleted from "./ExtraCompleted";
+import { flexDirections } from "react-native-wind/dist/styles/flex/flex-direction";
+import { justifyContent } from "react-native-wind/dist/styles/flex/justify-content";
+import { alignItems } from "react-native-wind/dist/styles/flex/align-items";
 
 const WorkCompleted = ({ workItem, reload, navigation }) => {
+  const renderDoneTime = () => {
+    if(workItem.startTime=== workItem.endTime) {
+      return(
+        <View style={{justifyContent:'center', alignItems:'center', paddingRight:5}}>
+          <Text>{renderTime(workItem.startTime)}</Text>
+          <Text>|</Text>
+          <Text>{renderTime(workItem.endTime)}</Text>
+        </View>
+      )
+    }
+    else{
+      return(
+        <View style={{justifyContent:'center', alignItems:'center', paddingRight:5}}>
+          <Text>{renderTime(workItem.endTime)}</Text>
+        </View>
+      )
+    }
+  }
   const renderDay = () => {
     const dueDate = workItem.statusWork;
     const options = { weekday: "short", month: "numeric", day: "numeric" };
@@ -49,8 +70,8 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
     );
   };
 
-  const renderTime = () => {
-    const date = new Date(workItem.endTime);
+  const renderTime = (time) => {
+    const date = new Date(time);
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
 
@@ -175,14 +196,7 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
                     </View>
                   )}
                   {renderDay()}
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      paddingLeft: 5,
-                    }}
-                  ></View>
+                  
                 </View>
               </View>
               <View
@@ -193,7 +207,7 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
                 }}
               >
                 <TouchableOpacity style={styles.playButton}>
-                  <Text>{renderTime()}</Text>
+                  <View style={{justifyContent:'center'}}>{renderDoneTime()}</View>
                 </TouchableOpacity>
               </View>
             </View>
