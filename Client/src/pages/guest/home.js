@@ -57,7 +57,6 @@ export default function Home({ navigation }) {
   const [someDay, setSomeDay] = useState(true);
   const [event, setEvent] = useState(true);
   const [done, setDone] = useState(true);
-  const [plan, setPlan] = useState(true);
   const [group, setGroup] = useState(true);
   const [rating, setRating] = useState(true);
   const [avt, setAvt] = useState(
@@ -129,7 +128,6 @@ export default function Home({ navigation }) {
       if (settings) {
         const parsedData = JSON.parse(settings);
         setGroup(parsedData.group);
-        setPlan(parsedData.plan);
         setRating(parsedData.ratings);
       }
       if (storedData) {
@@ -429,27 +427,20 @@ export default function Home({ navigation }) {
             >
               {email ? email : "Login"}
             </Text>
-            <FontAwesome5
-              name="crown"
-              style={styles.itemRow}
-              size={20}
-              color="#FFD300"
-            />
+            <TouchableOpacity onPress={() => {navigation.navigate('PREMIUM')}}>
+              <FontAwesome5
+                name="crown"
+                style={styles.itemRow}
+                size={20}
+                color="#FFD300"
+              />
+            </TouchableOpacity>
             {group && (
               <MaterialCommunityIcons
                 name="account-group-outline"
                 style={styles.itemRow}
                 size={20}
                 color="black"
-              />
-            )}
-            {plan && (
-              <FontAwesome5
-                name="seedling"
-                style={styles.itemRow}
-                size={20}
-                color="black"
-                onPress={() => navigation.navigate("ComingSoon")}
               />
             )}
             {rating && (

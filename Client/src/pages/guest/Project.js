@@ -30,7 +30,7 @@ function Project({ navigation }) {
   const [tomorow, setTomorow] = useState(true);
   const [thisWeek, setThisWeek] = useState(true);
   const [next7Day, setnext7Day] = useState(true);
-  const [hightPriority, setHightPriority] = useState(true);
+  const [highPriority, setHighPriority] = useState(true);
   const [mediumPriority, setMediumPriority] = useState(true);
   const [lowPriority, setLowPriority] = useState(true);
   const [planed, setPlaned] = useState(true);
@@ -51,7 +51,7 @@ function Project({ navigation }) {
           setTomorow(parsedData.tomorow);
           setThisWeek(parsedData.thisWeek);
           setnext7Day(parsedData.next7Day);
-          setHightPriority(parsedData.hightPriority);
+          setHighPriority(parsedData.highPriority);
           setMediumPriority(parsedData.mediumPriority);
           setLowPriority(parsedData.lowPriority);
           setPlaned(parsedData.planed);
@@ -85,7 +85,7 @@ function Project({ navigation }) {
         tomorow,
         thisWeek,
         next7Day,
-        hightPriority,
+        highPriority,
         mediumPriority,
         lowPriority,
         planed,
@@ -244,8 +244,8 @@ function Project({ navigation }) {
           <Switch
             trackColor={{ false: "gray", true: "red" }}
             thumbColor={"white"}
-            value={hightPriority}
-            onValueChange={() => setHightPriority(!hightPriority)}
+            value={highPriority}
+            onValueChange={() => setHighPriority(!highPriority)}
           />
         </View>
 

@@ -33,10 +33,10 @@ export default function Setting({ navigation }) {
   const [notifyEveryday, setNotifyEveryday] = useState(true);
   const [group, setGroup] = useState(true);
   const [ratings, setRatings] = useState(true);
-  const [plan, setPlan] = useState(true);
   const [email, setEmail] = useState("");
   const [img, setImg] = useState(null);
   const [tfa, setTfa] = useState(false);
+  const [name, setName] = useState("");
   const isFocused = useIsFocused();
   const [isPomodoroTimePickerVisible, setIsPomodoroTimePickerVisible] =
     useState(false);
@@ -52,8 +52,11 @@ export default function Setting({ navigation }) {
   }
   const fetchSettings = async () => {
     try {
-      const nameAcc = await AsyncStorage.getItem("accountName");
-      setEmail(nameAcc ? nameAcc : "");
+      const role = await getRole();
+      if (role) {
+        setName(role.name);
+        setEmail(role.email);
+      }
       const storedImg = await AsyncStorage.getItem("img");
       setImg(storedImg ? storedImg : null);
       const workingSound = await AsyncStorage.getItem("focusSound");
@@ -67,9 +70,9 @@ export default function Setting({ navigation }) {
         setBreakSound(parse?.nameSound);
       }
       const storedSettings = await AsyncStorage.getItem("settings");
-      const storage2FA = await AsyncStorage.getItem('2FA')
-      if(storage2FA && storage2FA=='true') {
-        setTfa(true)
+      const storage2FA = await AsyncStorage.getItem("2FA");
+      if (storage2FA && storage2FA == "true") {
+        setTfa(true);
       }
       if (storedSettings) {
         const parsedSettings = JSON.parse(storedSettings);
@@ -87,7 +90,6 @@ export default function Setting({ navigation }) {
         setNotifyEveryday(parsedSettings.notifyEveryday);
         setGroup(parsedSettings.group);
         setRatings(parsedSettings.ratings);
-        setPlan(parsedSettings.plan);
       }
     } catch (error) {
       console.log(error);
@@ -133,7 +135,6 @@ export default function Setting({ navigation }) {
       notifyEveryday,
       group,
       ratings,
-      plan
     };
     await AsyncStorage.setItem("settings", JSON.stringify(settings));
   };
@@ -297,7 +298,7 @@ export default function Setting({ navigation }) {
 
   const submitLogOut = async () => {
     const allKeys = await AsyncStorage.getAllKeys();
-    const keysToRemove = allKeys.filter(key => key !== '2FA');
+    const keysToRemove = allKeys.filter((key) => key !== "2FA");
     await AsyncStorage.multiRemove(keysToRemove);
     navigation.navigate("Home");
   };
@@ -306,22 +307,22 @@ export default function Setting({ navigation }) {
     const rs = await DeleteGuest(id);
     if (!rs.success) {
       const allKeys = await AsyncStorage.getAllKeys();
-    const keysToRemove = allKeys.filter(key => key !== '2FA');
-    await AsyncStorage.multiRemove(keysToRemove);
+      const keysToRemove = allKeys.filter((key) => key !== "2FA");
+      await AsyncStorage.multiRemove(keysToRemove);
       navigation.navigate("Home");
     } else {
       Alert.alert("Smart Study Hub Announcement", "Delete data successfully");
       const allKeys = await AsyncStorage.getAllKeys();
-    const keysToRemove = allKeys.filter(key => key !== '2FA');
-    await AsyncStorage.multiRemove(keysToRemove);
+      const keysToRemove = allKeys.filter((key) => key !== "2FA");
+      await AsyncStorage.multiRemove(keysToRemove);
       navigation.navigate("Home");
     }
   };
 
   const Change2Fa = async () => {
-    await AsyncStorage.setItem('2FA', String(!tfa))
-    setTfa(!tfa)
-  }
+    await AsyncStorage.setItem("2FA", String(!tfa));
+    setTfa(!tfa);
+  };
 
   const handleHeader = () => {
     if (email) {
@@ -349,26 +350,40 @@ export default function Setting({ navigation }) {
               style={s`w-12 h-12 rounded-3xl`}
             />
           </View>
-          <TouchableOpacity style={s`flex flex-col px-2`}>
-            <TouchableOpacity style={s`flex flex-row items-center`}>
+          <TouchableOpacity style={s`flex px-2`}>
+            <TouchableOpacity style={s`flex flex-row`}>
               <View style={s`mr-2`}>
                 {!email ? (
-                  <TouchableOpacity onPress={() => handleHeader()}>
-                    <Text style={s` text-lg font-medium`}>
-                      Sign In | Sign Up
-                    </Text>
+                  <TouchableOpacity
+                    style={styles.login}
+                    onPress={() => handleHeader()}
+                  >
+                    <View>
+                      <Text style={s` text-lg font-medium`}>
+                        Sign In | Sign Up
+                      </Text>
+                      <View style={s`mt-1`}>
+                        <Text>Sync all devices</Text>
+                      </View>
+                    </View>
                   </TouchableOpacity>
                 ) : (
-                  <TouchableOpacity onPress={() => handleHeader()}>
-                    <Text style={s` text-lg font-medium`}>{email}</Text>
+                  <TouchableOpacity
+                    style={s`ml-2 `}
+                    onPress={() => handleHeader()}
+                  >
+                    <View>
+                      <Text style={s` text-lg font-medium `}>{name}</Text>
+                    </View>
+                    <View>
+                      <Text style={s`mt-1 font-medium text-gray-700`}>
+                        {email}
+                      </Text>
+                    </View>
                   </TouchableOpacity>
                 )}
               </View>
             </TouchableOpacity>
-
-            <View style={s`mt-1`}>
-              <Text>Sync all devices</Text>
-            </View>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -560,16 +575,6 @@ export default function Setting({ navigation }) {
             onValueChange={() => setRatings(!ratings)}
           />
         </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <Text style={s`text-lg font-medium`}>Plan</Text>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={plan}
-            onValueChange={() => setPlan(!plan)}
-          />
-        </View>
       </View>
 
       <View style={s`flex flex-col justify-between px-2 mt-6 bg-white py-4`}>
@@ -663,5 +668,8 @@ const styles = StyleSheet.create({
     width: "100%",
     color: "black",
     backgroundColor: "white",
+  },
+  login: {
+    flex: 1,
   },
 });
