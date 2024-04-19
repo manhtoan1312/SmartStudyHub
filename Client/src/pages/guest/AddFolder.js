@@ -8,12 +8,13 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import { Fontisto, Entypo,AntDesign } from "@expo/vector-icons";
+import { Fontisto, Entypo, AntDesign } from "@expo/vector-icons";
 import { GetProjectForAddFolder } from "../../services/Guest/ProjectService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect } from "react";
 import { CreateFolder } from "../../services/Guest/FolderService";
 import ImageFocus from "../../components/Image_Focus";
+import getRole from "../../services/RoleService";
 
 const AddFolder = ({ navigation }) => {
   const [color, setColor] = useState("#FF1493");
@@ -46,7 +47,13 @@ const AddFolder = ({ navigation }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const id = await AsyncStorage.getItem("id");
+        const role = await getRole();
+        let id;
+        if (role) {
+          id = role.id;
+        } else {
+          id = await AsyncStorage.getItem("id");
+        }
         const response = await GetProjectForAddFolder(id);
         if (response.success) {
           setListProject(response.data);
@@ -76,8 +83,14 @@ const AddFolder = ({ navigation }) => {
 
   const handleDone = async () => {
     if (name) {
-      const id = await AsyncStorage.getItem("id");
-      const transformedList = projectSelected.map(id => ({ id }));
+      const role = await getRole();
+      let id;
+      if (role) {
+        id = role.id;
+      } else {
+        id = await AsyncStorage.getItem("id");
+      }
+      const transformedList = projectSelected.map((id) => ({ id }));
       const response = await CreateFolder(
         id,
         name,
@@ -85,7 +98,7 @@ const AddFolder = ({ navigation }) => {
         transformedList,
         null
       );
-      
+
       if (response.success) {
         navigation.goBack();
       } else {
@@ -142,7 +155,13 @@ const AddFolder = ({ navigation }) => {
 
       <View style={{ marginVertical: 20 }}>
         {listProject?.map((item, index) => (
-          <View key={index} style={[styles.projectRow, isSelectedProject(item.id) && {backgroundColor:'#F1D8E9'}]}>
+          <View
+            key={index}
+            style={[
+              styles.projectRow,
+              isSelectedProject(item.id) && { backgroundColor: "#F1D8E9" },
+            ]}
+          >
             <TouchableOpacity
               style={[styles.colorPreview, { backgroundColor: item.colorCode }]}
             />
@@ -248,7 +267,7 @@ const styles = StyleSheet.create({
   projectName: {
     marginLeft: 10,
     flex: 1,
-    fontSize:16
+    fontSize: 16,
   },
   addProjectButton: {
     width: 25,
@@ -257,8 +276,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",
-    borderColor: "lightcoral", 
-  borderWidth: 2,
+    borderColor: "lightcoral",
+    borderWidth: 2,
   },
   selectedAddProjectButton: {
     backgroundColor: "lightcoral",

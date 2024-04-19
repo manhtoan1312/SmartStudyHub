@@ -18,10 +18,15 @@ import AddWorkModal from "../../components/AddWorkModal";
 import HeaderDetail from "../../components/HeaderDetail";
 import { GetDetailProject } from "../../services/Guest/ProjectService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CreateWork, GetWorkByType, SortWork } from "../../services/Guest/WorkService";
+import {
+  CreateWork,
+  GetWorkByType,
+  SortWork,
+} from "../../services/Guest/WorkService";
 import ImageFocus from "../../components/Image_Focus";
 import { useIsFocused } from "@react-navigation/native";
 import SortWorkModal from "../../components/SortWorkModal";
+import getRole from "../../services/RoleService";
 const All = ({ navigation }) => {
   const [project, setProject] = useState(null);
   const [workName, setWorkName] = useState(null);
@@ -56,7 +61,13 @@ const All = ({ navigation }) => {
   }, []);
 
   const fetchData = async () => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const response = await GetWorkByType("ALL", id);
     if (response.success) {
       setProject(response.data);
@@ -80,7 +91,13 @@ const All = ({ navigation }) => {
   ) => {
     setModalVisible(false);
     Keyboard.dismiss();
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const settings = await AsyncStorage.getItem("settings");
     let time = 25;
     if (settings) {
@@ -95,9 +112,9 @@ const All = ({ navigation }) => {
         tagslist,
         workName,
         priority,
-        dueDate, 
+        dueDate,
         numberOfPomodoros,
-        time,
+        time
       );
 
       if (!response.success) {
@@ -166,10 +183,13 @@ const All = ({ navigation }) => {
                   totalWorkCompleted={project.totalWorkCompleted}
                 />
               </View>
-              <TouchableOpacity style={styles.input} onPress={() => inputRef.current.focus()}>
+              <TouchableOpacity
+                style={styles.input}
+                onPress={() => inputRef.current.focus()}
+              >
                 <AntDesign name="plus" size={24} color="black" />
                 <TextInput
-                  ref={inputRef} 
+                  ref={inputRef}
                   style={{ paddingLeft: 10 }}
                   placeholder="Add a Work..."
                   value={workName}
@@ -229,7 +249,7 @@ const All = ({ navigation }) => {
       {sortModalVisible && (
         <SortWorkModal
           isVisible={sortModalVisible}
-          page={''}
+          page={""}
           onChoose={(type) => {
             handleSortWork(type);
           }}

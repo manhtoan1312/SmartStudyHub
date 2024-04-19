@@ -20,6 +20,7 @@ import {
   GetWorkByType,
 } from "../services/Guest/WorkService";
 import { justifyContent } from "react-native-wind/dist/styles/flex/justify-content";
+import getRole from "../services/RoleService";
 
 const ModalSelectWork = ({ isVisible, play, onClose }) => {
   const [selectedWork, setSelectedWork] = useState(null);
@@ -45,7 +46,13 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
     fetchDataFPT(selectedType);
   }, [selectedType, isVisible]);
   const fetchDataFPT = async (type) => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     try {
       let result;
       switch (type) {
@@ -99,25 +106,20 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
     }
   };
 
-
-const onSelect = async (workItem, type) => {
-    try{
-        await AsyncStorage.setItem('work', JSON.stringify(workItem))
-        await AsyncStorage.setItem('workType', type)
-        onClose()
+  const onSelect = async (workItem, type) => {
+    try {
+      await AsyncStorage.setItem("work", JSON.stringify(workItem));
+      await AsyncStorage.setItem("workType", type);
+      onClose();
+    } catch (e) {
+      Alert.alert("Error when save work", e);
     }
-    catch(e) {
-        Alert.alert("Error when save work", e)
-    }
-}
+  };
   const renderWorkItems = () => {
     if (data.length > 0) {
       return data?.map((workItem) => (
-        <TouchableOpacity
-          key={workItem.id}
-          style={styles.workItem}
-        >
-          <WorkItem workItem={workItem} onSelect={onSelect}/>
+        <TouchableOpacity key={workItem.id} style={styles.workItem}>
+          <WorkItem workItem={workItem} onSelect={onSelect} />
         </TouchableOpacity>
       ));
     }
@@ -129,7 +131,9 @@ const onSelect = async (workItem, type) => {
           paddingTop: 80,
         }}
       >
-        <Text style={{ fontSize: 20, fontWeight: 400, color:'red' }}>No Work active</Text>
+        <Text style={{ fontSize: 20, fontWeight: 400, color: "red" }}>
+          No Work active
+        </Text>
       </View>
     );
   };

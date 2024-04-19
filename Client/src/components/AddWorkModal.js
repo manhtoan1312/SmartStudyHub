@@ -21,6 +21,7 @@ import { GetProjectByStatus } from "../services/Guest/ProjectService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import DateTimePicker from "./DateTimePicker";
+import getRole from "../services/RoleService";
 // import DateTimePicker from "react-native-modal-datetime-picker";
 
 const AddWorkModal = ({
@@ -58,7 +59,13 @@ const AddWorkModal = ({
     fetchDataOnFocus();
   }, [isFocused]);
   const fetchData = async () => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const response = await GetAllTagOfUser(id);
     const rs = await GetProjectByStatus(id, "ACTIVE");
     if (response.success) {
@@ -438,21 +445,21 @@ const AddWorkModal = ({
                 style={styles.projectTextContainer}
                 onPress={handleProjectListPress}
               >
-                  <View
-                    style={[
-                      styles.cirle,
-                      {
-                        backgroundColor: selectedProject?.colorCode
-                          ? selectedProject?.colorCode
-                          : "blue",
-                      },
-                    ]}
-                  ></View>
-                  <Text style={styles.projectNameText}>
-                    {selectedProject?.projectName
-                      ? selectedProject?.projectName
-                      : "Task"}
-                  </Text>
+                <View
+                  style={[
+                    styles.cirle,
+                    {
+                      backgroundColor: selectedProject?.colorCode
+                        ? selectedProject?.colorCode
+                        : "blue",
+                    },
+                  ]}
+                ></View>
+                <Text style={styles.projectNameText}>
+                  {selectedProject?.projectName
+                    ? selectedProject?.projectName
+                    : "Task"}
+                </Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity
@@ -515,10 +522,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   projectTextContainer: {
-    alignContent:'center',
+    alignContent: "center",
     flexDirection: "row",
     justifyContent: "center",
-    paddingLeft:65
+    paddingLeft: 65,
   },
   projectNameText: {
     marginLeft: 10,

@@ -28,6 +28,7 @@ import { useIsFocused } from "@react-navigation/native";
 import PhoneInputModal from "../../components/PhoneInputModal";
 import DateOfBirthPickerModal from "../../components/DateOfBirthPickerModal";
 import AddressPicker from "../../components/AddressPicker";
+import ClearData from "../../services/ClearData";
 const InforUser = ({ navigation }) => {
   const [infor, setInfor] = useState(null);
   const [editNameModalVisible, setEditNameModalVisible] = useState(false);
@@ -93,9 +94,7 @@ const InforUser = ({ navigation }) => {
   };
 
   const handleLogin = async () => {
-    const allKeys = await AsyncStorage.getAllKeys();
-    const keysToRemove = allKeys.filter((key) => key !== "2FA");
-    await AsyncStorage.multiRemove(keysToRemove);
+    await ClearData();
     navigation.goBack();
   };
   const closeEditNameModal = () => {
@@ -174,7 +173,13 @@ const InforUser = ({ navigation }) => {
 
   const confirmDeleteData = async () => {
     closeMoreOptionsModal();
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const rs = await CleanData(id);
     Alert.alert("Announcement", rs.message);
     navigation.navigate("Home");
@@ -185,9 +190,7 @@ const InforUser = ({ navigation }) => {
       {
         text: "OK",
         onPress: async () => {
-          const allKeys = await AsyncStorage.getAllKeys();
-          const keysToRemove = allKeys.filter((key) => key !== "2FA");
-          await AsyncStorage.multiRemove(keysToRemove);
+          await ClearData();
           navigation.navigate("Home");
         },
       },

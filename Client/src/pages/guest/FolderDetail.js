@@ -24,6 +24,7 @@ import { GetDetailFolder } from "../../services/Guest/FolderService";
 import Focus from "./Focus";
 import ImageFocus from "../../components/Image_Focus";
 import { useIsFocused } from "@react-navigation/native";
+import getRole from "../../services/RoleService";
 const FolderDetail = ({ route, navigation }) => {
   const id = route.params.id;
   const [project, setProject] = useState(null);
@@ -80,7 +81,13 @@ const FolderDetail = ({ route, navigation }) => {
   ) => {
     setModalVisible(false);
     Keyboard.dismiss();
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const settings = await AsyncStorage.getItem("Settings");
     let time = 25;
     if (settings) {
@@ -97,7 +104,7 @@ const FolderDetail = ({ route, navigation }) => {
         priority,
         dueDate,
         numberOfPomodoros,
-        time,
+        time
       );
       const response = await CreateWork(
         id,
@@ -107,7 +114,7 @@ const FolderDetail = ({ route, navigation }) => {
         priority,
         dueDate,
         numberOfPomodoros,
-        time,
+        time
       );
 
       if (!response.success) {
@@ -130,7 +137,7 @@ const FolderDetail = ({ route, navigation }) => {
         {project && (
           <>
             <View style={styles.header}>
-              <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
                 <Ionicons name="chevron-back-outline" size={24} color="gray" />
               </TouchableOpacity>
               <Text style={{ fontSize: 18, fontWeight: "400" }}>
@@ -162,7 +169,7 @@ const FolderDetail = ({ route, navigation }) => {
               </TouchableOpacity>
               {project.listProjectActive?.map((projectItem) => (
                 <View key={projectItem.id}>
-                  <Text style={{padding:10}}>{projectItem.projectName}</Text>
+                  <Text style={{ padding: 10 }}>{projectItem.projectName}</Text>
                   {projectItem?.listWorkActive?.map((workItem) => (
                     <WorkActive
                       key={workItem.id}
@@ -200,7 +207,9 @@ const FolderDetail = ({ route, navigation }) => {
               {doneVisible &&
                 project.listProjectCompleted?.map((projectItem) => (
                   <View key={projectItem.id}>
-                    <Text style={{padding:10}}>{projectItem.projectName}</Text>
+                    <Text style={{ padding: 10 }}>
+                      {projectItem.projectName}
+                    </Text>
                     {projectItem?.listWorkActive?.map((workItem) => (
                       <WorkActive
                         key={workItem.id}

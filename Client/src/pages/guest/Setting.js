@@ -16,6 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import getRole from "../../services/RoleService";
 import { Picker } from "react-native-wheel-pick";
 import { DeleteGuest } from "../../services/GuestService";
+import ClearData from "../../services/ClearData";
 export default function Setting({ navigation }) {
   const [preTime, setPreTime] = useState(0);
   const [workSound, setWorkSound] = useState("None");
@@ -297,26 +298,26 @@ export default function Setting({ navigation }) {
   };
 
   const submitLogOut = async () => {
-    const allKeys = await AsyncStorage.getAllKeys();
-    const keysToRemove = allKeys.filter((key) => key !== "2FA");
-    await AsyncStorage.multiRemove(keysToRemove);
+    await ClearData();
     navigation.navigate("Home");
   };
   const submitDelete = async () => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const rs = await DeleteGuest(id);
     if (!rs.success) {
-      const allKeys = await AsyncStorage.getAllKeys();
-      const keysToRemove = allKeys.filter((key) => key !== "2FA");
-      await AsyncStorage.multiRemove(keysToRemove);
-      navigation.navigate("Home");
+      console.log(rs.message)
     } else {
       Alert.alert("Smart Study Hub Announcement", "Delete data successfully");
-      const allKeys = await AsyncStorage.getAllKeys();
-      const keysToRemove = allKeys.filter((key) => key !== "2FA");
-      await AsyncStorage.multiRemove(keysToRemove);
-      navigation.navigate("Home");
     }
+    await ClearData();
+    await AsyncStorage.removeItem('id')
+    navigation.navigate("Home");
   };
 
   const Change2Fa = async () => {

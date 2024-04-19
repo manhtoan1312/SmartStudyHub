@@ -25,6 +25,7 @@ import {
   MarkCompleteProject,
   RecoverProject,
 } from "../../services/Guest/ProjectService";
+import getRole from "../../services/RoleService";
 function Project({ navigation }) {
   const [outOfDate, setOutOfDate] = useState(true);
   const [tomorow, setTomorow] = useState(true);
@@ -71,7 +72,13 @@ function Project({ navigation }) {
   }, []);
 
   const fetchProject = async () => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const response = await GetProjectActiveAndCompleted(id);
     if (response.success) {
       setListProject(response.data);
@@ -140,20 +147,18 @@ function Project({ navigation }) {
   }
 
   const handleChange = async (item) => {
-    let response= null
-    if(item.status==='ACTIVE'){
-      response = await MarkCompleteProject(item.id)
+    let response = null;
+    if (item.status === "ACTIVE") {
+      response = await MarkCompleteProject(item.id);
+    } else {
+      response = await RecoverProject(item.id);
     }
-    else{
-      response = await RecoverProject(item.id)
+    if (response.success) {
+      fetchProject();
+    } else {
+      Alert.alert("Change error", response.message);
     }
-    if(response.success){
-      fetchProject()
-    }
-    else{
-      Alert.alert('Change error', response.message)
-    }
-  }
+  };
   return (
     <ScrollView>
       <View
@@ -400,7 +405,8 @@ function Project({ navigation }) {
 
                 {/* Status Buttons */}
                 <View style={styles.statusButtonsContainer}>
-                  <TouchableOpacity onPress={() => handleChange(item)}
+                  <TouchableOpacity
+                    onPress={() => handleChange(item)}
                     style={[
                       styles.statusCircle,
                       {

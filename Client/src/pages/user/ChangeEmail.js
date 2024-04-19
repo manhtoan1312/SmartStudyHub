@@ -14,6 +14,7 @@ import {
   SendOTPChangePassword,
 } from "../../services/UserService";
 import { ResendOTP } from "../../services/AccountService";
+import ClearData from "../../services/ClearData";
 
 function ChangeEmail({ route, navigation }) {
   const email = route.params.email;
@@ -75,9 +76,7 @@ function ChangeEmail({ route, navigation }) {
   };
 
   const handleLogin = async () => {
-    const allKeys = await AsyncStorage.getAllKeys();
-    const keysToRemove = allKeys.filter(key => key !== '2FA');
-    await AsyncStorage.multiRemove(keysToRemove);
+    await ClearData()
     navigation.navigate("Login");
   };
   const handleResendOTP = async () => {

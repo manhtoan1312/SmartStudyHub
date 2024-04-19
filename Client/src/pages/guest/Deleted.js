@@ -7,9 +7,17 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { AntDesign, FontAwesome5, MaterialIcons, Octicons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  FontAwesome5,
+  MaterialIcons,
+  Octicons,
+} from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { GetWorkCompleted, GetWorkDeleted } from "../../services/Guest/WorkService";
+import {
+  GetWorkCompleted,
+  GetWorkDeleted,
+} from "../../services/Guest/WorkService";
 import { GetPomodoro } from "../../services/Guest/PomodoroService";
 import { GetProjectByStatus } from "../../services/Guest/ProjectService";
 import WorkCompleted from "../../components/WorkCompleted";
@@ -21,6 +29,7 @@ import ProjectDeleted from "../../components/ProjectDeleted";
 import WorkDeleted from "../../components/WorkDeleted";
 import FolderDeleted from "../../components/FolderDeleted";
 import { useIsFocused } from "@react-navigation/native";
+import getRole from "../../services/RoleService";
 
 const DeletedDetail = ({ navigation }) => {
   const [listWork, setListWork] = useState();
@@ -48,7 +57,13 @@ const DeletedDetail = ({ navigation }) => {
   }, []);
 
   const fetchWork = async () => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const response = await GetWorkDeleted(id);
     if (response.success) {
       setListWork(response.data);
@@ -58,7 +73,13 @@ const DeletedDetail = ({ navigation }) => {
   };
 
   const fetchFolder = async () => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const response = await GetAllFolderDelete(id);
     if (response.success) {
       setListFolder(response.data);
@@ -68,7 +89,13 @@ const DeletedDetail = ({ navigation }) => {
   };
 
   const fetchProject = async () => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const project = await GetProjectByStatus(id, "DELETED");
     if (project.success) {
       setListProject(project.data);
@@ -113,28 +140,43 @@ const DeletedDetail = ({ navigation }) => {
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Work")}
           >
-            <FontAwesome5 name="tasks" style={styles.icon} size={18} color="black" />
+            <FontAwesome5
+              name="tasks"
+              style={styles.icon}
+              size={18}
+              color="black"
+            />
             <Text style={styles.modalText}>Work</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Folder")}
           >
-            <AntDesign name="folderopen" style={styles.icon} size={18} color="black" />
+            <AntDesign
+              name="folderopen"
+              style={styles.icon}
+              size={18}
+              color="black"
+            />
             <Text style={styles.modalText}>Folder</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Project")}
           >
-            <Octicons name="project" style={styles.icon} size={18} color="black" />
-            <Text style={styles.modalText }>Project</Text>
+            <Octicons
+              name="project"
+              style={styles.icon}
+              size={18}
+              color="black"
+            />
+            <Text style={styles.modalText}>Project</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => toggleModal()}
           >
-            <Text style={[styles.modalText, {paddingLeft:30}]}>Cancel</Text>
+            <Text style={[styles.modalText, { paddingLeft: 30 }]}>Cancel</Text>
           </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
@@ -178,7 +220,7 @@ const DeletedDetail = ({ navigation }) => {
           ))}
         </ScrollView>
       )}
-    
+
       <ImageFocus />
     </View>
   );
@@ -212,14 +254,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     width: "100%",
-    flexDirection:'row'
+    flexDirection: "row",
   },
   modalText: {
     fontSize: 18,
   },
-  icon:{
-    paddingRight:15
-  }
+  icon: {
+    paddingRight: 15,
+  },
 });
 
 export default DeletedDetail;

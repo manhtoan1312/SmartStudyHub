@@ -24,6 +24,7 @@ import { useIsFocused } from "@react-navigation/native";
 import SortWorkModal from "../../components/SortWorkModal";
 import ImageFocus from "../../components/Image_Focus";
 import { useRef } from "react";
+import getRole from "../../services/RoleService";
 const ProjectDetail = ({ route, navigation }) => {
   const id = route.params.id;
   const [project, setProject] = useState(null);
@@ -109,40 +110,43 @@ const ProjectDetail = ({ route, navigation }) => {
     numberOfPomodoros,
     tags
   ) => {
-    
     setModalVisible(false);
     Keyboard.dismiss();
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const settings = await AsyncStorage.getItem("Settings");
     let time = 25;
     if (settings) {
       const parsedData = JSON.parse(settings);
       time = parsedData.pomodoroTime;
     }
-    console.log(numberOfPomodoros)
+    console.log(numberOfPomodoros);
     if (workName) {
-      const tagslist = tags.map((id) => ({ "id": id }))
+      const tagslist = tags.map((id) => ({ id: id }));
       const response = await CreateWork(
         id,
-        projectId ? projectId: null,
+        projectId ? projectId : null,
         tagslist,
         workName,
         priority,
         dueDate,
         numberOfPomodoros,
-        time,
+        time
       );
-      
-      if(!response.success){
-        Alert.alert('Create Work Error', response.message)
+
+      if (!response.success) {
+        Alert.alert("Create Work Error", response.message);
+      } else {
+        fetchData();
       }
-      else{
-        fetchData()
-      }
-      setWorkName('')
-    }
-    else{
-      Alert.alert('Warning', 'You must enter work name')
+      setWorkName("");
+    } else {
+      Alert.alert("Warning", "You must enter work name");
     }
   };
 
@@ -161,7 +165,9 @@ const ProjectDetail = ({ route, navigation }) => {
               <Text style={{ fontSize: 18, fontWeight: "400" }}>
                 {project.projectName}
               </Text>
-              <TouchableOpacity onPress={() => setSortModalVisible(true)}><AntDesign name="filter" size={24} color="gray" /></TouchableOpacity>
+              <TouchableOpacity onPress={() => setSortModalVisible(true)}>
+                <AntDesign name="filter" size={24} color="gray" />
+              </TouchableOpacity>
             </View>
             <View style={styles.body}>
               <View style={styles.detail}>
@@ -172,10 +178,13 @@ const ProjectDetail = ({ route, navigation }) => {
                   totalWorkCompleted={project.totalWorkCompleted}
                 />
               </View>
-              <TouchableOpacity style={styles.input} onPress={() => inputRef.current.focus()}>
+              <TouchableOpacity
+                style={styles.input}
+                onPress={() => inputRef.current.focus()}
+              >
                 <AntDesign name="plus" size={24} color="black" />
                 <TextInput
-                  ref={inputRef} 
+                  ref={inputRef}
                   style={{ paddingLeft: 10 }}
                   placeholder="Add a Work..."
                   value={workName}
@@ -236,7 +245,7 @@ const ProjectDetail = ({ route, navigation }) => {
       {sortModalVisible && (
         <SortWorkModal
           isVisible={sortModalVisible}
-          page={'project'}
+          page={"project"}
           onChoose={(type) => {
             handleSortWork(type);
           }}

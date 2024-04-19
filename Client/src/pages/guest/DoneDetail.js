@@ -12,12 +12,18 @@ import {
   Alert,
   ScrollView,
 } from "react-native";
-import { AntDesign, FontAwesome5, MaterialIcons, Octicons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  FontAwesome5,
+  MaterialIcons,
+  Octicons,
+} from "@expo/vector-icons";
 import WorkCompleted from "../../components/WorkCompleted";
 import ImageFocus from "../../components/Image_Focus";
 import PomodoroCompleted from "../../components/PomodoroCompleted";
 import ProjectDone from "../../components/ProjectDone";
 import { useIsFocused } from "@react-navigation/native";
+import getRole from "../../services/RoleService";
 
 const DoneDetail = ({ navigation }) => {
   const [listwork, setListWork] = useState();
@@ -44,7 +50,13 @@ const DoneDetail = ({ navigation }) => {
   }, []);
 
   const fetchWork = async () => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const response = await GetWorkCompleted(id);
     if (response.success) {
       setListWork(response.data);
@@ -53,7 +65,13 @@ const DoneDetail = ({ navigation }) => {
     }
   };
   const fetchPomodoro = async () => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const Po = await GetPomodoro(id);
     if (Po.success) {
       translatePomodoro(Po.data);
@@ -62,7 +80,13 @@ const DoneDetail = ({ navigation }) => {
     }
   };
   const fetchProject = async () => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const Project = await GetProjectByStatus(id, "COMPLETED");
     if (Project.success) {
       setListProject(Project.data);
@@ -143,28 +167,43 @@ const DoneDetail = ({ navigation }) => {
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Work")}
           >
-            <FontAwesome5 name="tasks" style={styles.icon} size={18} color="black" />
+            <FontAwesome5
+              name="tasks"
+              style={styles.icon}
+              size={18}
+              color="black"
+            />
             <Text style={styles.modalText}>Work</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Pomodoro")}
           >
-            <AntDesign name="clockcircleo" style={styles.icon} size={18} color="black" />
+            <AntDesign
+              name="clockcircleo"
+              style={styles.icon}
+              size={18}
+              color="black"
+            />
             <Text style={styles.modalText}>Pomodoro</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Project")}
           >
-            <Octicons name="project" style={styles.icon} size={18} color="black" />
+            <Octicons
+              name="project"
+              style={styles.icon}
+              size={18}
+              color="black"
+            />
             <Text style={styles.modalText}>Project</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => toggleModal()}
           >
-            <Text style={[styles.modalText, {paddingLeft:30}]}>Cancel</Text>
+            <Text style={[styles.modalText, { paddingLeft: 30 }]}>Cancel</Text>
           </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
@@ -208,7 +247,6 @@ const DoneDetail = ({ navigation }) => {
           ))}
         </ScrollView>
       )}
-      
 
       <ImageFocus />
     </View>
@@ -243,14 +281,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     width: "100%",
-    flexDirection:'row'
+    flexDirection: "row",
   },
   modalText: {
     fontSize: 18,
   },
-  icon:{
-    paddingRight:15
-  }
+  icon: {
+    paddingRight: 15,
+  },
 });
 
 export default DoneDetail;

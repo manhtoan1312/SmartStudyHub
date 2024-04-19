@@ -14,11 +14,15 @@ import { SearchByWorkName } from "../../services/Guest/WorkService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import WorkActive from "../../components/WorkActive";
 import WorkDone from "../../components/WorkDone";
+import getRole from "../../services/RoleService";
+import { useIsFocused } from "@react-navigation/native";
 
 const SearchWork = ({ navigation }) => {
   const [searchText, setSearchText] = useState("");
   const [work, setWork] = useState(null);
   const inputRef = useRef(null);
+  const isFocused = useIsFocused();
+  const [isSearched, setIsSearched] = useState(false)
   let typingTimeout = null;
 
   useEffect(() => {
@@ -27,12 +31,27 @@ const SearchWork = ({ navigation }) => {
     }
   }, []);
 
-  const handleSearch = async () => {
-    const id = await AsyncStorage.getItem("id");
-    const response = await SearchByWorkName(id, searchText);
+  useEffect(() => {
+    const fetchDataOnFocus = async () => {
+      if (isFocused && isSearched) {
+        await handleSearch(searchText)
+      }
+    };
+    fetchDataOnFocus();
+  }, [isFocused]);
+
+  const handleSearch = async (text) => {
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
+    const response = await SearchByWorkName(id, text);
     if (response.success) {
       setWork(response.data);
-      console.log(response.data);
+      console.log(response.data.length);
     } else {
       Alert.alert(
         "An error happened when searching for work",
@@ -41,14 +60,17 @@ const SearchWork = ({ navigation }) => {
     }
     Keyboard.dismiss();
   };
+  
 
   const handleTyping = (text) => {
+    setIsSearched(true)
     setSearchText(text);
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
-      handleSearch(); 
+      handleSearch(text); 
     }, 2000);
   };
+  
 
   const handleCancel = () => {
     navigation.goBack();
@@ -65,7 +87,7 @@ const SearchWork = ({ navigation }) => {
       return (
         <WorkActive
           workItem={item}
-          reload={handleSearch}
+          reload={()=>handleSearch(searchText)}
           navigation={navigation}
         />
       );
@@ -73,7 +95,7 @@ const SearchWork = ({ navigation }) => {
       return (
         <WorkDone
           workItem={item}
-          reload={handleSearch}
+          reload={() =>handleSearch(searchText)}
           navigation={navigation}
         />
       );

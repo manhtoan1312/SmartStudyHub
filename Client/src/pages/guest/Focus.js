@@ -30,6 +30,7 @@ import { CreatePomodoro } from "../../services/Guest/PomodoroService";
 import ModalSelectWork from "../../components/ModalSelectWork";
 import { ExtraMarkCompleted } from "../../services/Guest/ExtraWork";
 import { MarkCompleted } from "../../services/Guest/WorkService";
+import getRole from "../../services/RoleService";
 const { width, height } = Dimensions.get("screen");
 
 const red = "#f54e4e";
@@ -99,7 +100,13 @@ const Focus = () => {
 
   const postPomodoro = async () => {
     const endTime = new Date().getTime();
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const sTime = await AsyncStorage.getItem("startTime");
     let workid = null;
     let extraId = null;
@@ -295,7 +302,7 @@ const Focus = () => {
       setStop(false);
       setIsPaused(false);
       saveToAsyncStorage("initialPomodoroTime", minutes);
-      saveToAsyncStorage("startTime",String(new Date().getTime()));
+      saveToAsyncStorage("startTime", String(new Date().getTime()));
     }
   };
 
@@ -484,7 +491,7 @@ const Focus = () => {
       setIsPaused(true);
       setStop(true);
       resetData();
-      setSelectedExtra(null)
+      setSelectedExtra(null);
     } else {
       Alert.alert("Error when complete extra work", response.message);
     }

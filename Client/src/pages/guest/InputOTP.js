@@ -10,6 +10,7 @@ import {
 import { ResendOTP, register } from "../../services/AccountService";
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import getRole from "../../services/RoleService";
 
 function InputOTP({ route, navigation }) {
   const { otpCode, time, email, password, firstName, lastName } = route.params;
@@ -35,7 +36,13 @@ function InputOTP({ route, navigation }) {
     const currentTime = new Date().getTime();
     if (currentTime < expiredTime) {
       if (otpInput === otp) {
-        const id = await AsyncStorage.getItem("id");
+        const role = await getRole();
+        let id;
+        if (role) {
+          id = role.id;
+        } else {
+          id = await AsyncStorage.getItem("id");
+        }
         const response = await register(
           firstName,
           lastName,
@@ -88,7 +95,7 @@ function InputOTP({ route, navigation }) {
             keyboardType="numeric"
             value={otpInput}
             onChangeText={(text) => setOtpInput(text)}
-            placeholderTextColor={'#686868'}
+            placeholderTextColor={"#686868"}
             style={styles.input}
           />
         </View>

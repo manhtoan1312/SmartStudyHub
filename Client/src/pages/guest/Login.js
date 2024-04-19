@@ -41,12 +41,9 @@ function Login({ navigation }) {
         const token = url.slice(tokenIndex + 6);
         const decodedToken = jwt_decode(token);
         const subArray = decodedToken.sub.split("-");
-        const id = subArray[0];
         await AsyncStorage.setItem("token", tokenIndex);
-        await AsyncStorage.setItem("id", id);
         const firstName = subArray[subArray.length - 1].trim().split(" ")[0];
         const lastName = subArray[subArray.length - 1].trim().split(" ")[1];
-        console.log(id, token, firstName, lastName);
         await AsyncStorage.setItem("accountName", `${lastName} ${firstName}`);
         navigation.navigate("Home");
       } else if (url.includes("account-deleted")) {
@@ -90,10 +87,6 @@ function Login({ navigation }) {
       }
         } else {
           await AsyncStorage.setItem("token", response.token);
-          const role = jwt_decode(response.token);
-          const subArray = role.sub.split("-");
-          const id = subArray[0];
-          await AsyncStorage.setItem("id", id);
           navigation.navigate("Home");
         }
       } else {

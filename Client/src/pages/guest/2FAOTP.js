@@ -36,10 +36,6 @@ const TFAOTP = ({ route, navigation }) => {
       if (otpInput === otp) {
         await AsyncStorage.setItem("token", token);
         navigation.navigate("Home");
-        const role = jwtDecode(token);
-        const subArray = role.sub.split("-");
-        const id = subArray[0];
-        await AsyncStorage.setItem("id", id);
       } else {
         Alert.alert("Invalid OTP", "Please enter the correct OTP.");
       }

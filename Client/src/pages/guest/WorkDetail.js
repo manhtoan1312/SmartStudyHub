@@ -40,6 +40,7 @@ import {
   ExtraMarkCompleted,
   RecoverExtraWork,
 } from "../../services/Guest/ExtraWork";
+import getRole from "../../services/RoleService";
 
 const WorkDetail = ({ route, navigation }) => {
   const id = route.params.id;
@@ -71,10 +72,16 @@ const WorkDetail = ({ route, navigation }) => {
     try {
       setNote("");
       setExtraWorkName("");
-      const Userid = await AsyncStorage.getItem("id");
+      const role = await getRole();
+      let userId;
+      if (role) {
+        userId = role.id;
+      } else {
+        userId = await AsyncStorage.getItem("id");
+      }
       const [workResponse, listProjectResponse] = await Promise.all([
         GetDetailWork(id),
-        GetProjectByStatus(Userid, "ACTIVE"),
+        GetProjectByStatus(userId, "ACTIVE"),
       ]);
 
       if (isMounted.current) {

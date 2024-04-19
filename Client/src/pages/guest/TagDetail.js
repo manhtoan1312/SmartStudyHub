@@ -24,6 +24,7 @@ import { GetTagDetail } from "../../services/Guest/TagService";
 import ImageFocus from "../../components/Image_Focus";
 import { useIsFocused } from "@react-navigation/native";
 import SortWorkModal from "../../components/SortWorkModal";
+import getRole from "../../services/RoleService";
 const TagDetail = ({ route, navigation }) => {
   const id = route.params.id;
   const [tag, setTag] = useState(null);
@@ -62,7 +63,7 @@ const TagDetail = ({ route, navigation }) => {
     const sortAndUpdateList = async (list, type, updateFunc) => {
       const body = JSON.stringify(list);
       const response = await SortWork(body, type);
-  
+
       if (response.success) {
         const worksSortedArray = response.data || [];
         const updatedList = worksSortedArray
@@ -74,10 +75,10 @@ const TagDetail = ({ route, navigation }) => {
         console.log(response.message);
       }
     };
-  
+
     await sortAndUpdateList(project?.listWorkActive, type, setProject);
     await sortAndUpdateList(project?.listWorkCompleted, type, setProject);
-  
+
     setSortType(type);
   };
   const fetchData = async () => {
@@ -103,10 +104,15 @@ const TagDetail = ({ route, navigation }) => {
     numberOfPomodoros,
     tags
   ) => {
-    
     setModalVisible(false);
     Keyboard.dismiss();
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const settings = await AsyncStorage.getItem("Settings");
     let time = 25;
     if (settings) {
@@ -114,8 +120,9 @@ const TagDetail = ({ route, navigation }) => {
       time = parsedData.pomodoroTime;
     }
     if (workName) {
-      const tagslist = tags.map((id) => ({ "id": id }))
-      console.log(id,
+      const tagslist = tags.map((id) => ({ id: id }));
+      console.log(
+        id,
         projectId,
         tagslist,
         workName,
@@ -123,29 +130,28 @@ const TagDetail = ({ route, navigation }) => {
         dueDate,
         numberOfPomodoros,
         time,
-        timeWillStart,)
+        timeWillStart
+      );
       const response = await CreateWork(
         id,
-        projectId ? projectId: null,
+        projectId ? projectId : null,
         tagslist,
         workName,
         priority,
         dueDate,
         numberOfPomodoros,
         time,
-        timeWillStart,
+        timeWillStart
       );
-      
-      if(!response.success){
-        Alert.alert('Create Work Error', response.message)
+
+      if (!response.success) {
+        Alert.alert("Create Work Error", response.message);
+      } else {
+        fetchData();
       }
-      else{
-        fetchData()
-      }
-      setWorkName('')
-    }
-    else{
-      Alert.alert('Warning', 'You must enter work name')
+      setWorkName("");
+    } else {
+      Alert.alert("Warning", "You must enter work name");
     }
   };
 
@@ -239,7 +245,7 @@ const TagDetail = ({ route, navigation }) => {
       {sortModalVisible && (
         <SortWorkModal
           isVisible={sortModalVisible}
-          page={''}
+          page={""}
           onChoose={(type) => {
             handleSortWork(type);
           }}

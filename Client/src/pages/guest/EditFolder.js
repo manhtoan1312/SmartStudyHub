@@ -19,6 +19,7 @@ import {
   GetDetailFolder,
   DeleteFolder,
 } from "../../services/Guest/FolderService";
+import getRole from "../../services/RoleService";
 
 const EditFolder = ({ route, navigation }) => {
   const folderId = route.params.id;
@@ -52,7 +53,13 @@ const EditFolder = ({ route, navigation }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const id = await AsyncStorage.getItem("id");
+        const role = await getRole();
+        let id;
+        if (role) {
+          id = role.id;
+        } else {
+          id = await AsyncStorage.getItem("id");
+        }
         const response = await GetProjectForUpdate(id, folderId);
         if (response.success) {
           setListProject(response.data);
@@ -118,32 +125,38 @@ const EditFolder = ({ route, navigation }) => {
   };
 
   const handleDelete = async () => {
-    
     if (folderId) {
       Alert.alert(
         "Confirm action",
-        "All data related to this item will be deleted, are you sure you want to delete it?",[
+        "All data related to this item will be deleted, are you sure you want to delete it?",
+        [
           {
-            text: 'Cancel',
-            style: 'cancel',
+            text: "Cancel",
+            style: "cancel",
           },
-          {text: 'OK', onPress: () => confirmDeleteFolder()},
+          { text: "OK", onPress: () => confirmDeleteFolder() },
         ]
       );
-      
     }
   };
 
   const confirmDeleteFolder = async () => {
-    const id = await AsyncStorage.getItem('id')
-      const transformedList = projectSelected.map((id) => ({ id }));
-      const response = await DeleteFolder(id, folderId,name, color, transformedList, null);
-      if (response.success) {
-        navigation.goBack();
-      } else {
-        Alert.alert("Error!", response.message);
-      }
-  }
+    const id = await AsyncStorage.getItem("id");
+    const transformedList = projectSelected.map((id) => ({ id }));
+    const response = await DeleteFolder(
+      id,
+      folderId,
+      name,
+      color,
+      transformedList,
+      null
+    );
+    if (response.success) {
+      navigation.goBack();
+    } else {
+      Alert.alert("Error!", response.message);
+    }
+  };
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -222,10 +235,15 @@ const EditFolder = ({ route, navigation }) => {
       </View>
       {folderId && (
         <View style={styles.actionsContainer}>
-        <TouchableOpacity style={styles.doneButton} onPress={() => handleDelete()}>
-          <Text style={[styles.buttonText, styles.doneButtonText]}>Delete</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={styles.doneButton}
+            onPress={() => handleDelete()}
+          >
+            <Text style={[styles.buttonText, styles.doneButtonText]}>
+              Delete
+            </Text>
+          </TouchableOpacity>
+        </View>
       )}
     </ScrollView>
   );
@@ -246,7 +264,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 18,
-    fontWeight:'600'
+    fontWeight: "600",
   },
   content: {
     flexDirection: "row",

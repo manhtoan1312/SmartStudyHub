@@ -117,9 +117,10 @@ export default function Home({ navigation }) {
     try {
       const storedData = await AsyncStorage.getItem("projectData");
       const settings = await AsyncStorage.getItem("settings");
-      const id = await AsyncStorage.getItem("id");
+      const role = await getRole()
       const avatar = await AsyncStorage.getItem("img");
       const name = await AsyncStorage.getItem("accountName");
+      let id;
       setAvt(
         avatar
           ? avatar
@@ -146,17 +147,25 @@ export default function Home({ navigation }) {
         setDone(parsedData.done);
         setDeleted(parsedData.deleted);
       }
+      if(role) {
+        id = role.id
+      }
+      else{
+        id = await AsyncStorage.getItem('id')
+      }
       if (name) {
         setEmail(name);
       } else {
         getRole().then((role) => {
           if (role) {
             setEmail(role.name);
-            console.log(role.token);
             const setName = async () => {
               await AsyncStorage.setItem("accountName", role.name);
             };
             setName();
+          }
+          else{
+            setEmail('')
           }
         });
       }
@@ -201,7 +210,14 @@ export default function Home({ navigation }) {
   };
 
   const fetchDataFPT = async () => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+let id;
+if(role) {
+        id = role.id
+      }
+      else{
+        id = await AsyncStorage.getItem('id')
+      }
     if (id) {
       try {
         const [
@@ -358,7 +374,14 @@ export default function Home({ navigation }) {
   };
 
   const handleAddProject = async () => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+let id;
+if(role) {
+        id = role.id
+      }
+      else{
+        id = await AsyncStorage.getItem('id')
+      }
     const rs = await CheckMaxProject(id);
     if (rs?.success) {
       if (rs.isMax) {
@@ -372,7 +395,14 @@ export default function Home({ navigation }) {
   };
 
   const handleAddFolder = async () => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+let id;
+if(role) {
+        id = role.id
+      }
+      else{
+        id = await AsyncStorage.getItem('id')
+      }
     const rs = await CheckMaxFolder(id);
     if (rs?.success) {
       if (rs.isMax) {

@@ -18,10 +18,15 @@ import WorkDone from "../../components/WorkDone";
 import AddWorkModal from "../../components/AddWorkModal";
 import HeaderDetail from "../../components/HeaderDetail";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CreateWork, GetWorkByPriority, SortWork,} from "../../services/Guest/WorkService";
+import {
+  CreateWork,
+  GetWorkByPriority,
+  SortWork,
+} from "../../services/Guest/WorkService";
 import ImageFocus from "../../components/Image_Focus";
 import { useIsFocused } from "@react-navigation/native";
 import SortWorkModal from "../../components/SortWorkModal";
+import getRole from "../../services/RoleService";
 const Low = ({ navigation }) => {
   const [project, setProject] = useState(null);
   const [workName, setWorkName] = useState(null);
@@ -87,7 +92,13 @@ const Low = ({ navigation }) => {
   }, []);
 
   const fetchData = async () => {
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const response = await GetWorkByPriority("LOW", id);
     if (response.success) {
       setProject(response.data);
@@ -111,7 +122,13 @@ const Low = ({ navigation }) => {
   ) => {
     setModalVisible(false);
     Keyboard.dismiss();
-    const id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const settings = await AsyncStorage.getItem("settings");
     let time = 25;
     if (settings) {
@@ -128,7 +145,7 @@ const Low = ({ navigation }) => {
         priority,
         dueDate,
         numberOfPomodoros,
-        time,
+        time
       );
 
       if (!response.success) {
@@ -168,10 +185,13 @@ const Low = ({ navigation }) => {
                   totalWorkCompleted={project.totalWorkCompleted}
                 />
               </View>
-              <TouchableOpacity style={styles.input} onPress={() => inputRef.current.focus()}>
+              <TouchableOpacity
+                style={styles.input}
+                onPress={() => inputRef.current.focus()}
+              >
                 <AntDesign name="plus" size={24} color="black" />
                 <TextInput
-                  ref={inputRef} 
+                  ref={inputRef}
                   style={{ paddingLeft: 10 }}
                   placeholder="Add a Work..."
                   value={workName}
@@ -184,11 +204,11 @@ const Low = ({ navigation }) => {
               </TouchableOpacity>
               {project.listWorkActive?.map((workItem) => (
                 <WorkActive
-                key={workItem.id}
-                workItem={workItem}
-                reload={fetchData}
-                navigation={navigation}
-              />
+                  key={workItem.id}
+                  workItem={workItem}
+                  reload={fetchData}
+                  navigation={navigation}
+                />
               ))}
               <TouchableOpacity
                 style={styles.buttonComplete}
@@ -213,7 +233,7 @@ const Low = ({ navigation }) => {
                     workItem={workItem}
                     reload={fetchData}
                     navigation={navigation}
-                    priority='LOW'
+                    priority="LOW"
                   />
                 ))}
             </View>
@@ -227,13 +247,13 @@ const Low = ({ navigation }) => {
           keyboardHeight={keyboardHeight}
           handlecloseKeyboard={handleClosekeyboard}
           project={project}
-          priority='LOW'
+          priority="LOW"
         />
       )}
       {sortModalVisible && (
         <SortWorkModal
           isVisible={sortModalVisible}
-          page={'priority'}
+          page={"priority"}
           onChoose={(type) => {
             handleSortWork(type);
           }}
