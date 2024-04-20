@@ -10,29 +10,29 @@ import {
   Alert,
 } from "react-native";
 import { FontAwesome, EvilIcons } from "@expo/vector-icons";
-import { AuthenToRecover } from "../../services/AccountService";
+import { AuthenToRecover, ResendOTP } from "../../services/AccountService";
 import { recoverAccount } from "../../services/GuestService";
 
 function RecoverAccount({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const handleRecover = async () => {
-    const rs = await AuthenToRecover(email, password)
-    if(rs.success){
-        const id = rs.message.id
-        const response = await recoverAccount(id)
-        if(response.success){
-            Alert.alert("Announcement", response.message)
-            navigation.goBack()
-        }
-        else{
-            Alert.alert("Announcement", response.message)
-        }
-    }
-    else{
-        Alert.alert('Login fail', rs.message
-        )
+  const handleCheckAccount = async () => {
+    const rs = await AuthenToRecover(email, password);
+    if (rs.success) {
+      const response = await ResendOTP(email)
+      if(response.success)
+      {
+        navigation.navigate('RecoverStep2', {
+          otpCode: response.data.otpCode,
+          time: response.data.otpTimeExpiration,
+          id:rs.message.id
+        })
+      }
+      else {
+        Alert.alert("Authenticate fail", response.message);
+      }
+    } else {
+      Alert.alert("Authenticate fail!!", rs.message);
     }
   };
 
@@ -50,40 +50,46 @@ function RecoverAccount({ navigation }) {
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Recover Account</Text>
         </View>
-        <View style={styles.inputContainer}>
-          <EvilIcons
-            name="envelope"
-            size={24}
-            color="black"
-            style={styles.inputIcon}
-          />
-          <TextInput
-            placeholder="Email"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={(e) => setEmail(e)}
-            style={styles.input}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <EvilIcons
-            name="lock"
-            size={24}
-            color="black"
-            style={styles.inputIcon}
-          />
-          <TextInput
-            placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={(e) => setPassword(e)}
-            style={styles.input}
-          />
-        </View>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleRecover}>
-            <Text style={styles.buttonText}>Check Account</Text>
-          </TouchableOpacity>
+
+        <View>
+          <View style={styles.inputContainer}>
+            <EvilIcons
+              name="envelope"
+              size={24}
+              color="black"
+              style={styles.inputIcon}
+            />
+            <TextInput
+              placeholder="Email"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={(e) => setEmail(e)}
+              style={styles.input}
+            />
+          </View>
+          <View style={styles.inputContainer}>
+            <EvilIcons
+              name="lock"
+              size={24}
+              color="black"
+              style={styles.inputIcon}
+            />
+            <TextInput
+              placeholder="Password"
+              secureTextEntry
+              value={password}
+              onChangeText={(e) => setPassword(e)}
+              style={styles.input}
+            />
+          </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleCheckAccount}
+            >
+              <Text style={styles.buttonText}>Check Account</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>

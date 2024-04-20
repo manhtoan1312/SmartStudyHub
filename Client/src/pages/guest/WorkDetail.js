@@ -250,6 +250,15 @@ const WorkDetail = ({ route, navigation }) => {
     updateWork.isRemindered = false;
     setWork(updateWork);
   };
+
+  const handleStartPomodoro = async () => {};
+  const handleCreatePomodoro = async () => {
+    setMoreOptionsModalVisible(false)
+    await updateWork();
+    navigation.navigate('CreatePomodoro',{
+      work:work
+    })
+  }
   const colorflag = () => {
     if (work) {
       if (work?.priority === "HIGH") {
@@ -549,6 +558,23 @@ const WorkDetail = ({ route, navigation }) => {
           onRequestClose={hideMoreOptions}
         >
           <View style={styles.moreOptionsModalContainer}>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.buttonStart}
+                onPress={handleStartPomodoro}
+              >
+                <Text style={styles.startOption}>Start Work</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.buttonCreate}
+                onPress={handleCreatePomodoro}
+              >
+                <Text style={styles.createOption}>Create New Pomodoro</Text>
+              </TouchableOpacity>
+            </View>
+
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={styles.buttonMore}
@@ -995,6 +1021,35 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 10,
   },
+  buttonStart: {
+    width: 300,
+    borderRadius: 20,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: "green",
+    backgroundColor: "white",
+  },
+  buttonCreate: {
+    width: 300,
+    borderRadius: 20,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: "green",
+    backgroundColor: "white",
+  },
+
+  startOption:{
+    padding: 15,
+    textAlign: "center",
+    fontSize: 18,
+    color:"green",
+  },
+  createOption:{
+    padding: 15,
+    textAlign: "center",
+    fontSize: 18,
+    color:"green",
+  }
 });
 
 export default WorkDetail;

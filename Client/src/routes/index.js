@@ -50,6 +50,8 @@ import FocusSound from "../pages/guest/FocusSound";
 import PREMIUM from "../pages/guest/Premium";
 import RankingUser from "../pages/guest/RankingUser";
 import TFAOTP from "../pages/guest/2FAOTP";
+import RecoverStep2 from "../pages/guest/RecoverStep2";
+import CreatePomodoro from "../pages/guest/CreatePomodoro";
 
 const Stack = createStackNavigator();
 
@@ -104,6 +106,8 @@ const Navigator = () => (
     <Stack.Screen name="FocusSound" component={FocusSound} />
     <Stack.Screen name="Ranking" component={RankingUser} />
     <Stack.Screen name="2FA" component={TFAOTP} />
+    <Stack.Screen name="RecoverStep2" component={RecoverStep2} />
+    <Stack.Screen name="CreatePomodoro" component={CreatePomodoro} />
   </Stack.Navigator>
 );
 
