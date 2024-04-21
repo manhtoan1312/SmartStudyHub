@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
   FlatList,
+  Modal
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -213,16 +214,6 @@ const SoundDone = ({ navigation }) => {
             style={styles.addItem}
           >
             <Text style={styles.bodyText}>+ Add Sound</Text>
-          </TouchableOpacity>
-          {/* Hiển thị mục "None" */}
-          <TouchableOpacity
-            onPress={() => handleNone()}
-            style={[styles.addItem, noneSelected && styles.selectedItem]}
-          >
-            <Text style={[styles.bodyText]}>None</Text>
-            {noneSelected && (
-              <MaterialIcons name="check" size={24} color="orange" />
-            )}
           </TouchableOpacity>
           <FlatList
             data={soundList}

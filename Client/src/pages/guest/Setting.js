@@ -65,6 +65,9 @@ export default function Setting({ navigation }) {
         const parse = JSON.parse(workingSound);
         setWorkSound(parse?.nameSound);
       }
+      else{
+        setWorkSound('None')
+      }
       const breakSound = await AsyncStorage.getItem("soundDone");
       if (breakSound) {
         const parse = JSON.parse(breakSound);
