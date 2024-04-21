@@ -5,13 +5,16 @@ import {
 } from "../../services/Guest/ProjectService";
 import getRole from "../../services/RoleService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { SearchByWorkName } from "../../services/Guest/WorkService";
+import {
+  GetWorkByProjectAndStatus,
+} from "../../services/Guest/WorkService";
 import {
   StyleSheet,
   TouchableOpacity,
   View,
   Text,
-  SafeAreaView,
+  Touchable,
+  Alert,
 } from "react-native";
 import {
   AntDesign,
@@ -19,20 +22,29 @@ import {
   Ionicons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import { flex } from "react-native-wind/dist/styles/flex/flex";
-
+import DateTimePicker from "../../components/DateTimePicker";
+import PomodoroPickerModal from "../../components/PomodoroPickerModal";
+import ChooseProjectModal from "../../components/ChooseProjectModal";
+import ChooseWorkModal from "../../components/ChooseWorkModal";
+import { CreatePomodoro as addPomodoro } from "../../services/Guest/PomodoroService";
 const CreatePomodoro = ({ route, navigation }) => {
   const [projectList, setProjectList] = useState([]);
   const [workList, setWorkList] = useState([]);
   const [selectedProject, setSelectedProject] = useState({
-    id: route.params.work.projectId,
-    projectName: route.params.work.projectName,
+    id: route.params.work.projectId ? route.params.work.projectId : 0,
+    projectName: route.params.work.projectName
+      ? route.params.work.projectName
+      : "Task Default",
   });
   const [selectedWork, setSelectedWork] = useState(route.params.work);
   const [startTime, setStartTime] = useState(new Date().getTime());
   const [pomodoroTime, setPomodoroTime] = useState(
     route.params.work.timeOfPomodoro
   );
+  const [isProjectVisible, setProjectVisible] = useState(false);
+  const [isWorkVisible, setWorkVisible] = useState(false);
+  const [isStartTimeVisible, setStartTimeVisible] = useState(false);
+  const [isPomodoroVisible, setPomodoroVisible] = useState(false);
   const fetchData = async () => {
     const role = await getRole();
     let id;
@@ -47,8 +59,8 @@ const CreatePomodoro = ({ route, navigation }) => {
     }
   };
 
-  useEffect(() => {
-    fetchWork = async () => {
+  fetchWork = async () => {
+    if (selectedProject.id !== -1) {
       const role = await getRole();
       let id;
       if (role) {
@@ -56,16 +68,28 @@ const CreatePomodoro = ({ route, navigation }) => {
       } else {
         id = await AsyncStorage.getItem("id");
       }
-      let response;
-      if (selectedProject === "") {
-        response = await SearchByWorkName(id, "");
+      if (selectedProject.id === 0) {
+        const response = await GetWorkByProjectAndStatus("ACTIVE", id);
+        const response2 = await GetWorkByProjectAndStatus("COMPLETED", id);
+        if (response.success && response2.success) {
+          setWorkList({
+            active: response.data,
+            completed: response2.data,
+          });
+        }
       } else {
-        response = await GetDetailProject(selectedProject.id);
+        const response = await GetDetailProject(selectedProject.id);
+        if (response.success) {
+          setWorkList({
+            active: response.data.listWorkActive,
+            completed: response.data.listWorkCompleted,
+          });
+        }
       }
-      if (response.success) {
-        setWorkList(response.data);
-      }
-    };
+    }
+  };
+  useEffect(() => {
+    fetchWork();
   }, [selectedProject]);
   useEffect(() => {
     fetchData();
@@ -82,11 +106,76 @@ const CreatePomodoro = ({ route, navigation }) => {
   }
 
   const handleWork = () => {
-    setSelectedWork(null);
+    setSelectedWork({ id: -1, workName: "None" });
   };
   const handleProject = () => {
-    setSelectedProject(null);
-    setSelectedWork(null);
+    setSelectedProject({ id: -1, projectName: "None" });
+    setSelectedWork({ id: -1, workName: "None" });
+  };
+
+  const handleClickProject = () => {
+    setProjectVisible(!isProjectVisible);
+    setWorkVisible(false);
+    setStartTimeVisible(false);
+    setPomodoroVisible(false);
+  };
+  const handleClickWork = () => {
+    if (selectedProject.id !== -1) {
+      setProjectVisible(false);
+      setWorkVisible(!isWorkVisible);
+      setStartTimeVisible(false);
+      setPomodoroVisible(false);
+    }
+  };
+  const handleClickStartTime = () => {
+    setProjectVisible(false);
+    setWorkVisible(false);
+    setStartTimeVisible(!isStartTimeVisible);
+    setPomodoroVisible(false);
+  };
+  const handleClickPomodoro = () => {
+    setProjectVisible(false);
+    setWorkVisible(false);
+    setStartTimeVisible(false);
+    setPomodoroVisible(true);
+  };
+
+  const handleSelectTime = (time) => {
+    setStartTime(time);
+  };
+  const handleSelectPomodoro = (value) => {
+    setPomodoroTime(value);
+  };
+  const handleSelectProject = (value) => {
+    setProjectVisible(false);
+    setSelectedProject(value);
+  };
+
+  const handleSelectWork = (value) => {
+    setSelectedWork(value);
+    setWorkVisible(false);
+  };
+
+  const handleDone = async () => {
+    if (!(selectedProject.id !== -1 &&
+      selectedWork?.id === -1)) {
+      const role = await getRole();
+      let id;
+      if (role) {
+        id = role.id;
+      } else {
+        id = await AsyncStorage.getItem("id");
+      }
+      const wId = selectedWork.id ===-1 ? null : selectedWork.id
+      const endTime = startTime + pomodoroTime*60000;
+   const response = await addPomodoro(id, wId,null,pomodoroTime, startTime, endTime)
+   if(response.success) {
+    navigation.goBack()
+   }
+   else{
+    Alert.alert("Error when create new pomodoro", response.message)
+   }
+    }
   };
   return (
     <View>
@@ -97,17 +186,24 @@ const CreatePomodoro = ({ route, navigation }) => {
         <View>
           <Text style={styles.title}>Create New Pomodoro</Text>
         </View>
-        <TouchableOpacity>
-          <Text style={styles.title}>Done</Text>
+        <TouchableOpacity onPress={handleDone}>
+          <Text
+            style={[
+              styles.title,
+              selectedProject.id !== -1 &&
+                selectedWork?.id === -1 &&
+                styles.grayText,
+            ]}
+          >
+            Done
+          </Text>
         </TouchableOpacity>
       </View>
       <View style={styles.body}>
-        <TouchableOpacity style={styles.rowOption}>
+        <TouchableOpacity style={styles.rowOption} onPress={handleClickProject}>
           <Text style={{ fontSize: 16 }}>Project Name</Text>
           <TouchableOpacity style={styles.select} onPress={handleProject}>
-            <Text style={styles.name}>
-              {selectedProject ? selectedProject.projectName : "None"}
-            </Text>
+            <Text style={styles.name}>{selectedProject.projectName}</Text>
             {selectedProject ? (
               <AntDesign
                 style={{ paddingLeft: 10 }}
@@ -120,12 +216,17 @@ const CreatePomodoro = ({ route, navigation }) => {
             )}
           </TouchableOpacity>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.rowOption}>
-          <Text style={{ fontSize: 16 }}>Work Name</Text>
+        <TouchableOpacity style={styles.rowOption} onPress={handleClickWork}>
+          <Text
+            style={{
+              fontSize: 16,
+              color: selectedProject.id !== -1 ? "black" : "#888888",
+            }}
+          >
+            Work Name
+          </Text>
           <TouchableOpacity style={styles.select} onPress={handleWork}>
-            <Text style={styles.name}>
-              {selectedWork ? selectedWork.workName : "None"}
-            </Text>
+            <Text style={styles.name}>{selectedWork?.workName}</Text>
             {selectedWork ? (
               <AntDesign
                 style={{ paddingLeft: 10 }}
@@ -138,23 +239,55 @@ const CreatePomodoro = ({ route, navigation }) => {
             )}
           </TouchableOpacity>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.rowOption}>
+        <TouchableOpacity
+          style={styles.rowOption}
+          onPress={handleClickStartTime}
+        >
           <Text style={{ fontSize: 16 }}>Start Time</Text>
-          <TouchableOpacity style={styles.select}>
+          <View style={styles.select}>
             <Text style={styles.name}>
               {formatDateTime(new Date(startTime))}
             </Text>
             <MaterialIcons name="navigate-next" size={20} color="#888888" />
-          </TouchableOpacity>
+          </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.rowOption}>
+        <TouchableOpacity
+          style={styles.rowOption}
+          onPress={handleClickPomodoro}
+        >
           <Text style={{ fontSize: 16 }}>Pomodoro Time</Text>
-          <TouchableOpacity style={styles.select}>
+          <View style={styles.select}>
             <Text style={styles.name}>{pomodoroTime} Minute</Text>
             <MaterialIcons name="navigate-next" size={20} color="#888888" />
-          </TouchableOpacity>
+          </View>
         </TouchableOpacity>
       </View>
+      <ChooseWorkModal
+        visible={isWorkVisible}
+        selectedWork={selectedWork}
+        onSelect={handleSelectWork}
+        workList={workList}
+        onClose={() => setWorkVisible(false)}
+      />
+      <ChooseProjectModal
+        visible={isProjectVisible}
+        selectedProject={selectedProject}
+        onSelect={handleSelectProject}
+        projectList={projectList}
+        onClose={() => setProjectVisible(false)}
+      />
+      <DateTimePicker
+        onSelectTime={handleSelectTime}
+        visible={isStartTimeVisible}
+        onClose={() => setStartTimeVisible(false)}
+        defaultTime={new Date(startTime)}
+      />
+      <PomodoroPickerModal
+        visible={isPomodoroVisible}
+        selectedValue={pomodoroTime}
+        onClose={() => setPomodoroVisible(false)}
+        onSelect={handleSelectPomodoro}
+      />
     </View>
   );
 };
@@ -190,6 +323,9 @@ const styles = StyleSheet.create({
   select: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  grayText: {
+    color: "#888888",
   },
 });
 

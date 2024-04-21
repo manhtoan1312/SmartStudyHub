@@ -117,18 +117,20 @@ const DeletedThemeBody = () => {
     </Pressable>
   );
 
-  return (
-    themeList && (
-      <View style={{ marginHorizontal: 5, marginTop: 40 }}>
-        <FlatList
-          data={themeList}
-          numColumns={2}
-          keyExtractor={(theme) => theme?.id.toString()}
-          renderItem={renderItem}
-          ListFooterComponent={<View style={{ height: 150 }} />}
-        />
-      </View>
-    )
+  return themeList.length > 0 ? (
+    <View style={{ marginHorizontal: 5, marginTop: 40 }}>
+      <FlatList
+        data={themeList}
+        numColumns={2}
+        keyExtractor={(theme) => theme?.id.toString()}
+        renderItem={renderItem}
+        ListFooterComponent={<View style={{ height: 150 }} />}
+      />
+    </View>
+  ) : (
+    <View style={{height:"auto", flex:1, justifyContent:'center', alignItems:'center'}}>
+      <Text style={{fontSize:20, color:'#565656'}}>There're no Theme deleted</Text>
+    </View>
   );
 };
 

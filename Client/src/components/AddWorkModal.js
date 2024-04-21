@@ -50,6 +50,11 @@ const AddWorkModal = ({
   const [onDateChange, setOnDateChange] = useState(false);
   const navigation = useNavigation();
   const isFocused = useIsFocused();
+  
+  const defaultTime = new Date();
+  defaultTime.setHours(23);
+  defaultTime.setMinutes(59);
+
   useEffect(() => {
     const fetchDataOnFocus = async () => {
       if (isFocused) {
@@ -478,6 +483,7 @@ const AddWorkModal = ({
           visible={showPicker}
           onSelectTime={(value) => handleDateTimeConfirm(value)}
           onClose={hideDateTimePicker}
+          defaultTime={defaultTime}
         />
         {/* {showPicker && (
           <DateTimePicker

@@ -1,20 +1,44 @@
 import React from "react";
 import { useState } from "react";
-import { Text, TextInput, View, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import {
+  Text,
+  TextInput,
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from "react-native";
 import { AntDesign, Fontisto } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CreateTag } from "../../services/Guest/TagService";
 import ImageFocus from "../../components/Image_Focus";
+import getRole from "../../services/RoleService";
 
 const AddTag = ({ navigation }) => {
   const [color, setColor] = useState("#FF1493");
   const [name, setName] = useState("");
 
   const colorOptions = [
-    "#FF1493", "#00BFFF", "#32CD32", "#FFD700", "#8A2BE2",
-    "#FF4500", "#4682B4", "#00FF00", "#FF6347", "#1E90FF",
-    "#8B008B", "#2E8B57", "#DC143C", "#BA55D3", "#FF8C00",
-    "#20B2AA", "#9400D3", "#00FA9A", "#696969", "#808080",
+    "#FF1493",
+    "#00BFFF",
+    "#32CD32",
+    "#FFD700",
+    "#8A2BE2",
+    "#FF4500",
+    "#4682B4",
+    "#00FF00",
+    "#FF6347",
+    "#1E90FF",
+    "#8B008B",
+    "#2E8B57",
+    "#DC143C",
+    "#BA55D3",
+    "#FF8C00",
+    "#20B2AA",
+    "#9400D3",
+    "#00FA9A",
+    "#696969",
+    "#808080",
   ];
 
   const isSelected = (selectedColor) => {
@@ -22,18 +46,22 @@ const AddTag = ({ navigation }) => {
   };
 
   const handleDone = async () => {
-    if(name){
-        const id = await AsyncStorage.getItem('id')
-        const response = await CreateTag(id, name, color)
-        if(response.success){
-            navigation.goBack()
-        }
-        else{
-            Alert.alert('Error!', response.message)
-            
-        }
+    if (name) {
+      const role = await getRole();
+      let id;
+      if (role) {
+        id = role.id;
+      } else {
+        id = await AsyncStorage.getItem("id");
+      }
+      const response = await CreateTag(id, name, color);
+      if (response.success) {
+        navigation.goBack();
+      } else {
+        Alert.alert("Error!", response.message);
+      }
     }
-  }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -42,12 +70,16 @@ const AddTag = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.headerText}>Add Tag</Text>
         <TouchableOpacity>
-        <Text style={[styles.headerText, { color: name ? 'black' : 'gray' }]} onPress={() => handleDone()}>Done</Text>
-
+          <Text
+            style={[styles.headerText, { color: name ? "black" : "gray" }]}
+            onPress={() => handleDone()}
+          >
+            Done
+          </Text>
         </TouchableOpacity>
       </View>
       <View style={styles.content}>
-      <AntDesign name="tag" size={24} color={color} />
+        <AntDesign name="tag" size={24} color={color} />
         <TextInput
           style={styles.input}
           placeholder="Tag Name"
@@ -101,10 +133,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: 20,
     alignItems: "center",
-    backgroundColor:'white',
-    paddingVertical:20,
-    paddingStart:10
-    
+    backgroundColor: "white",
+    paddingVertical: 20,
+    paddingStart: 10,
   },
   colorPreview: {
     width: 40,
@@ -113,17 +144,17 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    borderBottomColor: 'gray',
+    borderBottomColor: "gray",
     padding: 10,
     borderRadius: 5,
     marginHorizontal: 10,
-    fontSize:16
+    fontSize: 16,
   },
   colorOptions: {
     flexDirection: "column",
-    backgroundColor:'white',
-    paddingHorizontal:15,
-    paddingVertical:20
+    backgroundColor: "white",
+    paddingHorizontal: 15,
+    paddingVertical: 20,
   },
   colorOptionRow: {
     flexDirection: "row",

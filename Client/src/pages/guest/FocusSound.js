@@ -73,6 +73,7 @@ const FocusSound = ({ navigation }) => {
     if (soundObject) {
       await soundObject.stopAsync();
     }
+  
     setSelectedSound(sound);
     setNoneSelected(false);
     const newSoundObject = new Audio.Sound();

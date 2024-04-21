@@ -13,12 +13,16 @@ import { MaterialIcons, AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { getAllThemeOfGuest } from "../services/Guest/getDataService";
-import { addTheme, getAllThemePREMIUM, markDeleteTheme } from "../services/PREMIUM/ThemeService";
+import {
+  addTheme,
+  getAllThemePREMIUM,
+  markDeleteTheme,
+} from "../services/PREMIUM/ThemeService";
 import getRole from "../services/RoleService";
 import { UploadAvt } from "../services/Guest/UploadFile";
 import ThemeItem from "./ThemeItem";
 
-const ThemeBody = ({navigation}) => {
+const ThemeBody = ({ navigation }) => {
   const [themeList, setThemeList] = useState([]);
   const [selectedTheme, setSelectedTheme] = useState(null);
   const screenWidth = Dimensions.get("window").width;
@@ -35,7 +39,7 @@ const ThemeBody = ({navigation}) => {
     } catch (error) {
       console.log("Error fetching theme from AsyncStorage:", error);
     }
-  
+
     try {
       const role = await getRole();
       if (role && role.role === "PREMIUM") {
@@ -70,41 +74,45 @@ const ThemeBody = ({navigation}) => {
       Alert.alert("Error", "Failed to fetch themes. Please try again later.");
     }
   };
-  
+
   useEffect(() => {
     fetchData();
   }, []);
-  
 
-  const handleSelectTheme = (theme) => {
+  const handleSelectTheme = async (theme) => {
+    if (theme.statusTheme === "PREMIUM") {
+      const role = await getRole();
+      if (role && role?.role === "PREMIUM") {
+        setSelectedTheme(theme);
+      } else {
+        navigation.navigate("PREMIUM");
+      }
+    }
     setSelectedTheme(theme);
   };
   const handleDeleteTheme = (theme) => {
-    if(theme.statusTheme!=="PREMIUM" && theme?.id !== selectedTheme?.id) {
-        Alert.alert(
-            "Confirm Action",
-            "Do you want to change this theme?",
-            [
-                { text: "Cancel", style: "cancel" },
-                { text: "Update", onPress: () => confirmUpdate(theme) },
-              { text: "Delete", onPress: () => confirmDelete(theme) },
-            ],
-            { cancelable: false }
-          );
+    if (theme.statusTheme !== "PREMIUM" && theme?.id !== selectedTheme?.id) {
+      Alert.alert(
+        "Confirm Action",
+        "Do you want to change this theme?",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Update", onPress: () => confirmUpdate(theme) },
+          { text: "Delete", onPress: () => confirmDelete(theme) },
+        ],
+        { cancelable: false }
+      );
     }
-  }
-  const confirmUpdate = async() => {
-
-  } 
+  };
+  const confirmUpdate = async () => {};
   const confirmDelete = async (theme) => {
-    const response = await markDeleteTheme(theme?.id)
-    if(response.success) {
-        fetchData()
+    const response = await markDeleteTheme(theme?.id);
+    if (response.success) {
+      fetchData();
+    } else {
+      Alert.alert("Error", response.message);
     }
-    else{
-        Alert.alert('Error', response.message)
-    }
-  }
+  };
 
   const handleSaveThemeToStorage = async () => {
     try {
@@ -125,7 +133,7 @@ const ThemeBody = ({navigation}) => {
   const handleAddTheme = async () => {
     try {
       const role = await getRole();
-      console.log(role.token)
+      console.log(role.token);
       if (role) {
         if (role.role === "PREMIUM") {
           const { status } =
@@ -154,10 +162,9 @@ const ThemeBody = ({navigation}) => {
                     const response = await UploadAvt(file, "THEME");
                     if (response.success) {
                       const res = await addTheme(text, response.data);
-                      if(res.success){
+                      if (res.success) {
                         fetchData();
-                      }
-                      else{
+                      } else {
                         Alert.alert("Error!", res.message);
                       }
                     } else {

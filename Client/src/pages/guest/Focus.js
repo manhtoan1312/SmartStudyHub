@@ -124,7 +124,6 @@ const Focus = () => {
       parseInt(sTime),
       endTime
     );
-    console.log(response);
     if (!response.success) {
       Alert.alert("Error!!", response.message);
     } else {

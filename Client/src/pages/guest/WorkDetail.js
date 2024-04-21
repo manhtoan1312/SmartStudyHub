@@ -59,7 +59,9 @@ const WorkDetail = ({ route, navigation }) => {
   const [dateTimePickerVisible, setDateTimePickerVisible] = useState(false);
   const [extraWorkName, setExtraWorkName] = useState("");
   const [note, setNote] = useState(work?.note || "");
-
+  const defaultTime = new Date();
+  defaultTime.setHours(23);
+  defaultTime.setMinutes(59);
   useEffect(() => {
     fetchData();
 
@@ -549,6 +551,7 @@ const WorkDetail = ({ route, navigation }) => {
           visible={dateTimePickerVisible}
           onSelectTime={handleDateTimePicked}
           onClose={hideDateTimePicker}
+          defaultTime={defaultTime}
         />
 
         <Modal
