@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   },
   minuteText: {
     fontSize: 18,
-    marginLeft: 20, // Adjust margin as needed
+    marginLeft: 20, 
   },
   doneButton: {
   },

@@ -36,7 +36,6 @@ export default function Setting({ navigation }) {
   const [ratings, setRatings] = useState(true);
   const [email, setEmail] = useState("");
   const [img, setImg] = useState(null);
-  const [tfa, setTfa] = useState(false);
   const [name, setName] = useState("");
   const isFocused = useIsFocused();
   const [isPomodoroTimePickerVisible, setIsPomodoroTimePickerVisible] =
@@ -74,10 +73,6 @@ export default function Setting({ navigation }) {
         setBreakSound(parse?.nameSound);
       }
       const storedSettings = await AsyncStorage.getItem("settings");
-      const storage2FA = await AsyncStorage.getItem("2FA");
-      if (storage2FA && storage2FA == "true") {
-        setTfa(true);
-      }
       if (storedSettings) {
         const parsedSettings = JSON.parse(storedSettings);
         setPreTime(parsedSettings.preTime);
@@ -319,13 +314,7 @@ export default function Setting({ navigation }) {
       Alert.alert("Smart Study Hub Announcement", "Delete data successfully");
     }
     await ClearData();
-    await AsyncStorage.removeItem('id')
     navigation.navigate("Home");
-  };
-
-  const Change2Fa = async () => {
-    await AsyncStorage.setItem("2FA", String(!tfa));
-    setTfa(!tfa);
   };
 
   const handleHeader = () => {
@@ -367,7 +356,7 @@ export default function Setting({ navigation }) {
                         Sign In | Sign Up
                       </Text>
                       <View style={s`mt-1`}>
-                        <Text>Sync all devices</Text>
+                        <Text>Store your own data</Text>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -603,20 +592,10 @@ export default function Setting({ navigation }) {
           <Text style={s`text-lg font-medium`}>Application information</Text>
           <AntDesign style={s`text-lg`} name="right" />
         </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <Text style={s`text-lg font-medium`}>Two-Factor Authentication</Text>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={tfa}
-            onValueChange={() => Change2Fa()}
-          />
-        </View>
-        <View style={s`flex flex-row justify-between py-2`}>
+        {/* <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Ratings App</Text>
           <AntDesign style={s`text-lg`} name="right" />
-        </View>
+        </View> */}
       </View>
 
       {!email && (

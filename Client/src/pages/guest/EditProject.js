@@ -13,11 +13,12 @@ import {
   DeleteProject,
   GetDetailProject,
   MarkCompleteProject,
+  RecoverProject,
   UpdateProject,
 } from "../../services/Guest/ProjectService";
 
 const EditProjectPage = ({ route, navigation }) => {
-  const  projectId  = route.params.id;
+  const projectId = route.params.id;
   const [color, setColor] = useState(null);
   const [name, setName] = useState(null);
   const [project, setProject] = useState(null);
@@ -48,6 +49,7 @@ const EditProjectPage = ({ route, navigation }) => {
     const fetchData = async () => {
       const response = await GetDetailProject(projectId);
       if (response.success) {
+        console.log(response.data);
         setProject(response.data);
         setName(response.data.projectName);
         setColor(response.data.colorCode);
@@ -58,6 +60,17 @@ const EditProjectPage = ({ route, navigation }) => {
   const isSelected = (selectedColor) => {
     return color === selectedColor;
   };
+
+  const recoverProject = async () => {
+    if (name) {
+      const response = await RecoverProject(project.id);
+      if (response.success) {
+        navigation.navigate("Home");
+      } else {
+        Alert.alert("Error!", response.message);
+      }
+    }
+  }
 
   const handleDone = async () => {
     if (name) {
@@ -73,15 +86,29 @@ const EditProjectPage = ({ route, navigation }) => {
   const handleDelete = async () => {
     Alert.alert(
       "Confirm action",
-      "All data related to this item will be deleted, are you sure you want to delete it?",[
+      "All data related to this item will be deleted, are you sure you want to delete it?",
+      [
         {
-          text: 'Cancel',
-          style: 'cancel',
+          text: "Cancel",
+          style: "cancel",
         },
-        {text: 'OK', onPress: () => confirmDeleteProject()},
+        { text: "OK", onPress: () => confirmDeleteProject() },
       ]
     );
-    
+  };
+
+  const handleRecover = async () => {
+    Alert.alert(
+      "Confirm action",
+      "Do you want to recover this project?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        { text: "OK", onPress: () => recoverProject() },
+      ]
+    );
   };
   const confirmDeleteProject = async () => {
     const response = await DeleteProject(projectId);
@@ -90,7 +117,7 @@ const EditProjectPage = ({ route, navigation }) => {
     } else {
       Alert.alert("Error!", response.message);
     }
-  }
+  };
 
   const handleUpdate = async () => {
     console.log(project.id, name, color, null, project.status);
@@ -129,7 +156,10 @@ const EditProjectPage = ({ route, navigation }) => {
       <View style={styles.content}>
         <View style={[styles.colorPreview, { backgroundColor: color }]}></View>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            project?.status === "COMPLETED" && name && styles.completedProject,
+          ]}
           placeholder="Project Name"
           value={name}
           onChangeText={(e) => setName(e)}
@@ -156,13 +186,28 @@ const EditProjectPage = ({ route, navigation }) => {
           </View>
         ))}
       </View>
+      {project?.status === "ACTIVE" ? (
+        <View style={styles.actionsContainer}>
+          <TouchableOpacity style={styles.doneButton} onPress={handleDone}>
+            <Text style={[styles.buttonText, styles.doneButtonText]}>
+              Complete
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View style={styles.actionsContainer}>
+          <TouchableOpacity style={styles.doneButton} onPress={handleRecover}>
+            <Text style={[styles.buttonText, styles.recoverButtonText]}>
+              Recover
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
       <View style={styles.actionsContainer}>
-        <TouchableOpacity style={styles.doneButton} onPress={handleDone}>
-          <Text style={[styles.buttonText, styles.doneButtonText]}>Complete</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.actionsContainer}>
-        <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete()}>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => handleDelete()}
+        >
           <Text style={[styles.buttonText, styles.deleteButtonText]}>
             Delete
           </Text>
@@ -187,7 +232,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontSize: 18,
-    fontWeight:'500'
+    fontWeight: "500",
   },
   content: {
     flexDirection: "row",
@@ -257,13 +302,18 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     color: "white",
-    fontWeight:600
+    fontWeight: 600,
   },
   doneButtonText: {
     color: "#4EE508",
+  },recoverButtonText: {
+    color: "#60A9E5",
   },
   deleteButtonText: {
     color: "red",
+  },
+  completedProject: {
+    textDecorationLine: "line-through",
   },
 });
 

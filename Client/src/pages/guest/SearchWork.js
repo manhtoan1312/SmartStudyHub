@@ -51,7 +51,6 @@ const SearchWork = ({ navigation }) => {
     const response = await SearchByWorkName(id, text);
     if (response.success) {
       setWork(response.data);
-      console.log(response.data.length);
     } else {
       Alert.alert(
         "An error happened when searching for work",
@@ -115,9 +114,9 @@ const SearchWork = ({ navigation }) => {
             placeholder="Search..."
             value={searchText}
             onChangeText={(text) => handleTyping(text)}
-            onSubmitEditing={() => handleSearch()}
-            returnKeyType="search"
-            returnKeyLabel="Search"
+            // onSubmitEditing={() => handleSearch(searchText)}
+            // returnKeyType="search"
+            // returnKeyLabel="Search"
           />
           {searchText !== "" && (
             <TouchableOpacity

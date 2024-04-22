@@ -10,7 +10,6 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 
 const SoundDeletedItem = ({ sound,onRecover, onDelete }) => {
-
   const handleLongPress = () => {
     onDelete(sound);
   };

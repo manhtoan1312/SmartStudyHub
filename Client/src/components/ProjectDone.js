@@ -3,7 +3,7 @@ import {
   DeleteProject,
   RecoverProject,
 } from "../services/Guest/ProjectService";
-import { MaterialIcons,Feather } from "@expo/vector-icons";
+import { MaterialIcons, Feather } from "@expo/vector-icons";
 import WorkActive from "./WorkActive";
 import WorkCompleted from "./WorkCompleted";
 import WorkDeleted from "./WorkDeleted";
@@ -14,7 +14,6 @@ const ProjectDone = ({ projectItem, reload, navigation }) => {
       reload();
     }
   }
-
   const handleChange = async () => {
     const response = await RecoverProject(projectItem.id);
     if (response.success) {
@@ -25,7 +24,7 @@ const ProjectDone = ({ projectItem, reload, navigation }) => {
   };
 
   const toDetail = () => {
-    navigation.navigate("ProjectDetail", { id: projectItem.id });
+    navigation.navigate("EditProject", { id: projectItem.id });
   };
 
   return (
@@ -57,7 +56,9 @@ const ProjectDone = ({ projectItem, reload, navigation }) => {
 
         {/* Status Buttons */}
         <View style={styles.statusButtonsContainer}>
-        <Feather name="refresh-ccw" size={24} color="gray" />
+          <TouchableOpacity onPress={handleChange}>
+            <Feather name="refresh-ccw" size={24} color="gray" />
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => confirmDeleteProject(projectItem.id)}
           >
@@ -71,7 +72,7 @@ const ProjectDone = ({ projectItem, reload, navigation }) => {
             workItem={item}
             reload={reload}
             navigation={navigation}
-            key={item.id} // Use a unique identifier here, such as item.id
+            key={item.id}
           />
         ))}
         {projectItem.listWorkCompleted?.map((item) => (

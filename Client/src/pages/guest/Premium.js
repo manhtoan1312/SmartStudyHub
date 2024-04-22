@@ -26,18 +26,6 @@ function PREMIUM({ navigation }) {
         </Text>
       </View>
       <View style={s`flex flex-col bg-white px-3`}>
-        <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`}>
-            <MaterialCommunityIcons
-              name="sync"
-              size={24}
-              color="#00BFFF" // Thay đổi màu cho icon sync
-            />
-            <Text style={s`h-full flex items-center pl-2`}>
-              Sync data across all devices.
-            </Text>
-          </View>
-        </View>
 
         <View style={s`flex flex-row justify-between py-2 mt-2`}>
           <View style={s`flex flex-row`}>
@@ -156,15 +144,6 @@ function PREMIUM({ navigation }) {
             />
             <Text style={s`h-full flex items-center pl-2`}>
               Add and edit Pomodoro records manually.
-            </Text>
-          </View>
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`}>
-            <MaterialCommunityIcons name="sync" size={24} color="#778899" />
-            <Text style={s`h-full flex items-center pl-2`}>
-              Sync data across all devices.
             </Text>
           </View>
         </View>

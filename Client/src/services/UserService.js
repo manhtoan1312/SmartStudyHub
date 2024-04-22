@@ -148,13 +148,13 @@ const updateInformation = async (
   dateOfBirth,
   country,
   imageUrl,
+  isTwoFactor
 ) => {
   try {
     const role = await getRole();
-
+    
     if (role) {
       const { token } = role;
-
       const response = await fetch(`${uri}/update-info`, {
         method: "put",
         headers: {
@@ -168,7 +168,8 @@ const updateInformation = async (
           address,
           dateOfBirth,
           country,
-          imageUrl, 
+          imageUrl,
+          isTwoFactor,
         }),
       });
 
@@ -375,26 +376,22 @@ const deleteCompletelyAvt = async (id) => {
   }
 };
 
-
 const deleteAvtUploaded = async (publicId) => {
   try {
     const role = await getRole();
 
     if (role) {
       const { token } = role;
-      const response = await fetch(
-        `${uri}/files/delete`,
-        {
-          method: "post",
-          headers: {
-            "Content-Type": "application/json",
-            authorization: `Bearer ${token}`,
-          },
-          body:JSON.stringify({
-            publicId
-          })
-        }
-      );
+      const response = await fetch(`${uri}/files/delete`, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          publicId,
+        }),
+      });
 
       if (response.status === 200) {
         const data = await response.json();
@@ -412,7 +409,6 @@ const deleteAvtUploaded = async (publicId) => {
   }
 };
 
-
 export {
   SendOTPChangePassword,
   changePassword,
@@ -425,5 +421,5 @@ export {
   deleteCurrentAvatar,
   getAvtUploaded,
   deleteCompletelyAvt,
-  deleteAvtUploaded
+  deleteAvtUploaded,
 };

@@ -24,40 +24,49 @@ import SoundItem from "../../components/SoundItem";
 import { Audio } from "expo-av";
 import * as DocumentPicker from "expo-document-picker";
 import SoundDeletedItem from "../../components/SoundDeletedItem";
+import ClearData from "../../services/ClearData";
 const SoundDone = ({ navigation }) => {
   const [selectedMode, setSelectedMode] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [soundList, setSoundList] = useState([]);
   const [deletedSoundList, setDeletedSoundList] = useState([]);
+  const [selectedSound, setSelectedSound] = useState({});
   const [soundObject, setSoundObject] = useState(null);
   const [noneSelected, setNoneSelected] = useState(false);
-  const [selectedSound, setSelectedSound] = useState({
-    nameSound: "Default Bell",
-    url: "https://res.cloudinary.com/dnj5purhu/video/upload/v1702956713/SmartStudyHub/SOUNDDONE/DEFAULT/DefaultBell_vh2hg0.mp3",
-  });
+  const [checkRole, setCheckRole] = useState(false);
+
   const fetchData = async () => {
     const sound = await AsyncStorage.getItem("soundDone");
     if (sound) {
       setSelectedSound(JSON.parse(sound));
-    }
-    else {
+    } else {
       setNoneSelected(true);
     }
     let response;
-    const role = getRole();
-    if (role?.role === "PREMIUM") {
+    const role = await getRole();
+    if (role && role.role === "PREMIUM") {
+      setCheckRole(true);
       response = await getAllSoundDonePREMIUM();
     } else {
       response = await getAllSoundDoneOfGuest();
     }
+
     if (response.success) {
       setSoundList(response.data);
+    }
+    else{
+      Alert.alert('Error!', response.message)
+      // if(response.message==='Wrong token'){
+      //   await ClearData()
+      //   navigation.navigate('Login')
+      // }
+
     }
   };
 
   const fetchDataDeleted = async () => {
     const role = await getRole();
-    if (role?.role === "PREMIUM") {
+    if (role && role.role === "PREMIUM") {
       const response = await getAllSoundDoneDelete();
       if (response.success) {
         setDeletedSoundList(response.data);
@@ -67,25 +76,41 @@ const SoundDone = ({ navigation }) => {
 
   useEffect(() => {
     fetchData();
-    fetchDataDeleted()
+    fetchDataDeleted();
   }, []);
+
+  const handleModeChange = (mode) => {
+    setSelectedMode(mode);
+    setModalVisible(false);
+  };
 
   const handleSelectSound = async (sound) => {
     if (soundObject) {
       await soundObject.stopAsync();
     }
+
     setSelectedSound(sound);
+    setNoneSelected(false);
     const newSoundObject = new Audio.Sound();
     try {
       await newSoundObject.loadAsync({ uri: sound.url });
       await newSoundObject.playAsync();
       setSoundObject(newSoundObject);
-
       await AsyncStorage.setItem("soundDone", JSON.stringify(sound));
     } catch (error) {
       console.error("Error playing sound:", error);
     }
   };
+
+  const handleNone = async () => {
+    if (soundObject) {
+      await soundObject.stopAsync();
+    }
+    setSelectedSound({});
+    setNoneSelected(true);
+    await AsyncStorage.removeItem("soundDone");
+  };
+
   const handleDeleteSound = (sound) => {
     if (sound.statusSound !== "DEFAULT") {
       Alert.alert(
@@ -100,93 +125,57 @@ const SoundDone = ({ navigation }) => {
     }
   };
 
-  const handleBack = async ()=> {
-    if (soundObject) {
-      await soundObject.stopAsync();
-    }
-    navigation.goBack()
-  }
-
   const confirmDelete = async (sound) => {
     const response = await markDeleteSoundDone(sound.id);
-    if(response.success){
-      fetchData()
-      fetchDataDeleted()
-    }
-    else{
-      Alert.alert('Error!!', response.message)
+    if (response.success) {
+      fetchData();
+      fetchDataDeleted();
+    } else {
+      Alert.alert("Error!!", response.message);
     }
   };
+
   const handleAddSound = async () => {
     try {
       const file = await DocumentPicker.getDocumentAsync({
         type: "audio/*",
       });
 
-      if (file.type === "success") {
-        if (
-          file.name.endsWith(".mp3") ||
-          file.name.endsWith(".wav") ||
-          file.name.endsWith(".ogg")
-        ) {
-          const { sound: soundObject } = await Audio.Sound.createAsync({
-            uri: file.uri,
-          });
-          await soundObject.playAsync();
-        } else {
-          Alert.alert(
-            "Error",
-            "Please select an audio file (mp3, wav, or ogg)."
-          );
-        }
+      if (!file.canceled) {
+        const response = await UploadAvt(file.assets[0].uri, 'SOUNDCONCENTRATION');
+        console.log(response);
+        addSoundStep2(file.assets[0].uri);
       }
     } catch (error) {
       console.error("Error picking sound:", error);
       Alert.alert("Error", "Failed to pick sound.");
     }
   };
-  const handleRecoverSound = (sound) => {
-    Alert.alert(
-      "Confirm Action",
-      "Do you want to recover this sound?",
-      [
-        { text: "No", style: "cancel" },
-        { text: "Yes", onPress: () => confirmRecover(sound) },
-      ],
-      { cancelable: false }
-    );
-  }
-  const handleDeleteCompletelySound = (sound) => {
-    Alert.alert(
-      "Confirm Action",
-      "Do you want to delete this sound forever?",
-      [
-        { text: "No", style: "cancel" },
-        { text: "Yes", onPress: () => confirmDeleteCompletely(sound) },
-      ],
-      { cancelable: false }
-    );
-  }
 
-  const confirmDeleteCompletely = async (sound) => {
-    const response = await deleteSoundDone(sound.id)
-    if(response.success) {
-      fetchDataDeleted()
+  const addSoundStep2 = async (uri) => {
+    Alert.prompt(
+      "Enter Sound Name",
+      null,
+      async (text) => {
+        if (text.trim().length > 0) {
+        } else {
+          // Hiển thị cảnh báo nếu người dùng không nhập tên âm thanh
+          Alert.alert("Error", "Please enter a valid name for the sound!");
+        }
+      },
+      "plain-text"
+    );
+  };
+
+  const handleBack = async () => {
+    if (soundObject) {
+      await soundObject.stopAsync();
     }
-    else{
-      Alert.alert("Error!!", response.message)
-    }
-  }
-  const confirmRecover = async (sound) => {
-    const response = await recoverSoundDone(sound.id)
-    if(response.success) {
-      fetchData()
-      fetchDataDeleted()
-    }
-    else{
-      Alert.alert("Error!!", response.message)
-    }
-  }
+    navigation.goBack();
+  };
+
+  // Các hàm khác đã được định nghĩa trước đó
+
   return (
     <View style={{ backgroundColor: "#eeeeee" }}>
       {/* Header */}
@@ -194,9 +183,9 @@ const SoundDone = ({ navigation }) => {
         <TouchableOpacity onPress={() => handleBack()}>
           <MaterialIcons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Break Sound</Text>
-        <TouchableOpacity>
-          <MaterialIcons name="more-vert" size={24} color="white" />
+        <Text style={styles.headerText}>Working Sound</Text>
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
+          <MaterialIcons name="more-vert" size={24} color={checkRole ? 'black' : "white"} />
         </TouchableOpacity>
       </View>
 
@@ -215,6 +204,16 @@ const SoundDone = ({ navigation }) => {
           >
             <Text style={styles.bodyText}>+ Add Sound</Text>
           </TouchableOpacity>
+          {/* Hiển thị mục "None" */}
+          <TouchableOpacity
+            onPress={() => handleNone()}
+            style={[styles.addItem, noneSelected && styles.selectedItem]}
+          >
+            <Text style={[styles.bodyText]}>None</Text>
+            {noneSelected && (
+              <MaterialIcons name="check" size={24} color="orange" />
+            )}
+          </TouchableOpacity>
           <FlatList
             data={soundList}
             renderItem={({ item }) => (
@@ -226,7 +225,7 @@ const SoundDone = ({ navigation }) => {
               />
             )}
           />
-        </View> : <FlatList
+        </View> : (deletedSoundList.length !== 0 ? <FlatList
             data={deletedSoundList}
             renderItem={({ item }) => (
               <SoundDeletedItem
@@ -235,7 +234,9 @@ const SoundDone = ({ navigation }) => {
                 onDelete={handleDeleteCompletelySound}
               />
             )}
-          />}
+          /> : <View style={{height:"100%", justifyContent:'center', alignItems:'center'}}>
+          <Text style={{fontSize:20,paddingBottom:100, color:'#565656'}}>There're no Sound deleted</Text>
+        </View>)}
       </View>
       <Modal
         animationType="slide"
@@ -245,25 +246,22 @@ const SoundDone = ({ navigation }) => {
           setModalVisible(false);
         }}
       >
-        {/* Modal content */}
         <TouchableOpacity
           style={styles.modalContainer}
           onPress={() => setModalVisible(false)}
         >
           <View style={styles.modalView}>
-            {/* Option Current */}
             <TouchableOpacity
               style={[styles.modeItem, selectedMode === 0 && styles.selected]}
               onPress={() => handleModeChange(0)}
             >
-              <Text>Current</Text>
+              <Text>Current Sounds</Text>
             </TouchableOpacity>
-            {/* Option Deleted */}
             <TouchableOpacity
               style={[styles.modeItem, selectedMode === 1 && styles.selected]}
               onPress={() => handleModeChange(1)}
             >
-              <Text>Deleted</Text>
+              <Text>Deleted Sounds</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
@@ -301,16 +299,20 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-start",
+    alignItems: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0)",
   },
   modalView: {
     backgroundColor: "white",
     borderRadius: 10,
-    padding: 20,
+    padding: 10,
     alignItems: "center",
     elevation: 5,
+    marginHorizontal: 10,
+    top: 120,
+    borderColor:"#f7c068",
+    borderWidth:1
   },
   modeItem: {
     marginVertical: 10,

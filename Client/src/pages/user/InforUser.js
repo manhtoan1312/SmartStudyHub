@@ -10,6 +10,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
+  Switch,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import getRole from "../../services/RoleService";
@@ -71,7 +72,6 @@ const InforUser = ({ navigation }) => {
   };
 
   const updateInfor = async () => {
-    const avt = await AsyncStorage.getItem("img");
     const response = await updateInformation(
       infor.phoneNumber ? infor.phoneNumber : null,
       infor.firstName,
@@ -79,9 +79,8 @@ const InforUser = ({ navigation }) => {
       infor.address ? infor.address : null,
       infor.dateOfBirth ? infor.dateOfBirth : null,
       infor.country ? infor.country : null,
-      avt
-        ? avt
-        : '"https://res.cloudinary.com/dnj5purhu/image/upload/v1701175788/SmartStudyHub/USER/default-avatar_c2ruot.png"'
+      infor.imageUrl,
+      infor?.isTwoFactor ? infor?.isTwoFactor : false
     );
     if (!response.success) {
       Alert.alert("Change User Information fail", response.message);
@@ -255,6 +254,10 @@ const InforUser = ({ navigation }) => {
     });
   };
 
+  const handle2FAChange = (value) => {
+    setInfor({ ...infor, isTwoFactor: value });
+  };
+
   return (
     <View>
       {infor && (
@@ -302,11 +305,7 @@ const InforUser = ({ navigation }) => {
                         borderRadius: 20,
                         marginRight: 10,
                       }}
-                      source={
-                        infor?.imageUrl
-                          ? { uri: infor?.imageUrl }
-                          : require("../../images/avt.jpg")
-                      }
+                      source={{uri: infor?.imageUrl}}
                     />
                     <MaterialIcons
                       name="navigate-next"
@@ -388,6 +387,17 @@ const InforUser = ({ navigation }) => {
                 >
                   <Text style={styles.infoLabel}>Change Password</Text>
                   <MaterialIcons name="navigate-next" size={24} color="black" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.infoItem} onPress={() => {}}>
+                  <Text style={styles.infoLabel}>
+                    Two-Factor Authentication
+                  </Text>
+                  <Switch
+                    trackColor={{ false: "gray", true: "red" }}
+                    thumbColor={"white"}
+                    value={infor?.isTwoFactor ? infor?.isTwoFactor : false}
+                    onValueChange={handle2FAChange}
+                  />
                 </TouchableOpacity>
               </View>
             </View>

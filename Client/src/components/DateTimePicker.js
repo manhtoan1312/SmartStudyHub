@@ -6,7 +6,7 @@ import DatePickerModal from "react-native-modal-datetime-picker";
 const DateTimePicker = ({ visible, onSelectTime, onClose, defaultTime }) => {
   const [selectedDate, setSelectedDate] = useState(getToday);
 
-  const [selectedTime, setSelectedTime] = useState(defaultTime);
+  const [selectedTime, setSelectedTime] = useState(new Date(defaultTime));
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
 
   const handleDayPress = (day) => {

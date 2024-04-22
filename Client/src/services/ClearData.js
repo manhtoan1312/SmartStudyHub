@@ -11,6 +11,7 @@ const ClearData = async () => {
     await AsyncStorage.removeItem("initialPomodoroTime");
     await AsyncStorage.removeItem("token");
     await AsyncStorage.removeItem("accountName");    
+    await AsyncStorage.removeItem('img')
     console.log("AsyncStorage items cleared successfully");
   } catch (error) {
     console.error("Error clearing AsyncStorage items:", error.message);

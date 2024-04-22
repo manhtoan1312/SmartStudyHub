@@ -17,6 +17,7 @@ import {
   addTheme,
   getAllThemePREMIUM,
   markDeleteTheme,
+  updateTheme,
 } from "../services/PREMIUM/ThemeService";
 import getRole from "../services/RoleService";
 import { UploadAvt } from "../services/Guest/UploadFile";
@@ -91,7 +92,7 @@ const ThemeBody = ({ navigation }) => {
     setSelectedTheme(theme);
   };
   const handleDeleteTheme = (theme) => {
-    if (theme.statusTheme !== "PREMIUM" && theme?.id !== selectedTheme?.id) {
+    if (theme.statusTheme !== "PREMIUM") {
       Alert.alert(
         "Confirm Action",
         "Do you want to change this theme?",
@@ -104,10 +105,40 @@ const ThemeBody = ({ navigation }) => {
       );
     }
   };
-  const confirmUpdate = async () => {};
+  const confirmUpdate = (theme) => {
+    Alert.prompt(
+      "Update Theme Name",
+      null, // Đặt phần mô tả là null
+      async (text) => {
+        if (text !== null && text.trim().length > 0) {
+          confirmUpdateTheme(theme, text)
+        }
+      },
+      "plain-text", 
+      theme.nameTheme, 
+      "default" 
+    );
+  };
+  
+  const confirmUpdateTheme = async (theme, text) => {
+    const response = await updateTheme(theme.id, text, theme.url)
+    if(response.success) {
+      if(theme.id === selectedTheme.id) {
+        await AsyncStorage.setItem('theme', JSON.stringify(response.data))
+      }
+      fetchData()
+    }
+    else{
+      Alert.alert('Error when updating theme!!', response.message)
+    }
+  }
+
   const confirmDelete = async (theme) => {
     const response = await markDeleteTheme(theme?.id);
     if (response.success) {
+      if (theme?.id === selectedTheme.id) {
+        await AsyncStorage.setItem("theme", JSON.stringify(themeList[1]));
+      }
       fetchData();
     } else {
       Alert.alert("Error", response.message);
@@ -133,7 +164,6 @@ const ThemeBody = ({ navigation }) => {
   const handleAddTheme = async () => {
     try {
       const role = await getRole();
-      console.log(role.token);
       if (role) {
         if (role.role === "PREMIUM") {
           const { status } =

@@ -105,7 +105,7 @@ function Login({ navigation }) {
         } else if (response.status === "2_3_f") {
           Alert.alert(
             "Account was banned",
-            "Do you want to reportt this problem?",
+            "Do you want to report this problem?",
             [
               {
                 text: "No",

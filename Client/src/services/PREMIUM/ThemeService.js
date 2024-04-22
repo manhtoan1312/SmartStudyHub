@@ -92,7 +92,7 @@ const addTheme = async (nameTheme, url) => {
 
       if (response.status === 200) {
         const data = await response.json();
-        return { success: true, message: data.meta.message };
+        return { success: true,  data: data.data };
       } else {
         const data = await response.json();
         return { success: false, message: data.meta.message };
@@ -131,7 +131,7 @@ const updateTheme = async (id, nameTheme, url) => {
   
         if (response.status === 200) {
           const data = await response.json();
-          return { success: true, message: data.meta.message };
+          return { success: true, data: data.data };
         } else {
           const data = await response.json();
           return { success: false, message: data.meta.message };
@@ -199,7 +199,7 @@ const updateTheme = async (id, nameTheme, url) => {
   
         if (response.status === 200) {
           const data = await response.json();
-          return { success: true, message: data.meta.message };
+          return { success: true,  data: data.data };
         } else {
           const data = await response.json();
           return { success: false, message: data.meta.message };
@@ -233,7 +233,7 @@ const updateTheme = async (id, nameTheme, url) => {
   
         if (response.status === 200) {
           const data = await response.json();
-          return { success: true, message: data.meta.message };
+          return { success: true,  data: data.data };
         } else {
           const data = await response.json();
           return { success: false, message: data.meta.message };
