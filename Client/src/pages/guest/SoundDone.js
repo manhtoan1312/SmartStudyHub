@@ -137,14 +137,22 @@ const SoundDone = ({ navigation }) => {
 
   const handleAddSound = async () => {
     try {
-      const file = await DocumentPicker.getDocumentAsync({
+      const result = await DocumentPicker.getDocumentAsync({
         type: "audio/*",
       });
 
-      if (!file.canceled) {
-        const response = await UploadAvt(file.assets[0].uri, 'SOUNDCONCENTRATION');
-        console.log(response);
-        addSoundStep2(file.assets[0].uri);
+      if (!result.canceled) {
+        const file = {
+          uri: result.assets[0].uri,
+          name: result.assets[0].fileName || "audio.m4a",
+          type: "audio/mp3",
+        };
+        const response = await UploadAvt(file, "SOUNDCONCENTRATION");
+        const { sound: soundObject } = await Audio.Sound.createAsync({
+          uri: result.assets[0].uri,
+        });
+        await soundObject.playAsync();
+        addSoundStep2(response.data );
       }
     } catch (error) {
       console.error("Error picking sound:", error);
@@ -158,9 +166,15 @@ const SoundDone = ({ navigation }) => {
       null,
       async (text) => {
         if (text.trim().length > 0) {
+          const response = await addSound(text, uri);
+          if(response.success) {
+            fetchData()
+          }
+          else{
+            Alert.alert('Error!', response.message)
+          }
         } else {
-          // Hiển thị cảnh báo nếu người dùng không nhập tên âm thanh
-          Alert.alert("Error", "Please enter a valid name for the sound!");
+           Alert.alert("Error", "Please enter a valid name for the sound!");
         }
       },
       "plain-text"

@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Alert,
   FlatList,
-  Modal
+  Modal,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -34,7 +34,7 @@ const FocusSound = ({ navigation }) => {
   const [selectedSound, setSelectedSound] = useState({});
   const [soundObject, setSoundObject] = useState(null);
   const [noneSelected, setNoneSelected] = useState(false);
-  const [checkRole, setCheckRole] = useState(false)
+  const [checkRole, setCheckRole] = useState(false);
   const fetchData = async () => {
     const sound = await AsyncStorage.getItem("focusSound");
     if (sound) {
@@ -45,7 +45,7 @@ const FocusSound = ({ navigation }) => {
     let response;
     const role = await getRole();
     if (role && role.role === "PREMIUM") {
-      setCheckRole(true)
+      setCheckRole(true);
       response = await getAllSoundPREMIUM();
     } else {
       response = await getAllSoundConcentrationOfGuest();
@@ -67,7 +67,7 @@ const FocusSound = ({ navigation }) => {
 
   useEffect(() => {
     fetchData();
-    fetchDataDeleted()
+    fetchDataDeleted();
   }, []);
 
   const handleModeChange = (mode) => {
@@ -118,30 +118,32 @@ const FocusSound = ({ navigation }) => {
 
   const confirmDelete = async (sound) => {
     const response = await markDeleteSound(sound.id);
-    if(response.success){
-      fetchData()
-      fetchDataDeleted()
-    }
-    else{
-      Alert.alert('Error!!', response.message)
+    if (response.success) {
+      fetchData();
+      fetchDataDeleted();
+    } else {
+      Alert.alert("Error!!", response.message);
     }
   };
 
   const handleAddSound = async () => {
     try {
-      const file = await DocumentPicker.getDocumentAsync({
+      const result = await DocumentPicker.getDocumentAsync({
         type: "audio/*",
       });
-  
-      if (!file.canceled) {
-        const response =await UploadAvt(file.assets[0].uri, 'SOUNDCONCENTRATION')
-        console.log(response)
-        // const { sound: soundObject } = await Audio.Sound.createAsync(
-        //   {uri: file.assets[0].uri
-        //   }
-        // );
-        // await soundObject.playAsync();
-        addSoundStep2(file.assets[0].uri)
+
+      if (!result.canceled) {
+        const file = {
+          uri: result.assets[0].uri,
+          name: result.assets[0].fileName || "audio.m4a",
+          type: "audio/mp3",
+        };
+        const response = await UploadAvt(file, "SOUNDCONCENTRATION");
+        const { sound: soundObject } = await Audio.Sound.createAsync({
+          uri: result.assets[0].uri,
+        });
+        await soundObject.playAsync();
+        addSoundStep2(response.data );
       }
     } catch (error) {
       console.error("Error picking sound:", error);
@@ -154,17 +156,21 @@ const FocusSound = ({ navigation }) => {
       "Enter Sound Name",
       null,
       async (text) => {
-          if (text.trim().length > 0) {
-              
-          } else {
-              // Hiển thị cảnh báo nếu người dùng không nhập tên âm thanh
-              Alert.alert("Error", "Please enter a valid name for the sound!");
+        if (text.trim().length > 0) {
+          const response = await addSound(text, uri);
+          if(response.success) {
+            fetchData()
           }
+          else{
+            Alert.alert('Error!', response.message)
+          }
+        } else {
+           Alert.alert("Error", "Please enter a valid name for the sound!");
+        }
       },
       "plain-text"
-  );
-  }
-  
+    );
+  };
 
   const handleBack = async () => {
     if (soundObject) {
@@ -182,7 +188,7 @@ const FocusSound = ({ navigation }) => {
       ],
       { cancelable: false }
     );
-  }
+  };
   const handleDeleteCompletelySound = (sound) => {
     Alert.alert(
       "Confirm Action",
@@ -193,27 +199,25 @@ const FocusSound = ({ navigation }) => {
       ],
       { cancelable: false }
     );
-  }
+  };
 
   const confirmDeleteCompletely = async (sound) => {
-    const response = await deleteSound(sound.id)
-    if(response.success) {
-      fetchDataDeleted()
+    const response = await deleteSound(sound.id);
+    if (response.success) {
+      fetchDataDeleted();
+    } else {
+      Alert.alert("Error!!", response.message);
     }
-    else{
-      Alert.alert("Error!!", response.message)
-    }
-  }
+  };
   const confirmRecover = async (sound) => {
-    const response = await recoverSound(sound.id)
-    if(response.success) {
-      fetchData()
-      fetchDataDeleted()
+    const response = await recoverSound(sound.id);
+    if (response.success) {
+      fetchData();
+      fetchDataDeleted();
+    } else {
+      Alert.alert("Error!!", response.message);
     }
-    else{
-      Alert.alert("Error!!", response.message)
-    }
-  }
+  };
 
   return (
     <View style={{ backgroundColor: "#eeeeee" }}>
@@ -224,7 +228,11 @@ const FocusSound = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.headerText}>Working Sound</Text>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <MaterialIcons name="more-vert" size={24} color={checkRole ? 'black' : "white"} />
+          <MaterialIcons
+            name="more-vert"
+            size={24}
+            color={checkRole ? "black" : "white"}
+          />
         </TouchableOpacity>
       </View>
 
@@ -236,35 +244,38 @@ const FocusSound = ({ navigation }) => {
           backgroundColor: "white",
         }}
       >
-        {selectedMode=== 0 ? <View>
-          <TouchableOpacity
-            onPress={() => handleAddSound()}
-            style={styles.addItem}
-          >
-            <Text style={styles.bodyText}>+ Add Sound</Text>
-          </TouchableOpacity>
-          {/* Hiển thị mục "None" */}
-          <TouchableOpacity
-            onPress={() => handleNone()}
-            style={[styles.addItem, noneSelected && styles.selectedItem]}
-          >
-            <Text style={[styles.bodyText]}>None</Text>
-            {noneSelected && (
-              <MaterialIcons name="check" size={24} color="orange" />
-            )}
-          </TouchableOpacity>
+        {selectedMode === 0 ? (
+          <View>
+            <TouchableOpacity
+              onPress={() => handleAddSound()}
+              style={styles.addItem}
+            >
+              <Text style={styles.bodyText}>+ Add Sound</Text>
+            </TouchableOpacity>
+            {/* Hiển thị mục "None" */}
+            <TouchableOpacity
+              onPress={() => handleNone()}
+              style={[styles.addItem, noneSelected && styles.selectedItem]}
+            >
+              <Text style={[styles.bodyText]}>None</Text>
+              {noneSelected && (
+                <MaterialIcons name="check" size={24} color="orange" />
+              )}
+            </TouchableOpacity>
+            <FlatList
+              data={soundList}
+              renderItem={({ item }) => (
+                <SoundItem
+                  sound={item}
+                  selectedSound={selectedSound}
+                  onSelect={handleSelectSound}
+                  onDelete={handleDeleteSound}
+                />
+              )}
+            />
+          </View>
+        ) : deletedSoundList.length !== 0 ? (
           <FlatList
-            data={soundList}
-            renderItem={({ item }) => (
-              <SoundItem
-                sound={item}
-                selectedSound={selectedSound}
-                onSelect={handleSelectSound}
-                onDelete={handleDeleteSound}
-              />
-            )}
-          />
-        </View> : (deletedSoundList.length !== 0 ? <FlatList
             data={deletedSoundList}
             renderItem={({ item }) => (
               <SoundDeletedItem
@@ -273,9 +284,22 @@ const FocusSound = ({ navigation }) => {
                 onDelete={handleDeleteCompletelySound}
               />
             )}
-          /> : <View style={{height:"100%", justifyContent:'center', alignItems:'center'}}>
-          <Text style={{fontSize:20,paddingBottom:100, color:'#565656'}}>There're no Sound deleted</Text>
-        </View>)}
+          />
+        ) : (
+          <View
+            style={{
+              height: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ fontSize: 20, paddingBottom: 100, color: "#565656" }}
+            >
+              There're no Sound deleted
+            </Text>
+          </View>
+        )}
       </View>
       <Modal
         animationType="slide"
@@ -350,8 +374,8 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginHorizontal: 10,
     top: 120,
-    borderColor:"#f7c068",
-    borderWidth:1
+    borderColor: "#f7c068",
+    borderWidth: 1,
   },
   modeItem: {
     marginVertical: 10,
