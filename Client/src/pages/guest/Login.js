@@ -23,17 +23,8 @@ function Login({ navigation }) {
   const [password, setPassword] = useState("");
   const [hide, setHide] = useState(true);
   const unsubscribeRef = useRef(null);
-  const [tfa, setTfa] = useState(false);
 
-  useEffect(() => {
-    const getSettings = async () => {
-      const storage2FA = await AsyncStorage.getItem("2FA");
-      if (storage2FA && storage2FA == "true") {
-        setTfa(true);
-      }
-    };
-    getSettings();
-  });
+
   useEffect(() => {
     const handleUrlChange = async ({ url }) => {
       const tokenIndex = url.indexOf("token=");
@@ -72,7 +63,7 @@ function Login({ navigation }) {
       e.preventDefault();
       const response = await login(email, password);
       if (response.success) {
-        if (tfa) {
+        if (response.data.isTwoFactor) {
           const res = await ResendOTP(email);
         
       if (res.success) {
@@ -202,7 +193,7 @@ function Login({ navigation }) {
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>{tfa ? "Next" : "Log in"}</Text>
+            <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
         </View>
 

@@ -26,8 +26,7 @@ const SoundDeletedItem = ({ sound,onRecover, onDelete }) => {
         {
           backgroundColor: pressed ? "#fee4d4" : "transparent",
         },
-        styles.addItem,
-        isSelected && styles.selectedItem,
+        styles.addItem
       ]}
     >
       <View style={styles.container}>

@@ -20,7 +20,7 @@ const login = async (email, password) => {
       await AsyncStorage.setItem('accountName', `${data.data.lastName} ${data.data.firstName}`);
       return {
         success: true,
-        message: data.meta.message,
+        data: data.data,
         token: data.data.token,
       };
     } else {

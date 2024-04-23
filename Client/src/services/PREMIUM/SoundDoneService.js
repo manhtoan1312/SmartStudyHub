@@ -71,7 +71,7 @@ const uri =
       }
     };
   
-  const addSoundDone = async (nameSoundDone, url) => {
+  const addSoundDone = async (nameSound, url) => {
     try {
       const role = await getRole();
   
@@ -85,7 +85,7 @@ const uri =
             authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            nameSoundDone,
+            nameSound,
             url,
           }),
         });
@@ -109,7 +109,7 @@ const uri =
     }
   };
   
-  const updateSoundDone = async (id, nameSoundDone, url) => {
+  const updateSoundDone = async (id, nameSound, url) => {
       try {
         const role = await getRole();
     
@@ -124,7 +124,7 @@ const uri =
             },
             body: JSON.stringify({
               id,
-              nameSoundDone,
+              nameSound,
               url,
             }),
           });

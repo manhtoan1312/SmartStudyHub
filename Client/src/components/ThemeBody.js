@@ -107,8 +107,8 @@ const ThemeBody = ({ navigation }) => {
   };
   const confirmUpdate = (theme) => {
     Alert.prompt(
-      "Update Theme Name",
-      null, // Đặt phần mô tả là null
+      "Update Theme",
+      'Enter Theme name', // Đặt phần mô tả là null
       async (text) => {
         if (text !== null && text.trim().length > 0) {
           confirmUpdateTheme(theme, text)
