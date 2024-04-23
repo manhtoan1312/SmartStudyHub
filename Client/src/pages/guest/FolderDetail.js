@@ -33,6 +33,7 @@ const FolderDetail = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [closeKeyboard, setCloseKeyboard] = useState(false);
+  const [isSort, setIsSort] =useState(false)
   const isFocused = useIsFocused();
   useEffect(() => {
     const fetchDataOnFocus = async () => {
@@ -56,11 +57,37 @@ const FolderDetail = ({ route, navigation }) => {
     };
   }, []);
 
+  const handleSortWork = async (type, pro) => {
+    setSortModalVisible(false);
+    setIsSort(true)
+    const body1 = JSON.stringify(pro?.listWorkActive);
+    const body2 = JSON.stringify(pro?.listWorkCompleted);
+    const response = await SortWork(body1, type);
+    const response2 = await SortWork(body2, type);
+
+    if (response.success) {
+      const worksSortedArray = response.data || [];
+      setProject((pre) =>( {...pre,workActive: worksSortedArray }));
+    } else {
+      console.log(response.message);
+    }
+    if (response2.success) {
+      const worksSortedArray = response2.data || [];
+      setProject((prev) => ({ ...prev, workCompleted: worksSortedArray }));
+    } else {
+      console.log(response2.message);
+    }
+    setSortType(type);
+  };
+  
   const fetchData = async () => {
     console.log(id);
     const response = await GetDetailFolder(id);
     if (response.success) {
       setProject(response.data);
+      if (isSort && sortType) {
+        handleSortWork(sortType, response.data);
+      }
     } else {
       Alert.alert("Error when get folder detail!", response.message);
       navigation.navigate("Home");

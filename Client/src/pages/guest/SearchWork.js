@@ -67,7 +67,7 @@ const SearchWork = ({ navigation }) => {
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
       handleSearch(text); 
-    }, 2000);
+    }, 1000);
   };
   
 

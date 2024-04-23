@@ -37,6 +37,7 @@ const High = ({ navigation }) => {
   const [preName, setPreName] = useState(null);
   const [sortModalVisible, setSortModalVisible] = useState(false);
   const [sortType, setSortType] = useState("");
+  const [isSort, setIsSort] =useState(false)
   const inputRef = useRef(null);
 
   const isFocused = useIsFocused();
@@ -73,6 +74,9 @@ const High = ({ navigation }) => {
     const response = await GetWorkByPriority("HIGH", id);
     if (response.success) {
       setProject(response.data);
+      if (isSort && sortType) {
+        handleSortWork(sortType, response.data);
+      }
     } else {
       Alert.alert("Error when get High priority work!", response.message);
       navigation.navigate("Home");
@@ -83,35 +87,28 @@ const High = ({ navigation }) => {
     setCloseKeyboard(true);
     Keyboard.dismiss();
   };
-  const handleSortWork = async (type) => {
+  const handleSortWork = async (type, pro) => {
     setSortModalVisible(false);
-
-    const body1 = JSON.stringify(project?.listWorkActive);
-    const body2 = JSON.stringify(project?.listWorkCompleted);
+    setIsSort(true)
+    const body1 = JSON.stringify(pro?.listWorkActive);
+    const body2 = JSON.stringify(pro?.listWorkCompleted);
     const response = await SortWork(body1, type);
     const response2 = await SortWork(body2, type);
 
     if (response.success) {
       const worksSortedArray = response.data || [];
-      const updatedList = worksSortedArray
-        .map((item) => item.worksSorted)
-        .flat();
-      setProject((prev) => ({ ...prev, listWorkActive: updatedList }));
+      setProject((pre) =>( {...pre,workActive: worksSortedArray }));
     } else {
       console.log(response.message);
     }
     if (response2.success) {
       const worksSortedArray = response2.data || [];
-      const updatedList = worksSortedArray
-        .map((item) => item.worksSorted)
-        .flat();
-      setProject((prev) => ({ ...prev, listWorkCompleted: updatedList }));
+      setProject((prev) => ({ ...prev, workCompleted: worksSortedArray }));
     } else {
       console.log(response2.message);
     }
     setSortType(type);
   };
-
   const handleDone = async (
     projectId,
     priority,
@@ -158,6 +155,10 @@ const High = ({ navigation }) => {
     }
   };
 
+  const handleReload = async () => {
+    await fetchData();
+  };
+  
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -201,14 +202,26 @@ const High = ({ navigation }) => {
                   }}
                 />
               </TouchableOpacity>
-              {project.listWorkActive?.map((workItem) => (
+              {isSort ? (project.workActive?.map((workItem) => (
+                <View key={workItem?.key}>
+                  <Text>{workItem?.key}</Text>
+                  {workItem?.worksSorted?.map((item) => (
+                    <WorkActive
+                  key={item.id}
+                  workItem={item}
+                  reload={handleReload}
+                  navigation={navigation}
+                />
+                  ))}
+                  </View>
+              ))): (project.listWorkActive?.map((workItem) => (
                 <WorkActive
                   key={workItem.id}
                   workItem={workItem}
-                  reload={fetchData}
+                  reload={handleReload}
                   navigation={navigation}
                 />
-              ))}
+              )))}
               <TouchableOpacity
                 style={styles.buttonComplete}
                 onPress={() => setDoneVisible(!doneVisible)}
@@ -226,14 +239,26 @@ const High = ({ navigation }) => {
                 />
               </TouchableOpacity>
               {doneVisible &&
-                project.listWorkCompleted?.map((workItem) => (
+                (isSort ? (project.workCompleted?.map((workItem) => (
+                  <View key={workItem?.key}>
+                    <Text>{workItem?.key}</Text>
+                    {workItem?.worksSorted?.map((item) => (
+                      <WorkDone
+                      key={item.id}
+                      workItem={item}
+                      reload={handleReload}
+                      navigation={navigation}
+                    />
+                    ))}
+                    </View>
+                ))) : (project.listWorkCompleted?.map((workItem) => (
                   <WorkDone
                     key={workItem.id}
                     workItem={workItem}
-                    reload={fetchData}
+                    reload={handleReload}
                     navigation={navigation}
                   />
-                ))}
+                ))))}
             </View>
           </>
         )}
@@ -253,7 +278,7 @@ const High = ({ navigation }) => {
           isVisible={sortModalVisible}
           page={"priority"}
           onChoose={(type) => {
-            handleSortWork(type);
+            handleSortWork(type, project);
           }}
           onClose={() => setSortModalVisible(false)}
           type={sortType}

@@ -174,29 +174,48 @@ export default function Setting({ navigation }) {
 
   const handlePomodoroTimeChange = (index) => {
     setIsPomodoroTimePickerVisible(false);
-    setPomodoroTime(index);
-    // getRole().then((role) => {
-    //   if (role && role.role === "PREMIUM") {
-    //     setPomodoroTime(index);
-    //   } else {
-    //     navigation.navigate("PREMIUM");
-    //   }
-    // });
+    
+    getRole().then((role) => {
+      if (role && role.role === "PREMIUM") {
+        setPomodoroTime(index);
+      } else {
+        navigation.navigate("PREMIUM");
+      }
+    });
   };
 
   const handleShortBreakTimeChange = (index) => {
     setIsShortBreakTimePickerVisible(false);
-    setShortBreakTime(index);
+    getRole().then((role) => {
+      if (role && role.role === "PREMIUM") {
+        setShortBreakTime(index);
+      } else {
+        navigation.navigate("PREMIUM");
+      }
+    });
+    
   };
 
   const handleLongBreakTimeChange = (index) => {
     setIsLongBreakTimePickerVisible(false);
-    setLongBreakTime(index);
+    getRole().then((role) => {
+      if (role && role.role === "PREMIUM") {
+        setLongBreakTime(index);
+      } else {
+        navigation.navigate("PREMIUM");
+      }
+    });
   };
 
   const handleBreakAfterChange = (index) => {
     setIsBreakAfterPickerVisible(false);
-    setBreakAfter(index);
+    getRole().then((role) => {
+      if (role && role.role === "PREMIUM") {
+        setBreakAfter(index)
+      } else {
+        navigation.navigate("PREMIUM");
+      }
+    });
   };
 
   const renderPicker = (
