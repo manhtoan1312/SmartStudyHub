@@ -31,15 +31,15 @@ const CreatePomodoro = ({ route, navigation }) => {
   const [projectList, setProjectList] = useState([]);
   const [workList, setWorkList] = useState([]);
   const [selectedProject, setSelectedProject] = useState({
-    id: route.params.work.projectId ? route.params.work.projectId : 0,
-    projectName: route.params.work.projectName
-      ? route.params.work.projectName
+    id: route.params.work?.projectId ? route.params.work?.projectId : 0,
+    projectName: route.params.work?.projectName
+      ? route.params.work?.projectName
       : "Task Default",
   });
   const [selectedWork, setSelectedWork] = useState(route.params.work);
   const [startTime, setStartTime] = useState(new Date().getTime());
   const [pomodoroTime, setPomodoroTime] = useState(
-    route.params.work.timeOfPomodoro
+    route.params.work?.timeOfPomodoro ? route.params.work?.timeOfPomodoro : 25
   );
   const [isProjectVisible, setProjectVisible] = useState(false);
   const [isWorkVisible, setWorkVisible] = useState(false);
@@ -60,7 +60,7 @@ const CreatePomodoro = ({ route, navigation }) => {
   };
 
   fetchWork = async () => {
-    if (selectedProject.id !== -1) {
+    if (selectedProject?.id !== -1) {
       const role = await getRole();
       let id;
       if (role) {
@@ -68,7 +68,7 @@ const CreatePomodoro = ({ route, navigation }) => {
       } else {
         id = await AsyncStorage.getItem("id");
       }
-      if (selectedProject.id === 0) {
+      if (selectedProject?.id === 0) {
         const response = await GetWorkByProjectAndStatus("ACTIVE", id);
         const response2 = await GetWorkByProjectAndStatus("COMPLETED", id);
         if (response.success && response2.success) {
@@ -78,7 +78,7 @@ const CreatePomodoro = ({ route, navigation }) => {
           });
         }
       } else {
-        const response = await GetDetailProject(selectedProject.id);
+        const response = await GetDetailProject(selectedProject?.id);
         if (response.success) {
           setWorkList({
             active: response.data.listWorkActive,
@@ -120,7 +120,7 @@ const CreatePomodoro = ({ route, navigation }) => {
     setPomodoroVisible(false);
   };
   const handleClickWork = () => {
-    if (selectedProject.id !== -1) {
+    if (selectedProject?.id !== -1) {
       setProjectVisible(false);
       setWorkVisible(!isWorkVisible);
       setStartTimeVisible(false);
@@ -157,7 +157,7 @@ const CreatePomodoro = ({ route, navigation }) => {
   };
 
   const handleDone = async () => {
-    if (!(selectedProject.id !== -1 &&
+    if (!(selectedProject?.id !== -1 &&
       selectedWork?.id === -1)) {
       const role = await getRole();
       let id;
@@ -166,7 +166,7 @@ const CreatePomodoro = ({ route, navigation }) => {
       } else {
         id = await AsyncStorage.getItem("id");
       }
-      const wId = selectedWork.id ===-1 ? null : selectedWork.id
+      const wId = selectedWork?.id ===-1 ? null : selectedWork?.id
       const endTime = startTime + pomodoroTime*60000;
    const response = await addPomodoro(id, wId,null,pomodoroTime, startTime, endTime)
    if(response.success) {
@@ -190,7 +190,7 @@ const CreatePomodoro = ({ route, navigation }) => {
           <Text
             style={[
               styles.title,
-              selectedProject.id !== -1 &&
+              selectedProject?.id !== -1 &&
                 selectedWork?.id === -1 &&
                 styles.grayText,
             ]}
@@ -220,7 +220,7 @@ const CreatePomodoro = ({ route, navigation }) => {
           <Text
             style={{
               fontSize: 16,
-              color: selectedProject.id !== -1 ? "black" : "#888888",
+              color: selectedProject?.id !== -1 ? "black" : "#888888",
             }}
           >
             Work Name

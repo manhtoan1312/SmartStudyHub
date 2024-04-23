@@ -187,9 +187,7 @@ const WorkDetail = ({ route, navigation }) => {
   };
 
   const openSelectDueDate = () => {
-    if (work.statusWork === "SOMEDAY") {
       setCalendarVisible(true);
-    }
   };
 
   const handleSelectDueDate = (date) => {
@@ -710,12 +708,12 @@ const WorkDetail = ({ route, navigation }) => {
                 style={styles.content}
               >
                 <View>
-                  <View style={styles.name}>
+                  <TouchableOpacity style={styles.name}>
                     <AntDesign name="calendar" size={24} color="gray" />
                     <View style={{ justifyContent: "center" }}>
                       <Text style={{ paddingLeft: 15 }}>Due Date</Text>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 </View>
                 <View>
                   {work.statusWork !== "SOMEDAY" ? (
@@ -738,7 +736,7 @@ const WorkDetail = ({ route, navigation }) => {
                   </View>
                 </View>
                 <View>
-                  {work.isRemindered ? renderTime() : <Text>False</Text>}
+                  {work.isRemindered ? renderTime() : <Text>No</Text>}
                 </View>
               </TouchableOpacity>
             </View>

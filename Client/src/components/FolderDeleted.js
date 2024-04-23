@@ -3,11 +3,13 @@ import {
   MaterialIcons,
   Feather,
   MaterialCommunityIcons,
+  AntDesign,
 } from "@expo/vector-icons";
 import {
   DeleteCompletelyFolder,
   RecoverFolder,
 } from "../services/Guest/FolderService";
+import { Swipeable } from "react-native-gesture-handler";
 const FolderDeleted = ({ folderItem, reload, navigation }) => {
   async function confirmDelete() {
     const response = await DeleteCompletelyFolder(folderItem.id);
@@ -15,6 +17,23 @@ const FolderDeleted = ({ folderItem, reload, navigation }) => {
       reload();
     }
   }
+
+  const renderRightActions = (progress, dragX) => {
+    const trans = dragX.interpolate({
+      inputRange: [0, 50, 100, 101],
+      outputRange: [0, 0, 0, 1],
+    });
+    return (
+      <TouchableOpacity
+        style={styles.rightActions}
+        onPress={() => handleDelete()}
+      >
+        <TouchableOpacity onPress={() => handleDetete()}>
+          <AntDesign name="delete" size={24} color="black" />
+        </TouchableOpacity>
+      </TouchableOpacity>
+    );
+  };
 
   const handleDetete = () => {
     Alert.alert(
@@ -41,35 +60,34 @@ const FolderDeleted = ({ folderItem, reload, navigation }) => {
   };
 
   return (
-    <TouchableOpacity key={folderItem.id} style={styles.folderItemContainer}>
-      {/* Circle with colorCode */}
-      <MaterialCommunityIcons
-        name="folder-remove"
-        size={24}
-        color={folderItem.colorCode}
-      />
-
-      {/* Project Name */}
-      <View style={styles.projectNameContainer}>
-        <Text
-          style={[
-            styles.projectName,
-          ]}
-        >
-          {folderItem.folderName}
-        </Text>
-      </View>
-
-      {/* Status Buttons */}
-      <View style={styles.statusButtonsContainer}>
-        <TouchableOpacity onPress={() => handleChange()}>
-          <Feather name="refresh-ccw" size={24} color="green" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleDetete()}>
-          <MaterialIcons name="delete" size={24} color="gray" />
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
+    <Swipeable renderRightActions={renderRightActions}>
+      <TouchableOpacity key={folderItem.id} style={styles.folderItemContainer}>
+        {/* Circle with colorCode */}
+        <MaterialCommunityIcons
+          name="folder-remove"
+          size={24}
+          color={folderItem.colorCode}
+        />
+  
+        {/* Project Name */}
+        <View style={styles.projectNameContainer}>
+          <Text
+            style={[
+              styles.projectName,
+            ]}
+          >
+            {folderItem.folderName}
+          </Text>
+        </View>
+  
+        {/* Status Buttons */}
+        <View style={styles.statusButtonsContainer}>
+          <TouchableOpacity onPress={() => handleChange()}>
+            <Feather name="refresh-ccw" size={24} color="green" />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Swipeable>
   );
 };
 
@@ -118,6 +136,11 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     borderColor: "green",
   },
+  rightActions:{
+    paddingRight:10,
+    justifyContent:'center',
+    alignItems:'center'
+  }
 });
 
 export default FolderDeleted;

@@ -99,7 +99,7 @@ function Login({ navigation }) {
                 text: "No",
                 style: "cancel",
               },
-              { text: "Yes", onPress: () => navigation.navigate("Recover") },
+              { text: "Yes", onPress: () => navigation.navigate("Recover",{email:email}) },
             ]
           );
         } else if (response.status === "2_3_f") {

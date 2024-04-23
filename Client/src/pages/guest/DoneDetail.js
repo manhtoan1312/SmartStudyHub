@@ -15,6 +15,7 @@ import {
 import {
   AntDesign,
   FontAwesome5,
+  MaterialCommunityIcons,
   MaterialIcons,
   Octicons,
 } from "@expo/vector-icons";
@@ -29,7 +30,7 @@ const DoneDetail = ({ navigation }) => {
   const [listwork, setListWork] = useState();
   const [listPomodoro, setListPomodoro] = useState();
   const [listProject, setListProject] = useState();
-  const [selectedCategory, setSelectedCategory] = useState("Work");
+  const [selectedCategory, setSelectedCategory] = useState("Pomodoro");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const isFocused = useIsFocused();
   useEffect(() => {
@@ -103,6 +104,14 @@ const DoneDetail = ({ navigation }) => {
     setSelectedCategory(category);
     toggleModal();
   };
+  const handleCreatePomodoro = () => {
+    navigation.navigate('CreatePomodoro', {work:{
+      id:-1,
+      projectId:-1,
+      workName:'None',
+      projectName:'None',
+    }})
+  }
   const translatePomodoro = (listPo) => {
     if (listPo) {
       const dateArray = [];
@@ -155,14 +164,31 @@ const DoneDetail = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Three dots button */}
-        <TouchableOpacity onPress={toggleModal}>
+        <View style={{flexDirection:'row'}}>
+          <TouchableOpacity onPress={handleCreatePomodoro} style={{marginRight:10}}>
+          <MaterialCommunityIcons name="clock-edit-outline" size={24} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={toggleModal}>
+        
           <MaterialIcons name="more-vert" size={24} color="black" />
-        </TouchableOpacity>
+        </TouchableOpacity></View>
       </View>
 
       {/* Modal for category options */}
       <Modal transparent={true} visible={isModalVisible} animationType="slide">
         <TouchableOpacity style={styles.modal}>
+        <TouchableOpacity
+            style={styles.modalItem}
+            onPress={() => handleCategorySelect("Pomodoro")}
+          >
+            <AntDesign
+              name="clockcircleo"
+              style={styles.icon}
+              size={18}
+              color="black"
+            />
+            <Text style={styles.modalText}>Pomodoro</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Work")}
@@ -175,18 +201,7 @@ const DoneDetail = ({ navigation }) => {
             />
             <Text style={styles.modalText}>Work</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.modalItem}
-            onPress={() => handleCategorySelect("Pomodoro")}
-          >
-            <AntDesign
-              name="clockcircleo"
-              style={styles.icon}
-              size={18}
-              color="black"
-            />
-            <Text style={styles.modalText}>Pomodoro</Text>
-          </TouchableOpacity>
+          
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Project")}

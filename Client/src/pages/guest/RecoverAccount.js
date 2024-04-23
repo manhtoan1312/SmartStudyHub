@@ -13,13 +13,15 @@ import { FontAwesome, EvilIcons } from "@expo/vector-icons";
 import { AuthenToRecover, ResendOTP } from "../../services/AccountService";
 import { recoverAccount } from "../../services/GuestService";
 
-function RecoverAccount({ navigation }) {
+function RecoverAccount({route, navigation }) {
+  const lastEmail = route.params.email
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const handleCheckAccount = async () => {
     const rs = await AuthenToRecover(email, password);
     if (rs.success) {
-      const response = await ResendOTP(email)
+      if(email === lastEmail) {
+        const response = await ResendOTP(email)
       if(response.success)
       {
         navigation.navigate('RecoverStep2', {
@@ -30,6 +32,12 @@ function RecoverAccount({ navigation }) {
       }
       else {
         Alert.alert("Authenticate fail", response.message);
+      }
+      }
+      else{
+        Alert.alert('Error', 'You entered the wrong account to recover')
+        setEmail('')
+        setPassword('')
       }
     } else {
       Alert.alert("Authenticate fail!!", rs.message);

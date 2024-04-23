@@ -12,18 +12,10 @@ import {
   Ionicons,
   FontAwesome5,
 } from "@expo/vector-icons";
-import { Audio } from "expo-av";
-import {
-  ExtraMarkCompleted,
-  RecoverExtraWork,
-} from "../services/Guest/ExtraWork";
 import { DeleteWork, RecoverWork } from "../services/Guest/WorkService";
 import { Swipeable } from "react-native-gesture-handler";
 import ExtraActive from "./ExtraActive";
 import ExtraCompleted from "./ExtraCompleted";
-import { flexDirections } from "react-native-wind/dist/styles/flex/flex-direction";
-import { justifyContent } from "react-native-wind/dist/styles/flex/justify-content";
-import { alignItems } from "react-native-wind/dist/styles/flex/align-items";
 
 const WorkCompleted = ({ workItem, reload, navigation }) => {
   const renderDoneTime = () => {

@@ -32,13 +32,8 @@ const SomeDay = ({ navigation }) => {
   const [project, setProject] = useState(null);
   const [workName, setWorkName] = useState(null);
   const [doneVisible, setDoneVisible] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
-  const [closeKeyboard, setCloseKeyboard] = useState(false);
-  const [preName, setPreName] = useState(null);
   const [sortModalVisible, setSortModalVisible] = useState(false);
   const [sortType, setSortType] = useState("");
-  const inputRef = useRef(null);
 
   const isFocused = useIsFocused();
   useEffect(() => {
@@ -49,19 +44,6 @@ const SomeDay = ({ navigation }) => {
     };
     fetchDataOnFocus();
   }, [isFocused]);
-  useEffect(() => {
-    fetchData();
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      (event) => {
-        const keyboardHeight = event.endCoordinates.height;
-        setKeyboardHeight(keyboardHeight);
-      }
-    );
-    return () => {
-      keyboardDidShowListener.remove();
-    };
-  }, []);
   const handleSortWork = async (type) => {
     setSortModalVisible(false);
 
@@ -185,23 +167,6 @@ const SomeDay = ({ navigation }) => {
                   totalWorkCompleted={project.totalWorkCompleted}
                 />
               </View>
-              <TouchableOpacity
-                style={styles.input}
-                onPress={() => inputRef.current.focus()}
-              >
-                <AntDesign name="plus" size={24} color="black" />
-                <TextInput
-                  ref={inputRef}
-                  style={{ paddingLeft: 10 }}
-                  placeholder="Add a Work..."
-                  value={workName}
-                  onChangeText={(text) => setWorkName(text)}
-                  onFocus={() => {
-                    setModalVisible(true);
-                    setCloseKeyboard(false);
-                  }}
-                />
-              </TouchableOpacity>
               {project.listWorkActive?.map((workItem) => (
                 <WorkActive
                   key={workItem.id}
@@ -239,16 +204,6 @@ const SomeDay = ({ navigation }) => {
           </>
         )}
       </ScrollView>
-      {modalVisible && (
-        <AddWorkModal
-          onDone={handleDone}
-          closeKeyboard={closeKeyboard}
-          keyboardHeight={keyboardHeight}
-          handlecloseKeyboard={handleClosekeyboard}
-          project={project}
-          type="SOMEDAY"
-        />
-      )}
       {sortModalVisible && (
         <SortWorkModal
           isVisible={sortModalVisible}

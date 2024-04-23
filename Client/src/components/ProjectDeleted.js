@@ -3,12 +3,11 @@ import {
   DeleteCompletelyProject,
   RecoverProject,
 } from "../services/Guest/ProjectService";
-import { MaterialIcons, Feather } from "@expo/vector-icons";
-import WorkActive from "./WorkActive";
-import WorkCompleted from "./WorkCompleted";
+import { MaterialIcons, Feather, AntDesign } from "@expo/vector-icons";
 import WorkDeleted from "./WorkDeleted";
 import WorkactiveDL from "./workactiveDL";
 import WorkCompletedDL from "./WorkCompleteDL";
+import { Swipeable } from "react-native-gesture-handler";
 const ProjectDeleted = ({ projectItem, reload, navigation }) => {
   async function confirmDelete() {
     const response = await DeleteCompletelyProject(projectItem.id);
@@ -16,6 +15,23 @@ const ProjectDeleted = ({ projectItem, reload, navigation }) => {
       reload();
     }
   }
+
+  const renderRightActions = (progress, dragX) => {
+    const trans = dragX.interpolate({
+      inputRange: [0, 50, 100, 101],
+      outputRange: [0, 0, 0, 1],
+    });
+    return (
+      <TouchableOpacity
+        style={styles.rightActions}
+        onPress={() => handleDelete()}
+      >
+        <TouchableOpacity onPress={() => handleDetete()}>
+          <AntDesign name="delete" size={24} color="black" />
+        </TouchableOpacity>
+      </TouchableOpacity>
+    );
+  };
 
   const handleDetete = () => {
     Alert.alert(
@@ -43,36 +59,35 @@ const ProjectDeleted = ({ projectItem, reload, navigation }) => {
 
   return (
     <View>
-      <TouchableOpacity
-        key={projectItem.id}
-        style={styles.projectItemContainer}
-      >
-        {/* Circle with colorCode */}
-        <View
-          style={[
-            styles.colorCircle,
-            { backgroundColor: projectItem?.colorCode },
-          ]}
-        />
+      <Swipeable renderRightActions={renderRightActions}>
+        <TouchableOpacity
+          key={projectItem.id}
+          style={styles.projectItemContainer}
+        >
+          {/* Circle with colorCode */}
+          <View
+            style={[
+              styles.colorCircle,
+              { backgroundColor: projectItem?.colorCode },
+            ]}
+          />
 
-        {/* Project Name */}
-        <View style={styles.projectNameContainer}>
-          <Text style={[styles.projectName, styles.completedProject]}>
-            {projectItem.projectName}
-          </Text>
-        </View>
+          {/* Project Name */}
+          <View style={styles.projectNameContainer}>
+            <Text style={[styles.projectName, styles.completedProject]}>
+              {projectItem.projectName}
+            </Text>
+          </View>
 
-        {/* Status Buttons */}
-        <View style={styles.statusButtonsContainer}>
-          <TouchableOpacity onPress={() => handleChange()}>
-            <Feather name="refresh-ccw" size={24} color="green" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDetete()}>
-            <MaterialIcons name="delete" size={24} color="gray" />
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
-      <View style={{ marginLeft: 30 }}>
+          {/* Status Buttons */}
+          <View style={styles.statusButtonsContainer}>
+            <TouchableOpacity onPress={() => handleChange()}>
+              <Feather name="refresh-ccw" size={24} color="green" />
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Swipeable>
+      <View style={{ paddingLeft: 30 }}>
         {projectItem.listWorkActive?.map((item) => (
           <WorkactiveDL
             workItem={item}
@@ -146,6 +161,11 @@ const styles = StyleSheet.create({
     marginRight: 10,
     backgroundColor: "transparent",
     borderColor: "green",
+  },
+  rightActions: {
+    paddingRight: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
