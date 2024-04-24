@@ -25,8 +25,9 @@ import SortWorkModal from "../../components/SortWorkModal";
 import ImageFocus from "../../components/Image_Focus";
 import { useRef } from "react";
 import getRole from "../../services/RoleService";
-const ProjectDetail = ({ route, navigation }) => {
-  const id = route.params.id;
+import { GetDetailFolder } from "../../services/Guest/FolderService";
+const TaskDefault = ({route, navigation }) => {
+  const id = route.params.id
   const [project, setProject] = useState(null);
   const [workName, setWorkName] = useState(null);
   const [doneVisible, setDoneVisible] = useState(false);
@@ -34,9 +35,9 @@ const ProjectDetail = ({ route, navigation }) => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [closeKeyboard, setCloseKeyboard] = useState(false);
   const [sortModalVisible, setSortModalVisible] = useState(false);
+  const inputRef = useRef(null);
   const [sortType, setSortType] = useState("");
   const [isSort, setIsSort] =useState(false)
-  const inputRef = useRef(null);
   const isFocused = useIsFocused();
   useEffect(() => {
     const fetchDataOnFocus = async () => {
@@ -46,33 +47,6 @@ const ProjectDetail = ({ route, navigation }) => {
     };
     fetchDataOnFocus();
   }, [isFocused]);
-  useEffect(() => {
-    fetchData();
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      (event) => {
-        const keyboardHeight = event.endCoordinates.height;
-        setKeyboardHeight(keyboardHeight);
-      }
-    );
-    return () => {
-      keyboardDidShowListener.remove();
-    };
-  }, []);
-
-  const fetchData = async () => {
-    const response = await GetDetailProject(id);
-    if (response.success) {
-      setProject(response.data);
-      if (isSort && sortType) {
-        handleSortWork(sortType, response.data);
-      }
-    } else {
-      Alert.alert("Error when get project detail!", response.message);
-      navigation.navigate("Home");
-    }
-  };
-
   const handleSortWork = async (type, pro) => {
     setSortModalVisible(false);
     setIsSort(true)
@@ -94,6 +68,32 @@ const ProjectDetail = ({ route, navigation }) => {
       console.log(response2.message);
     }
     setSortType(type);
+  };
+  useEffect(() => {
+    fetchData();
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      (event) => {
+        const keyboardHeight = event.endCoordinates.height;
+        setKeyboardHeight(keyboardHeight);
+      }
+    );
+    return () => {
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
+  const fetchData = async () => {
+    const response = await GetDetailFolder(id)
+    if (response.success) {
+      setProject(response.data);
+      if (isSort && sortType) {
+        handleSortWork(sortType, response.data);
+      }
+    } else {
+      Alert.alert("Error when get TASKDEFAULT work!", response.message);
+      navigation.navigate("Home");
+    }
   };
 
   const handleClosekeyboard = () => {
@@ -117,18 +117,17 @@ const ProjectDetail = ({ route, navigation }) => {
     } else {
       id = await AsyncStorage.getItem("id");
     }
-    const settings = await AsyncStorage.getItem("Settings");
+    const settings = await AsyncStorage.getItem("settings");
     let time = 25;
     if (settings) {
       const parsedData = JSON.parse(settings);
       time = parsedData.pomodoroTime;
     }
-    console.log(numberOfPomodoros);
     if (workName) {
       const tagslist = tags.map((id) => ({ id: id }));
       const response = await CreateWork(
         id,
-        projectId ? projectId : null,
+        projectId,
         tagslist,
         workName,
         priority,
@@ -152,7 +151,6 @@ const ProjectDetail = ({ route, navigation }) => {
     await fetchData();
   };
   
-
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -166,7 +164,7 @@ const ProjectDetail = ({ route, navigation }) => {
                 <Ionicons name="chevron-back-outline" size={24} color="gray" />
               </TouchableOpacity>
               <Text style={{ fontSize: 18, fontWeight: "400" }}>
-                {project.projectName}
+                {project.folderName}
               </Text>
               <TouchableOpacity onPress={() => setSortModalVisible(true)}>
                 <AntDesign name="filter" size={24} color="gray" />
@@ -265,16 +263,16 @@ const ProjectDetail = ({ route, navigation }) => {
           closeKeyboard={closeKeyboard}
           keyboardHeight={keyboardHeight}
           handlecloseKeyboard={handleClosekeyboard}
-          project={project}
-          type="SOMEDAY"
+          project={null}
+          type="TOMORROW"
         />
       )}
       {sortModalVisible && (
         <SortWorkModal
           isVisible={sortModalVisible}
-          page={"project"}
+          page={""}
           onChoose={(type) => {
-            handleSortWork(type, project);
+            handleSortWork(type ,project);
           }}
           onClose={() => setSortModalVisible(false)}
           type={sortType}
@@ -325,5 +323,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 });
+
 
 export default ProjectDetail;
