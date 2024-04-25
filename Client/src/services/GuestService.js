@@ -68,11 +68,11 @@ const recoverAccount = async (id) => {
   }
 };
 
-const RankByMonth = async () => {
+const RankByMonth = async (page, size) => {
   try {
     const id = await AsyncStorage.getItem("id");
     const response = await fetch(
-      `${uri}/rank-by-focus-previous-month?userId=${id}`,
+      `${uri}/rank-by-focus-previous-month?userId=${id}&page=${page}&size=${size}`,
       {
         method: "get",
         headers: {
@@ -92,11 +92,11 @@ const RankByMonth = async () => {
   }
 };
 
-const RankByFocusAllTime = async () => {
+const RankByFocusAllTime = async (page, size) => {
   try {
     const id = await AsyncStorage.getItem("id");
     const response = await fetch(
-      `${uri}/rank-by-focus-all-time?userId=${id}`,
+      `${uri}/rank-by-focus-all-time?userId=${id}&page=${page}&size=${size}`,
       {
         method: "get",
         headers: {
