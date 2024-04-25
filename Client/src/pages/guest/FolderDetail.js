@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Alert,
   StyleSheet,
@@ -17,23 +17,25 @@ import WorkActive from "../../components/WorkActive";
 import WorkDone from "../../components/WorkDone";
 import AddWorkModal from "../../components/AddWorkModal";
 import HeaderDetail from "../../components/HeaderDetail";
-import { GetDetailProject } from "../../services/Guest/ProjectService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CreateWork } from "../../services/Guest/WorkService";
+import { CreateWork, SortWork } from "../../services/Guest/WorkService";
 import { GetDetailFolder } from "../../services/Guest/FolderService";
-import Focus from "./Focus";
 import ImageFocus from "../../components/Image_Focus";
 import { useIsFocused } from "@react-navigation/native";
 import getRole from "../../services/RoleService";
-const FolderDetail = ({ route, navigation }) => {
-  const id = route.params.id;
+import SortWorkModal from "../../components/SortWorkModal";
+const FolderDetail = ({route, navigation }) => {
+  const id = route.params.id
   const [project, setProject] = useState(null);
   const [workName, setWorkName] = useState(null);
   const [doneVisible, setDoneVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [closeKeyboard, setCloseKeyboard] = useState(false);
-  const [isSort, setIsSort] =useState(false)
+  const [sortModalVisible, setSortModalVisible] = useState(false);
+  const inputRef = useRef(null);
+  const [sortType, setSortType] = useState("PROJECT");
+  const [isSort, setIsSort] =useState(true)
   const isFocused = useIsFocused();
   useEffect(() => {
     const fetchDataOnFocus = async () => {
@@ -43,20 +45,6 @@ const FolderDetail = ({ route, navigation }) => {
     };
     fetchDataOnFocus();
   }, [isFocused]);
-  useEffect(() => {
-    fetchData();
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      (event) => {
-        const keyboardHeight = event.endCoordinates.height;
-        setKeyboardHeight(keyboardHeight);
-      }
-    );
-    return () => {
-      keyboardDidShowListener.remove();
-    };
-  }, []);
-
   const handleSortWork = async (type, pro) => {
     setSortModalVisible(false);
     setIsSort(true)
@@ -79,17 +67,29 @@ const FolderDetail = ({ route, navigation }) => {
     }
     setSortType(type);
   };
-  
+  useEffect(() => {
+    fetchData();
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      (event) => {
+        const keyboardHeight = event.endCoordinates.height;
+        setKeyboardHeight(keyboardHeight);
+      }
+    );
+    return () => {
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
   const fetchData = async () => {
-    console.log(id);
-    const response = await GetDetailFolder(id);
+    const response = await GetDetailFolder(id)
     if (response.success) {
       setProject(response.data);
       if (isSort && sortType) {
         handleSortWork(sortType, response.data);
       }
     } else {
-      Alert.alert("Error when get folder detail!", response.message);
+      Alert.alert("Error when get TASKDEFAULT work!", response.message);
       navigation.navigate("Home");
     }
   };
@@ -115,7 +115,7 @@ const FolderDetail = ({ route, navigation }) => {
     } else {
       id = await AsyncStorage.getItem("id");
     }
-    const settings = await AsyncStorage.getItem("Settings");
+    const settings = await AsyncStorage.getItem("settings");
     let time = 25;
     if (settings) {
       const parsedData = JSON.parse(settings);
@@ -123,19 +123,9 @@ const FolderDetail = ({ route, navigation }) => {
     }
     if (workName) {
       const tagslist = tags.map((id) => ({ id: id }));
-      console.log(
-        id,
-        projectId,
-        tagslist,
-        workName,
-        priority,
-        dueDate,
-        numberOfPomodoros,
-        time
-      );
       const response = await CreateWork(
         id,
-        projectId ? projectId : null,
+        projectId,
         tagslist,
         workName,
         priority,
@@ -155,6 +145,10 @@ const FolderDetail = ({ route, navigation }) => {
     }
   };
 
+  const handleReload = async () => {
+    await fetchData();
+  };
+  
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -164,13 +158,15 @@ const FolderDetail = ({ route, navigation }) => {
         {project && (
           <>
             <View style={styles.header}>
-              <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
                 <Ionicons name="chevron-back-outline" size={24} color="gray" />
               </TouchableOpacity>
               <Text style={{ fontSize: 18, fontWeight: "400" }}>
                 {project.folderName}
               </Text>
-              <AntDesign name="filter" size={24} color="gray" />
+              <TouchableOpacity onPress={() => setSortModalVisible(true)}>
+                <AntDesign name="filter" size={24} color="gray" />
+              </TouchableOpacity>
             </View>
             <View style={styles.body}>
               <View style={styles.detail}>
@@ -181,9 +177,13 @@ const FolderDetail = ({ route, navigation }) => {
                   totalWorkCompleted={project.totalWorkCompleted}
                 />
               </View>
-              <TouchableOpacity style={styles.input}>
+              <TouchableOpacity
+                style={styles.input}
+                onPress={() => inputRef.current.focus()}
+              >
                 <AntDesign name="plus" size={24} color="black" />
                 <TextInput
+                  ref={inputRef}
                   style={{ paddingLeft: 10 }}
                   placeholder="Add a Work..."
                   value={workName}
@@ -194,35 +194,34 @@ const FolderDetail = ({ route, navigation }) => {
                   }}
                 />
               </TouchableOpacity>
-              {project.listProjectActive?.map((projectItem) => (
-                <View key={projectItem.id}>
-                  <Text style={{ padding: 10 }}>{projectItem.projectName}</Text>
-                  {projectItem?.listWorkActive?.map((workItem) => (
+              {isSort ? (project.workActive?.map((workItem) => (
+                <View key={workItem?.key}>
+                  <Text>{workItem?.key}</Text>
+                  {workItem?.worksSorted?.map((item) => (
                     <WorkActive
-                      key={workItem.id}
-                      workItem={workItem}
-                      reload={fetchData}
-                      navigation={navigation}
-                    />
+                  key={item.id}
+                  workItem={item}
+                  reload={handleReload}
+                  navigation={navigation}
+                />
                   ))}
-                  {projectItem?.listWorkCompleted?.map((workItem) => (
-                    <WorkDone
-                      key={workItem.id}
-                      workItem={workItem}
-                      reload={fetchData}
-                      navigation={navigation}
-                    />
-                  ))}
-                </View>
-              ))}
+                  </View>
+              ))): (project.listWorkActive?.map((workItem) => (
+                <WorkActive
+                  key={workItem.id}
+                  workItem={workItem}
+                  reload={handleReload}
+                  navigation={navigation}
+                />
+              )))}
               <TouchableOpacity
                 style={styles.buttonComplete}
                 onPress={() => setDoneVisible(!doneVisible)}
               >
                 <Text style={{ fontSize: 12, color: "#666666" }}>
                   {doneVisible
-                    ? "Hide completed projects"
-                    : "Displays completed projects"}
+                    ? "Hide completed tasks"
+                    : "Displays completed tasks"}
                 </Text>
                 <AntDesign
                   name={doneVisible ? "up" : "down"}
@@ -232,29 +231,26 @@ const FolderDetail = ({ route, navigation }) => {
                 />
               </TouchableOpacity>
               {doneVisible &&
-                project.listProjectCompleted?.map((projectItem) => (
-                  <View key={projectItem.id}>
-                    <Text style={{ padding: 10 }}>
-                      {projectItem.projectName}
-                    </Text>
-                    {projectItem?.listWorkActive?.map((workItem) => (
-                      <WorkActive
-                        key={workItem.id}
-                        workItem={workItem}
-                        reload={fetchData}
-                        navigation={navigation}
-                      />
-                    ))}
-                    {projectItem?.listWorkCompleted?.map((workItem) => (
+                (isSort ? (project.workCompleted?.map((workItem) => (
+                  <View key={workItem?.key}>
+                    <Text>{workItem?.key}</Text>
+                    {workItem?.worksSorted?.map((item) => (
                       <WorkDone
-                        key={workItem.id}
-                        workItem={workItem}
-                        reload={fetchData}
-                        navigation={navigation}
-                      />
+                      key={item.id}
+                      workItem={item}
+                      reload={handleReload}
+                      navigation={navigation}
+                    />
                     ))}
-                  </View>
-                ))}
+                    </View>
+                ))) : (project.listWorkCompleted?.map((workItem) => (
+                  <WorkDone
+                    key={workItem.id}
+                    workItem={workItem}
+                    reload={handleReload}
+                    navigation={navigation}
+                  />
+                ))))}
             </View>
           </>
         )}
@@ -265,14 +261,25 @@ const FolderDetail = ({ route, navigation }) => {
           closeKeyboard={closeKeyboard}
           keyboardHeight={keyboardHeight}
           handlecloseKeyboard={handleClosekeyboard}
-          project={project}
-          type="SOMEDAY"
+          project={null}
+          type="TOMORROW"
+        />
+      )}
+      {sortModalVisible && (
+        <SortWorkModal
+          isVisible={sortModalVisible}
+          page={""}
+          onChoose={(type) => {
+            handleSortWork(type ,project);
+          }}
+          onClose={() => setSortModalVisible(false)}
+          type={sortType}
         />
       )}
       <ImageFocus />
     </KeyboardAvoidingView>
   );
-  x;
+  
 };
 
 const styles = StyleSheet.create({
@@ -314,5 +321,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
 });
+
 
 export default FolderDetail;

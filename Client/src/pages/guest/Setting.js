@@ -319,19 +319,15 @@ export default function Setting({ navigation }) {
     navigation.navigate("Home");
   };
   const submitDelete = async () => {
-    const role = await getRole();
-    let id;
-    if (role) {
-      id = role.id;
-    } else {
-      id = await AsyncStorage.getItem("id");
-    }
+    const  id = await AsyncStorage.getItem("id");
     const rs = await DeleteGuest(id);
     if (!rs.success) {
       console.log(rs.message)
     } else {
       Alert.alert("Smart Study Hub Announcement", "Delete data successfully");
     }
+    console.log('hi')
+    await AsyncStorage.removeItem("id")
     await ClearData();
     navigation.navigate("Home");
   };
