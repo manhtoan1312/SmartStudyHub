@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     height: 55,
+    marginRight:10
   },
   circle: {
     width: 20,
