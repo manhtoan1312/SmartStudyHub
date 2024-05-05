@@ -9,13 +9,14 @@ import {
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import useTimerService from "../hooks/useTimerService";
+import { useSelector } from "react-redux";
 const { width: screenWidth } = Dimensions.get("window");
 const ImageFocus = () => {
   const navigation = useNavigation();
-  const timerService = useTimerService();
-
+  // const timerService = useTimerService();
+const time = useSelector((state) => state.isPlay.value)
   const toPomodoro = () => {
-    timerService.stopTimer();
+    // timerService.stopTimer();
     navigation.navigate("Focus");
   };
   return (
@@ -33,7 +34,7 @@ const ImageFocus = () => {
             style={{ color: "white", fontSize: 24 }}
             onPress={() => toPomodoro()}
           >
-            {timerService.minutesLeft}
+           {parseInt(time/60) +1}
           </Text>
         </ImageBackground>
       </TouchableOpacity>

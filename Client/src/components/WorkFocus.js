@@ -1,16 +1,21 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const WorkItem = ({ workItem, onSelect }) => {
   const handleSelect = () => {
-    onSelect(workItem, "WORK");
+    onSelect(workItem, "WORK", false);
   };
   const handleSelectExtra = (item) => {
-    onSelect(item, "EXTRA");
+    onSelect(item, "EXTRA", false);
   };
 
+  const playWork = () => {
+    onSelect(workItem, "WORK", true);
+  }
+  const playExtra = () => {
+    onSelect(workItem, "EXTRA", true);
+  }
   return (
     <View>
       <TouchableOpacity
@@ -36,7 +41,7 @@ const WorkItem = ({ workItem, onSelect }) => {
             </View>
           )}
         </View>
-        <TouchableOpacity style={styles.playButton}>
+        <TouchableOpacity style={styles.playButton} onPress={playWork}>
           <Ionicons name="ios-play-circle-sharp" size={26} color="#ff3232" />
         </TouchableOpacity>
       </TouchableOpacity>
@@ -54,7 +59,7 @@ const WorkItem = ({ workItem, onSelect }) => {
                   {extraWork.extraWorkName}
                 </Text>
               </View>
-              <TouchableOpacity style={styles.playButton}>
+              <TouchableOpacity style={styles.playButton} onPress={playExtra}>
                 <Ionicons
                   name="ios-play-circle-sharp"
                   size={26}

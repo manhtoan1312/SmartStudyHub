@@ -21,11 +21,13 @@ import {
   ExtraMarkCompleted,
 } from "../services/Guest/ExtraWork";
 import { Swipeable } from "react-native-gesture-handler";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useDispatch, useSelector } from "react-redux";
+import { setFocus } from "../slices/focusSlice";
 
 const WorkActive = ({ workItem, reload, navigation }) => {
-  const [extraVisible, setExtraVisible] = useState(false);
-
+  const [extraVisible, setExtraVisible] = useState(false)
+  const {defaultTimePomodoro} = useSelector((state) => state.focus)
+  const dispatch = useDispatch()
   async function playSound() {
     const { sound } = await Audio.Sound.createAsync(
       require("../sound/Done.mp3")
@@ -137,10 +139,20 @@ const WorkActive = ({ workItem, reload, navigation }) => {
 
   const handlePlay = async () => {
     try {
-      await AsyncStorage.setItem("work", JSON.stringify(workItem));
-      await AsyncStorage.setItem("workType", "WORK");
-      await AsyncStorage.setItem("stop", "true");
-      navigation.navigate("Focus");
+      dispatch(
+        setFocus({
+          workId: workItem.id,
+          workName: workItem.workName,
+          startTime: workItem?.startTime,
+          numberOfPomodoro: workItem.numberOfPomodoros,
+          numberOfPomodorosDone: workItem.numberOfPomodorosDone,
+          pomodoroTime: workItem.timeOfPomodoro,
+          isPause:true, 
+          isStop:true,
+          secondsLeft: workItem.timeOfPomodoro *60
+        })
+      );
+      navigation.navigate('Focus')
     } catch (e) {
       Alert.alert("Error when save work", e);
     }
@@ -148,9 +160,21 @@ const WorkActive = ({ workItem, reload, navigation }) => {
   const playExtra = async (item) => {
     if (item.status === "ACTIVE") {
       try {
-        await AsyncStorage.setItem("work", JSON.stringify(item));
-        await AsyncStorage.setItem("workType", "EXTRA");
-        await AsyncStorage.setItem("stop", "true");
+        dispatch(
+          setFocus({
+            extraWorkId: item.id,
+            extraWorkName: item.extraWorkName,
+            isPause:true, 
+            isStop:true,
+            workId: null,
+          workName: null,
+          startTime: null,
+          numberOfPomodoro: null,
+          numberOfPomodorosDone: null,
+          pomodoroTime: null,
+          secondsLeft: workItem.timeOfPomodoro *60
+          })
+        );
         navigation.navigate("Focus");
       } catch (e) {
         Alert.alert("Error when save work", e);
@@ -400,7 +424,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-
+    marginRight:10,
     backgroundColor: "white",
     borderRadius: 10,
     padding: 10,

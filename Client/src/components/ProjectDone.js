@@ -67,7 +67,7 @@ const ProjectDone = ({ projectItem, reload, navigation }) => {
         </View>
       </TouchableOpacity>
       <View style={{ marginLeft: 30 }}>
-        {projectItem.listWorkActive?.map((item) => (
+        {projectItem?.listWorkActive?.map((item) => (
           <WorkActive
             workItem={item}
             reload={reload}
@@ -80,7 +80,7 @@ const ProjectDone = ({ projectItem, reload, navigation }) => {
             workItem={item}
             reload={reload}
             navigation={navigation}
-            key={item.id} // Use a unique identifier here, such as item.id
+            key={item.id} 
           />
         ))}
         {projectItem.listWorkDeleted?.map((item) => (

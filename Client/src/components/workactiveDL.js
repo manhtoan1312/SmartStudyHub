@@ -28,10 +28,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import ExtraDeleted from "./ExtraDeleted";
 import ExtraCompleted from "./ExtraCompleted";
 import ExtraActive from "./ExtraActive";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsPlay } from "../slices/isPlaySlice";
 
 const WorkactiveDL = ({ workItem, reload, navigation }) => {
   const [extraVisible, setExtraVisible] = useState(false);
-
+  const isPlay = useSelector((state) => state.isPlay.value)
+  const dispatch = useDispatch()
   async function playSound() {
     const { sound } = await Audio.Sound.createAsync(
       require("../sound/Done.mp3")
@@ -153,7 +156,7 @@ const WorkactiveDL = ({ workItem, reload, navigation }) => {
     try {
       await AsyncStorage.setItem("work", JSON.stringify(workItem));
       await AsyncStorage.setItem("workType", "WORK");
-      await AsyncStorage.setItem("stop", "true");
+      dispatch(setIsPlay(false))
       navigation.navigate("Focus");
     } catch (e) {
       Alert.alert("Error when save work", e);

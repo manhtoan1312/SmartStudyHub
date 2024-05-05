@@ -12,6 +12,7 @@ const ClearData = async () => {
     await AsyncStorage.removeItem("token");
     await AsyncStorage.removeItem("accountName");    
     await AsyncStorage.removeItem('img')
+    await AsyncStorage.removeItem('workType')
     console.log("AsyncStorage items cleared successfully");
   } catch (error) {
     console.error("Error clearing AsyncStorage items:", error.message);

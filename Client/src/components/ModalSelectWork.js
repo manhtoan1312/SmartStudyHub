@@ -13,17 +13,16 @@ import {
 import WorkItem from "./WorkFocus";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { GetProjectByStatus } from "../services/Guest/ProjectService";
-import { GetAllTagOfUser } from "../services/Guest/TagService";
 import {
   GetWorkByPriority,
   GetWorkByType,
 } from "../services/Guest/WorkService";
-import { justifyContent } from "react-native-wind/dist/styles/flex/justify-content";
 import getRole from "../services/RoleService";
+import { useDispatch } from "react-redux";
+import { setFocus } from "../slices/focusSlice";
 
 const ModalSelectWork = ({ isVisible, play, onClose }) => {
-  const [selectedWork, setSelectedWork] = useState(null);
+  const dispatch = useDispatch();
   const [selectedType, setSelectedType] = useState("Today");
   const [chooseTypeVisible, setChooseTypeVisible] = useState(false);
   const [typeOptions] = useState([
@@ -106,10 +105,44 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
     }
   };
 
-  const onSelect = async (workItem, type) => {
+  const onSelect = async (workItem, type, play) => {
     try {
-      await AsyncStorage.setItem("work", JSON.stringify(workItem));
-      await AsyncStorage.setItem("workType", type);
+      if(type==='WORK') {
+        dispatch(
+          setFocus({
+            workId: workItem.id,
+            workName: workItem.workName,
+            startTime: workItem?.startTime,
+            numberOfPomodoro: workItem.numberOfPomodoro,
+            numberOfPomodorosDone: workItem.numberOfPomodorosDone,
+            pomodoroTime: workItem.timeOfPomodoro,
+            isPause: true,
+            isStop: true,
+            secondsLeft: workItem.timeOfPomodoro*60
+          })
+        );
+      }
+      else{
+        dispatch(
+          setFocus({
+            workId: null,
+            workName: nulll,
+            startTime: null,
+            numberOfPomodoro: 0,
+            numberOfPomodorosDone: 0,
+            pomodoroTime: workItem.timeOfPomodoro,
+            isPause: true,
+            isStop: true,
+            secondsLeft: workItem.timeOfPomodoro*60,
+          extraWorkId: workItem?.extraWorkId,
+          extraWorkName: workItem?.extraWorkName,
+          })
+        );
+      }
+      if(play) {
+        dispatch(setFocus({isPause: false,
+          isStop: false,}))
+      }
       onClose();
     } catch (e) {
       Alert.alert("Error when save work", e);
@@ -119,7 +152,7 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
     if (data.length > 0) {
       return data?.map((workItem) => (
         <TouchableOpacity key={workItem.id} style={styles.workItem}>
-          <WorkItem workItem={workItem} onSelect={onSelect} />
+          <WorkItem workItem={workItem} onSelect={onSelect}/>
         </TouchableOpacity>
       ));
     }

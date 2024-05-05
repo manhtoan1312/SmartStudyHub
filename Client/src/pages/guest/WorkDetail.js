@@ -41,6 +41,8 @@ import {
   RecoverExtraWork,
 } from "../../services/Guest/ExtraWork";
 import getRole from "../../services/RoleService";
+import { setFocus } from "../../slices/focusSlice";
+import { useDispatch } from "react-redux";
 
 const WorkDetail = ({ route, navigation }) => {
   const id = route.params.id;
@@ -59,6 +61,7 @@ const WorkDetail = ({ route, navigation }) => {
   const [dateTimePickerVisible, setDateTimePickerVisible] = useState(false);
   const [extraWorkName, setExtraWorkName] = useState("");
   const [note, setNote] = useState(work?.note || "");
+  const dispatch = useDispatch()
   const defaultTime = new Date();
   defaultTime.setHours(23);
   defaultTime.setMinutes(59);
@@ -251,7 +254,20 @@ const WorkDetail = ({ route, navigation }) => {
     setWork(updateWork);
   };
 
-  const handleStartPomodoro = async () => {};
+  const handleStartPomodoro = async () => {
+    dispatch(
+      setFocus({
+        workId: workItem.id,
+        workName: workItem.workName,
+        startTime: workItem?.startTime,
+        numberOfPomodoro: workItem.numberOfPomodoro,
+        numberOfPomodorosDone: workItem.numberOfPomodorosDone,
+        pomodoroTime: workItem.timeOfPomodoro,
+        isPause:true, 
+        isStop:true
+      })
+    );
+  };
   const handleCreatePomodoro = async () => {
     setMoreOptionsModalVisible(false)
     await updateWork();
@@ -426,9 +442,20 @@ const WorkDetail = ({ route, navigation }) => {
     if (work.workName) {
       if (item.status === "ACTIVE") {
         try {
-          await AsyncStorage.setItem("work", JSON.stringify(item));
-          await AsyncStorage.setItem("workType", "EXTRA");
-          await AsyncStorage.setItem("stop", "true");
+          dispatch(
+            setFocus({
+              extraWorkId: item.id,
+              extraWorkName: item.extraWorkName,
+              isPause:true, 
+              isStop:true,
+              workId: null,
+            workName: null,
+            startTime: null,
+            numberOfPomodoro: null,
+            numberOfPomodorosDone: null,
+            pomodoroTime: null,
+            })
+          );
           navigation.navigate("Focus");
         } catch (e) {
           Alert.alert("Error when save work", e);

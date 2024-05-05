@@ -17,6 +17,8 @@ import getRole from "../../services/RoleService";
 import { Picker } from "react-native-wheel-pick";
 import { DeleteGuest } from "../../services/GuestService";
 import ClearData from "../../services/ClearData";
+import { useDispatch } from "react-redux";
+import { setFocus } from "../../slices/focusSlice";
 export default function Setting({ navigation }) {
   const [preTime, setPreTime] = useState(0);
   const [workSound, setWorkSound] = useState("None");
@@ -38,6 +40,7 @@ export default function Setting({ navigation }) {
   const [img, setImg] = useState(null);
   const [name, setName] = useState("");
   const isFocused = useIsFocused();
+  const dispatch = useDispatch();
   const [isPomodoroTimePickerVisible, setIsPomodoroTimePickerVisible] =
     useState(false);
   const [isShortBreakTimePickerVisible, setIsShortBreakTimePickerVisible] =
@@ -63,9 +66,8 @@ export default function Setting({ navigation }) {
       if (workingSound) {
         const parse = JSON.parse(workingSound);
         setWorkSound(parse?.nameSound);
-      }
-      else{
-        setWorkSound('None')
+      } else {
+        setWorkSound("None");
       }
       const breakSound = await AsyncStorage.getItem("soundDone");
       if (breakSound) {
@@ -119,8 +121,6 @@ export default function Setting({ navigation }) {
   const updateData = async () => {
     const settings = {
       preTime,
-      workSound,
-      breakSound,
       focusSound,
       vibrate,
       pomodoroTime,
@@ -135,6 +135,17 @@ export default function Setting({ navigation }) {
       group,
       ratings,
     };
+    dispatch(
+      setFocus({
+        shortBreakTime,
+        longBreakTime,
+        breakAfter,
+        autoStartPo,
+        autoStartBreak,
+        disableBreakTime,
+        defaultTimePomodoro: pomodoroTime,
+      })
+    );
     await AsyncStorage.setItem("settings", JSON.stringify(settings));
   };
 
@@ -174,7 +185,7 @@ export default function Setting({ navigation }) {
 
   const handlePomodoroTimeChange = (index) => {
     setIsPomodoroTimePickerVisible(false);
-    
+
     getRole().then((role) => {
       if (role && role.role === "PREMIUM") {
         setPomodoroTime(index);
@@ -193,7 +204,6 @@ export default function Setting({ navigation }) {
         navigation.navigate("PREMIUM");
       }
     });
-    
   };
 
   const handleLongBreakTimeChange = (index) => {
@@ -211,7 +221,7 @@ export default function Setting({ navigation }) {
     setIsBreakAfterPickerVisible(false);
     getRole().then((role) => {
       if (role && role.role === "PREMIUM") {
-        setBreakAfter(index)
+        setBreakAfter(index);
       } else {
         navigation.navigate("PREMIUM");
       }
@@ -319,15 +329,15 @@ export default function Setting({ navigation }) {
     navigation.navigate("Home");
   };
   const submitDelete = async () => {
-    const  id = await AsyncStorage.getItem("id");
+    const id = await AsyncStorage.getItem("id");
     const rs = await DeleteGuest(id);
     if (!rs.success) {
-      console.log(rs.message)
+      console.log(rs.message);
     } else {
       Alert.alert("Smart Study Hub Announcement", "Delete data successfully");
     }
-    console.log('hi')
-    await AsyncStorage.removeItem("id")
+    console.log("hi");
+    await AsyncStorage.removeItem("id");
     await ClearData();
     navigation.navigate("Home");
   };

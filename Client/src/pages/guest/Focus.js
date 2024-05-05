@@ -9,7 +9,6 @@ import {
   Modal,
   Pressable,
 } from "react-native";
-import { CheckBox } from "react-native-elements";
 import { CircularProgress } from "react-native-circular-progress";
 import {
   AntDesign,
@@ -31,6 +30,9 @@ import ModalSelectWork from "../../components/ModalSelectWork";
 import { ExtraMarkCompleted } from "../../services/Guest/ExtraWork";
 import { MarkCompleted } from "../../services/Guest/WorkService";
 import getRole from "../../services/RoleService";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsPlay } from "../../slices/isPlaySlice";
+import { setFocus } from "../../slices/focusSlice";
 const { width, height } = Dimensions.get("screen");
 
 const red = "#f54e4e";
@@ -39,220 +41,42 @@ const green = "#4aec8c";
 const Focus = () => {
   const navigation = useNavigation();
   const [choose, setChoose] = useState(false);
-  const [countWork, setCountWork] = useState(0);
-  const [minutes, setMinutes] = useState(25);
-  const [seconds, setSeconds] = useState(0);
-  const [isPaused, setIsPaused] = useState(true);
-  const [mode, setMode] = useState("work");
-  const [secondsLeft, setSecondsLeft] = useState(25 * 60);
   const [selectedTask, setSelectedTask] = useState(null);
   const [percentage, setPercentage] = useState(100);
-  const [shortBreakTime, setShortBreakTime] = useState(5);
-  const [longBreakTime, setLongBreakTime] = useState(15);
-  const [breakAfter, setBreakAfter] = useState(4);
-  const [autoStartPo, setAutoStartPo] = useState(false);
-  const [autoStartBreak, setAutoStartBreak] = useState(false);
-  const [type, setType] = useState("-");
   const [isModalVisible, setModalVisible] = useState(false);
-  const [disableBreakTime, setDisableBreakTime] = useState(false);
-  const [stop, setStop] = useState(true);
-  const [startTime, setStartTime] = useState(0);
-  const [initialPomodoroTime, setInitialPomodoroTime] = useState(25);
-  const [secondLeftDefault, setSecondsLeftDefault] = useState(25 * 60);
+  const dispatch = useDispatch();
   const [timerModeOptions, setTimerModeOptions] = useState([]);
   const [selectedTimerModeOption, setSelectedTimerModeOption] = useState("-");
-  const [typeWorkSelect, setTypeWork] = useState(null);
-  const [selectedExtra, setSelectedExtra] = useState(null);
-  let countPo = 0;
-
-  async function playSound() {
-    const { sound } = await Audio.Sound.createAsync(
-      require("../../sound/DefaultBell.mp3")
-    );
-    await sound.playAsync();
-  }
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (!isPaused) {
-        const interval = setInterval(() => {
-          setSecondsLeft((prevSeconds) => {
-            if (type === "-" || mode !== "work") {
-              if (prevSeconds === 0) {
-                postPomodoro();
-                setStop(true);
-                setIsPaused(true);
-                switchMode();
-                playSound();
-                return calculateTotalSeconds();
-              }
-              return prevSeconds - 1;
-            } else {
-              return prevSeconds + 1;
-            }
-          });
-        }, 1000);
-
-        return () => clearInterval(interval);
+  const [theme, setTheme] = useState(null);
+  const {
+    isStop,
+    isPause,
+    workName,
+    secondsLeft,
+    mode,
+    pomodoroTime,
+    shortBreakTime,
+    longBreakTime,
+    type,
+    startTime,
+    workMode,
+    workId,
+    extraWorkId,
+    extraWorkName,
+    defaultTimePomodoro,
+    numberOfPomodoro,
+    numberOfPomodorosDone,
+  } = useSelector((state) => state.focus);
+  useEffect(() => {
+    const fetchTheme = async () => {
+      const theme = await AsyncStorage.getItem("theme");
+      if (theme) {
+        const parse = JSON.parse(theme);
+        setTheme(parse);
       }
-    }, [isPaused, mode, secondsLeft, type])
-  );
-
-  const postPomodoro = async () => {
-    const endTime = new Date().getTime();
-    const role = await getRole();
-    let id;
-    if (role) {
-      id = role.id;
-    } else {
-      id = await AsyncStorage.getItem("id");
-    }
-    const sTime = await AsyncStorage.getItem("startTime");
-    let workid = null;
-    let extraId = null;
-    if (selectedTask) {
-      workid = selectedTask.id;
-    }
-    if (selectedExtra) {
-      extraId = selectedExtra.id;
-    }
-    const response = await CreatePomodoro(
-      id,
-      workid,
-      extraId,
-      selectedTask ? selectedTask.timeOfPomodoro : secondLeftDefault / 60,
-      parseInt(sTime),
-      endTime
-    );
-    if (!response.success) {
-      Alert.alert("Error!!", response.message);
-    } else {
-      await AsyncStorage.removeItem("startTime");
-      setStartTime(null);
-    }
-  };
-  useFocusEffect(
-    React.useCallback(() => {
-      setMinutes(parseInt(secondsLeft / 60));
-      setSeconds(secondsLeft % 60);
-      updateProgress();
-    }, [secondsLeft])
-  );
-
-  const fetchSettings = async () => {
-    try {
-      const storedSettings = await AsyncStorage.getItem("settings");
-      const secondLeft = await AsyncStorage.getItem("secondsLeft");
-      const countWork = await AsyncStorage.getItem("countWork");
-      const pause = await AsyncStorage.getItem("play");
-      const mode = await AsyncStorage.getItem("mode");
-      const storedStop = await AsyncStorage.getItem("stop");
-      const storedStartTime = await AsyncStorage.getItem("startTime");
-      const storedInitialPomodoroTime = await AsyncStorage.getItem(
-        "initialPomodoroTime"
-      );
-
-      if (storedStop === "false") {
-        setStop(false);
-        setMinutes(storedInitialPomodoroTime);
-        setSecondsLeftDefault(parseInt(storedInitialPomodoroTime) * 60);
-      } else {
-        setMinutes(parseInt(secondLeft) / 60);
-      }
-      if (secondLeft) {
-        setSecondsLeft(parseInt(secondLeft));
-      }
-      if (storedStartTime) {
-        setStartTime(parseInt(storedStartTime));
-      }
-      if (initialPomodoroTime) {
-        setInitialPomodoroTime(initialPomodoroTime);
-      }
-      if (storedSettings) {
-        const parsedSettings = JSON.parse(storedSettings);
-        setShortBreakTime(parsedSettings.shortBreakTime);
-        setLongBreakTime(parsedSettings.longBreakTime);
-        setBreakAfter(parsedSettings.breakAfter);
-        setAutoStartPo(parsedSettings.autoStartPo);
-        setAutoStartBreak(parsedSettings.autoStartBreak);
-        setDisableBreakTime(parsedSettings.disableBreakTime);
-        const pomodoroTimeString = String(parsedSettings.pomodoroTime);
-        setTimerModeOptions([
-          {
-            key: "-",
-            label: `Count down from ${
-              pomodoroTimeString.padStart(2, "0")
-                ? pomodoroTimeString.padStart(2, "0")
-                : "25"
-            }:00 to 00:00`,
-          },
-          { key: "+", label: "Start the timer until I turn it off" },
-        ]);
-        if (storedStop === "true" && parsedSettings) {
-          setSecondsLeftDefault(parsedSettings.pomodoroTime * 60);
-          setSecondsLeft(parsedSettings.pomodoroTime * 60);
-          setMinutes(parsedSettings.pomodoroTime);
-        }
-      }
-
-      if (countWork) {
-        setCountWork(parseInt(countWork));
-      }
-      if (pause) {
-        setIsPaused(pause === "1" ? false : true);
-      }
-      if (mode) {
-        setType(mode);
-        setSelectedTimerModeOption(mode);
-      }
-    } catch (error) {
-      console.log(error);
-      Alert.alert(
-        "Smart Study Hub Announcement",
-        "An error occurred while get settings",
-        [
-          {
-            text: "Cancel",
-          },
-          {
-            text: "OK",
-          },
-        ],
-        { cancelable: false }
-      );
-    }
-  };
-
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchAll();
-    }, [])
-  );
-  const fetchAll = async () => {
-    await fetchSettings();
-    fetchWork();
-  };
-  const fetchWork = async () => {
-    const work = await AsyncStorage.getItem("work");
-    const typeWork = await AsyncStorage.getItem("workType");
-    const stoped = await AsyncStorage.getItem("stop");
-    if (work && typeWork) {
-      const parse = JSON.parse(work);
-      setTypeWork(typeWork);
-      if (typeWork === "WORK") {
-        setSelectedTask(parse);
-        setSecondsLeftDefault(parseInt(parse.timeOfPomodoro) * 60);
-        if (stoped === "true") {
-          setSecondsLeft(parseInt(parse.timeOfPomodoro) * 60);
-          setMinutes(parseInt(parse.timeOfPomodoro));
-        } else {
-          setStop(false);
-        }
-      } else {
-        setSelectedExtra(parse);
-      }
-    }
-  };
+    };
+    fetchTheme();
+  }, []);
 
   const calculateTotalSeconds = () => {
     if (type === "-") {
@@ -272,97 +96,31 @@ const Focus = () => {
     setPercentage(calculatedPercentage);
   };
 
-  const switchMode = async () => {
-    if (mode === "work") {
-      setCountWork((pre) => pre + 1);
-    }
-    if (disableBreakTime) {
-      setSecondsLeft(secondLeftDefault);
-    } else {
-      if (mode === "work") {
-        if (countWork % breakAfter === 0) {
-          setMode("longBreak");
-          setSecondsLeft(longBreakTime * 60);
-        } else {
-          setMode("shortBreak");
-          setSecondsLeft(shortBreakTime * 60);
-        }
-      } else {
-        setMode("work");
-        setSecondsLeft(secondLeftDefault);
-      }
-    }
-    if (
-      (mode === "work" && autoStartPo) ||
-      (mode !== "work" && autoStartBreak)
-    ) {
-      setInitialPomodoroTime(minutes);
-      setStartTime(new Date().getTime());
-      setStop(false);
-      setIsPaused(false);
-      saveToAsyncStorage("initialPomodoroTime", minutes);
-      saveToAsyncStorage("startTime", String(new Date().getTime()));
-    }
-  };
-
   const startFocus = () => {
-    if (stop && secondsLeft === secondLeftDefault) {
-      if (selectedTask) {
-        saveToAsyncStorage("initialPomodoroTime", selectedTask.timeOfPomodoro);
-      } else {
-        saveToAsyncStorage("initialPomodoroTime", secondLeftDefault / 60);
-      }
-      setStartTime(new Date().getTime());
-      setStop(!stop);
-      saveToAsyncStorage("startTime", new Date().getTime().toString());
-    }
-    setIsPaused(!isPaused);
-  };
-
-  const saveToAsyncStorage = async (key, value) => {
-    try {
-      await AsyncStorage.setItem(key, String(value));
-    } catch (error) {
-      console.error("Error saving data to AsyncStorage:", error);
+    if (isStop) {
+      dispatch(setFocus({ isPause: false, isStop: false }));
+    } else {
+      dispatch(setFocus({ isPause: !isPause }));
     }
   };
 
   const handleCloseTask = async () => {
-    setSelectedTask(null);
-    setSelectedExtra(null);
-    setStop(true);
-    setIsPaused(true);
-    await resetData();
-    if (type === "+") {
-      setSecondsLeft(0);
-    }
-    await AsyncStorage.removeItem("work");
-    await AsyncStorage.removeItem("workType");
-  };
-  const getNewSetting = async () => {
-    const storedSettings = await AsyncStorage.getItem("settings");
-    if (storedSettings) {
-      const parsedSettings = JSON.parse(storedSettings);
-      setShortBreakTime(parsedSettings.shortBreakTime);
-      setLongBreakTime(parsedSettings.longBreakTime);
-      setBreakAfter(parsedSettings.breakAfter);
-      setAutoStartPo(parsedSettings.autoStartPo);
-      setAutoStartBreak(parsedSettings.autoStartBreak);
-      setDisableBreakTime(parsedSettings.disableBreakTime);
-      setSecondsLeftDefault(parsedSettings.pomodoroTime * 60);
-      setMinutes(parsedSettings.pomodoroTime);
-      setSeconds(0);
-      if (type === "+") {
-        setMinutes(0);
-        setSecondsLeft(0);
-      } else {
-        setSecondsLeft(parsedSettings.pomodoroTime * 60);
-      }
-    }
+    dispatch(
+      setFocus({
+        workId: null,
+        workName: null,
+        extraWorkId: null,
+        extraWorkName: null,
+        numberOfPomodoro: null,
+        numberOfPomodorosDone: null,
+        secondsLeft:defaultTimePomodoro*60,
+        pomodoroTime:defaultTimePomodoro
+      })
+    );
   };
 
   const handleStop = async () => {
-    if (mode === "work") {
+    if (workMode === "work") {
       Alert.alert(
         "Smart Study Hub Announcement",
         "Do you want to stop this Pomodoro?",
@@ -377,46 +135,27 @@ const Focus = () => {
         ]
       );
     } else {
-      setStop(true);
-      setIsPaused(true);
-      switchMode();
+      dispatch(
+        setFocus({
+          isPause: true,
+          isStop: true,
+          secondsLeft: (workId ? pomodoroTime : defaultTimePomodoro)*60,
+        })
+      );
     }
   };
 
-  const getSetting = async () => {
-    const setting = await AsyncStorage.getItem("settings");
-    if (setting) {
-      return JSON.parse(setting);
-    }
-    return null;
-  };
-  const resetData = async () => {
-    const setting = await getSetting();
-    if (setting) {
-      setSecondsLeft(setting.pomodoroTime * 60);
-      setSecondsLeftDefault(setting.pomodoroTime * 60);
-      setMinutes(parseInt(setting.pomodoroTime));
-      setSeconds(0);
-      setPercentage(100);
-    }
-  };
   const stopPo = async () => {
-    if (selectedTask) {
-      setSecondsLeft(selectedTask.timeOfPomodoro * 60);
-      setMinutes(selectedTask.timeOfPomodoro);
-    } else {
-      resetData();
-    }
-    setStop(true);
-    setIsPaused(true);
-    if (type == "+") {
-      setSecondsLeft(0);
-      countPo = 0;
-      setPercentage(100);
-    }
+    dispatch(
+      setFocus({
+        isPause: true,
+        isStop: true,
+        secondsLeft: (workId ? pomodoroTime : defaultTimePomodoro)*60,
+      })
+    );
   };
   const openTimerModeModal = () => {
-    if (!isPaused) {
+    if (!isPause || !isStop) {
       Alert.alert(
         "Smart Study Hub Announcement",
         "Please stop the timer before changing the timer mode.",
@@ -433,125 +172,66 @@ const Focus = () => {
   };
 
   const handleTimerModeSelection = async () => {
-    if (selectedTimerModeOption !== type) {
-      if (selectedTimerModeOption === "+") {
-        setSecondsLeft(0);
-        setMinutes(0);
-      } else {
-        getNewSetting();
-        setSecondsLeft(secondLeftDefault);
-      }
-      setType(selectedTimerModeOption);
-    }
     setModalVisible(false);
   };
 
-  useEffect(() => {
-    updateProgress();
-  }, [type]);
   const backtoHome = async () => {
-    try {
-      await AsyncStorage.setItem("secondsLeft", String(secondsLeft));
-      await AsyncStorage.setItem("countWork", String(countWork));
-      if (isPaused) {
-        await AsyncStorage.setItem("play", "0");
-      } else {
-        await AsyncStorage.setItem("play", "1");
-      }
-      await AsyncStorage.setItem("countPomodoro", String(countPo));
-      await AsyncStorage.setItem("mode", type);
-      saveToAsyncStorage("stop", stop);
-
-      navigation.goBack();
-    } catch (error) {
-      console.log(error);
-      Alert.alert(
-        "Smart Study Hub Announcement",
-        "An error occurred while saving the settings",
-        [
-          {
-            text: "Cancel",
-          },
-          {
-            text: "OK",
-          },
-        ],
-        { cancelable: false }
-      );
-    }
+    navigation.goBack();
   };
 
-  const handleDoneExtra = async (id) => {
-    const response = await ExtraMarkCompleted(id);
+  const handleDoneExtra = async () => {
+    const response = await ExtraMarkCompleted(extraWorkId);
     if (response.success) {
-      await AsyncStorage.removeItem("work");
-      await AsyncStorage.removeItem("workType");
-      await AsyncStorage.setItem("stop", "true");
-      setIsPaused(true);
-      setStop(true);
-      resetData();
-      setSelectedExtra(null);
+      dispatch(
+        setFocus({
+          extraWorkId: null,
+          extraWorkName: null,
+        })
+      );
     } else {
       Alert.alert("Error when complete extra work", response.message);
     }
   };
-  const handleDoneWork = async (id) => {
-    if (typeWorkSelect === "WORK") {
-      const response = await MarkCompleted(id);
+  const handleDoneWork = async () => {
+    if (workId) {
+      const response = await MarkCompleted(workId);
       if (response.success) {
-        await AsyncStorage.removeItem("work");
-        await AsyncStorage.removeItem("workType");
-        setSelectedTask(null);
-        setIsPaused(true);
-        setStop(true);
-        resetData();
+        dispatch(
+          setFocus({
+            workId: null,
+            workName: null,
+            pomodoroTime: defaultTimePomodoro,
+          })
+        );
       } else {
         Alert.alert("Error when complete work", response.message);
       }
     } else {
-      const response = await ExtraMarkCompleted(id);
+      const response = await ExtraMarkCompleted(extraWorkId);
       if (response.success) {
-        await AsyncStorage.removeItem("work");
-        await AsyncStorage.removeItem("workType");
-        resetData();
-        setIsPaused(true);
-        setStop(true);
-        setSelectedTask(null);
+        dispatch(setFocus({ extraWorkId: null, extraWorkName: null }));
       } else {
         Alert.alert("Error when complete extra work", response.message);
       }
     }
   };
   const handleClose = async () => {
-    setChoose(false);
-    setStop(true);
-    await fetchWork();
-    if (selectedTask) {
-      setSecondsLeft(selectedTask?.timeOfPomodoro * 60);
-      setMinutes(selectedTask?.timeOfPomodoro);
-    }
-    setStop(true);
-    setIsPaused(true);
-    setPercentage(100);
+    setChoose(false)
   };
-  useEffect(() => {
-    if (stop && selectedTask && type === "-") {
-      setSecondsLeftDefault(selectedTask.timeOfPomodoro * 60);
-      setSecondsLeft(selectedTask.timeOfPomodoro * 60);
-      setPercentage(100);
-    }
-    if (type === "+") {
-      setSecondsLeft(0);
-    }
-    if (!selectedTask) {
-      resetData();
-    }
-  }, [selectedTask]);
+
+  const handleSelectMode = (key) => {
+    const second =
+      key === "+" ? 0 : workId ? pomodoroTime : defaultTimePomodoro;
+    dispatch(setFocus({ mode: key, secondsLeft: second }));
+    setModalVisible(false);
+  };
   return (
     <View style={styles.container}>
       <Image
         style={styles.imageBg}
-        source={require("../../images/bg_focus_1.jpg")}
+        source={
+          theme ? { uri: theme.url } : require("../../images/bg_focus_1.jpg")
+        }
       />
       <View style={styles.overlay}>
         <TouchableOpacity style={styles.downButton}>
@@ -568,10 +248,10 @@ const Focus = () => {
           onPress={() => setChoose(true)}
           style={styles.taskContainer}
         >
-          {!selectedTask && !selectedExtra && <Text>Please Choose a Task</Text>}
-          {selectedTask && (
+          {!extraWorkId && !workId && <Text>Please Choose a Task</Text>}
+          {workId && (
             <TouchableOpacity
-              onPress={() => handleDoneWork(selectedTask.id)}
+              onPress={() => handleDoneWork()}
               style={styles.selectedTask}
             >
               <TouchableOpacity
@@ -580,9 +260,9 @@ const Focus = () => {
               ></TouchableOpacity>
               <View style={styles.taskDetailsContainer}>
                 <View style={styles.taskDetails}>
-                  <Text style={styles.workName}>{selectedTask.workName}</Text>
+                  <Text style={styles.workName}>{workName}</Text>
                   <View style={styles.timerIcons}>
-                    {selectedTask.numberOfPomodoros !== 0 && (
+                    {numberOfPomodoro !== 0 && (
                       <View style={styles.pomodoroContainer}>
                         <MaterialCommunityIcons
                           name="clock-check"
@@ -590,7 +270,7 @@ const Focus = () => {
                           color="#ff3232"
                         />
                         <Text style={styles.pomodoroText}>
-                          {selectedTask.numberOfPomodorosDone}/
+                          {numberOfPomodorosDone}/
                         </Text>
                         <MaterialCommunityIcons
                           name="clock"
@@ -598,7 +278,7 @@ const Focus = () => {
                           color="#ff9999"
                         />
                         <Text style={[styles.pomodoroText, { marginRight: 5 }]}>
-                          {selectedTask.numberOfPomodoros}
+                          {numberOfPomodoro}
                         </Text>
                       </View>
                     )}
@@ -615,9 +295,9 @@ const Focus = () => {
               </TouchableOpacity>
             </TouchableOpacity>
           )}
-          {selectedExtra && (
+          {extraWorkId && !workId && (
             <TouchableOpacity
-              onPress={() => handleDoneExtra(selectedExtra.id)}
+              onPress={() => handleDoneExtra()}
               style={styles.selectedTask}
             >
               <TouchableOpacity
@@ -626,18 +306,14 @@ const Focus = () => {
               ></TouchableOpacity>
               <View style={styles.taskDetailsContainer}>
                 <View style={styles.taskDetails}>
-                  <Text style={styles.workName}>
-                    {selectedExtra.extraWorkName}
-                  </Text>
+                  <Text style={styles.workName}>{extraWorkName}</Text>
                 </View>
               </View>
-              <TouchableOpacity style={styles.closeButton}>
-                <AntDesign
-                  onPress={() => handleCloseTask()}
-                  name="closecircleo"
-                  size={24}
-                  color="gray"
-                />
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => handleCloseTask()}
+              >
+                <AntDesign name="closecircleo" size={24} color="gray" />
               </TouchableOpacity>
             </TouchableOpacity>
           )}
@@ -650,23 +326,23 @@ const Focus = () => {
             size={200}
             width={15}
             fill={percentage}
-            tintColor={mode === "work" ? "red" : "green"}
+            tintColor={workMode === "work" ? "red" : "green"}
             backgroundColor="rgba(255, 255, 255, 0.2)"
             rotation={0}
             lineCap="round"
           >
             {() => (
               <Text style={styles.progressText}>
-                {String(minutes).padStart(2, "0")}:
-                {String(seconds).padStart(2, "0")}
+                {String(parseInt(secondsLeft / 60)).padStart(2, "0")}:
+                {String(parseInt(secondsLeft % 60)).padStart(2, "0")}
               </Text>
             )}
           </CircularProgress>
           <ControlButtons
-            isPaused={isPaused}
+            isPaused={isPause}
             handleStop={handleStop}
             startFocus={startFocus}
-            mode={mode}
+            mode={workMode}
           />
         </View>
 
@@ -681,13 +357,13 @@ const Focus = () => {
             </View>
           </View>
           <View style={styles.settingsIcon} onTouchEnd={openTimerModeModal}>
-            {type === null && (
+            {mode === null && (
               <MaterialIcons name="timer" size={20} color="white" />
             )}
-            {type === "-" && (
+            {mode === "-" && (
               <Ionicons name="hourglass-outline" size={20} color="white" />
             )}
-            {type === "+" && (
+            {mode === "+" && (
               <FontAwesome5 name="hourglass-start" size={20} color="white" />
             )}
             <View style={styles.textMode}>
@@ -729,14 +405,14 @@ const Focus = () => {
                   key={option.key}
                   style={[
                     styles.timerModeOption,
-                    option.key === selectedTimerModeOption && {
+                    option.key === mode && {
                       backgroundColor: "#FFC0CB",
                     },
                   ]}
-                  onPress={() => setSelectedTimerModeOption(option.key)}
+                  onPress={() => handleSelectMode(option.key)}
                 >
                   <Text style={styles.timerModeText}>{option.label}</Text>
-                  {option.key === selectedTimerModeOption && (
+                  {option.key === mode && (
                     <AntDesign
                       name="checkcircle"
                       size={20}
@@ -752,12 +428,6 @@ const Focus = () => {
                   onPress={() => setModalVisible(false)}
                 >
                   <Text style={styles.buttonText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.button, styles.okButton]}
-                  onPress={() => handleTimerModeSelection()}
-                >
-                  <Text style={styles.buttonText}>OK</Text>
                 </TouchableOpacity>
               </View>
             </View>
