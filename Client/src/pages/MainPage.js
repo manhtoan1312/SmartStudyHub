@@ -225,7 +225,7 @@ const MainPage = () => {
       isPause: newStop,
       isStop: newStop,
       secondsLeft: newSecondsLeft,
-      mode: newMode,
+      workMode: newMode,
       countWork: newCountWork,
     };
 
