@@ -35,19 +35,12 @@ import { setIsPlay } from "../../slices/isPlaySlice";
 import { setFocus } from "../../slices/focusSlice";
 const { width, height } = Dimensions.get("screen");
 
-const red = "#f54e4e";
-const green = "#4aec8c";
-
 const Focus = () => {
   const navigation = useNavigation();
   const [choose, setChoose] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
   const [percentage, setPercentage] = useState(100);
   const [isModalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
-  const [timerModeOptions, setTimerModeOptions] = useState([]);
-  const [selectedTimerModeOption, setSelectedTimerModeOption] = useState("-");
-  const [theme, setTheme] = useState(null);
   const {
     isStop,
     isPause,
@@ -55,10 +48,6 @@ const Focus = () => {
     secondsLeft,
     mode,
     pomodoroTime,
-    shortBreakTime,
-    longBreakTime,
-    type,
-    startTime,
     workMode,
     workId,
     extraWorkId,
@@ -67,6 +56,21 @@ const Focus = () => {
     numberOfPomodoro,
     numberOfPomodorosDone,
   } = useSelector((state) => state.focus);
+  const [selectedMode, setSelectedMode] = useState(mode);
+  const [theme, setTheme] = useState(null);
+
+  const timerModeOptions = [
+    {
+      key: "-",
+      label: `countdown from ${String(
+        workId ? pomodoroTime : defaultTimePomodoro
+      ).padStart(2, "0")}:00 until the end.`,
+    },
+    {
+      key: "+",
+      label: `start timing from 00:00 until I turn it off (manually turn it off).`,
+    },
+  ];
   useEffect(() => {
     const fetchTheme = async () => {
       const theme = await AsyncStorage.getItem("theme");
@@ -78,23 +82,14 @@ const Focus = () => {
     fetchTheme();
   }, []);
 
-  const calculateTotalSeconds = () => {
-    if (type === "-") {
-      return mode === "work"
-        ? secondLeftDefault
-        : (mode === "shortBreak" ? shortBreakTime : longBreakTime) * 60;
-    } else if (type === "+") {
-      setMode("work");
-      return 10000000000;
+  useEffect(() => {
+    if (mode === "-") {
+      const percent =
+        (secondsLeft / ((workId ? pomodoroTime : defaultTimePomodoro) * 60)) *
+        100;
+      setPercentage(percent);
     }
-    return secondLeftDefault;
-  };
-
-  const updateProgress = () => {
-    const totalSeconds = calculateTotalSeconds();
-    const calculatedPercentage = Math.round((secondsLeft / totalSeconds) * 100);
-    setPercentage(calculatedPercentage);
-  };
+  }, [secondsLeft]);
 
   const startFocus = () => {
     if (isStop) {
@@ -113,8 +108,8 @@ const Focus = () => {
         extraWorkName: null,
         numberOfPomodoro: null,
         numberOfPomodorosDone: null,
-        secondsLeft:defaultTimePomodoro*60,
-        pomodoroTime:defaultTimePomodoro
+        secondsLeft: defaultTimePomodoro * 60,
+        pomodoroTime: defaultTimePomodoro,
       })
     );
   };
@@ -139,7 +134,8 @@ const Focus = () => {
         setFocus({
           isPause: true,
           isStop: true,
-          secondsLeft: (workId ? pomodoroTime : defaultTimePomodoro)*60,
+          secondsLeft: (workId ? pomodoroTime : defaultTimePomodoro) * 60,
+          workMode: "work",
         })
       );
     }
@@ -150,7 +146,7 @@ const Focus = () => {
       setFocus({
         isPause: true,
         isStop: true,
-        secondsLeft: (workId ? pomodoroTime : defaultTimePomodoro)*60,
+        secondsLeft: (workId ? pomodoroTime : defaultTimePomodoro) * 60,
       })
     );
   };
@@ -169,10 +165,6 @@ const Focus = () => {
     } else {
       setModalVisible(true);
     }
-  };
-
-  const handleTimerModeSelection = async () => {
-    setModalVisible(false);
   };
 
   const backtoHome = async () => {
@@ -216,14 +208,21 @@ const Focus = () => {
     }
   };
   const handleClose = async () => {
-    setChoose(false)
+    setChoose(false);
   };
 
   const handleSelectMode = (key) => {
-    const second =
-      key === "+" ? 0 : workId ? pomodoroTime : defaultTimePomodoro;
-    dispatch(setFocus({ mode: key, secondsLeft: second }));
+    setSelectedMode(key);
+  };
+
+  const handleSubmitMode = () => {
     setModalVisible(false);
+    const second =
+      selectedMode === "+"
+        ? 0
+        : (workId ? pomodoroTime : defaultTimePomodoro) * 60;
+    setPercentage(100);
+    dispatch(setFocus({ mode: selectedMode, secondsLeft: second }));
   };
   return (
     <View style={styles.container}>
@@ -250,64 +249,76 @@ const Focus = () => {
         >
           {!extraWorkId && !workId && <Text>Please Choose a Task</Text>}
           {workId && (
-            <TouchableOpacity
-              onPress={() => handleDoneWork()}
-              style={styles.selectedTask}
+            <View
+              style={{ width: 280, flexDirection: "row", alignItems: "center" }}
             >
-              <TouchableOpacity
-                onPress={() => {}}
-                style={styles.circleContainer}
-              ></TouchableOpacity>
-              <View style={styles.taskDetailsContainer}>
-                <View style={styles.taskDetails}>
-                  <Text style={styles.workName}>{workName}</Text>
-                  <View style={styles.timerIcons}>
-                    {numberOfPomodoro !== 0 && (
-                      <View style={styles.pomodoroContainer}>
-                        <MaterialCommunityIcons
-                          name="clock-check"
-                          size={14}
-                          color="#ff3232"
-                        />
-                        <Text style={styles.pomodoroText}>
-                          {numberOfPomodorosDone}/
-                        </Text>
-                        <MaterialCommunityIcons
-                          name="clock"
-                          size={14}
-                          color="#ff9999"
-                        />
-                        <Text style={[styles.pomodoroText, { marginRight: 5 }]}>
-                          {numberOfPomodoro}
-                        </Text>
+              <TouchableOpacity style={styles.selectedTask} onPress={() => setChoose(true)}>
+                <TouchableOpacity
+                  style={{flexDirection: "row"}}
+                  onPress={() => handleDoneWork()}
+                >
+                  <TouchableOpacity
+                    onPress={() => {}}
+                    style={styles.circleContainer}
+                  ></TouchableOpacity>
+                  <View style={styles.taskDetailsContainer}>
+                    <View style={styles.taskDetails}>
+                      <Text style={styles.workName}>{workName}</Text>
+                      <View style={styles.timerIcons}>
+                        {numberOfPomodoro !== 0 && (
+                          <View style={styles.pomodoroContainer}>
+                            <MaterialCommunityIcons
+                              name="clock-check"
+                              size={14}
+                              color="#ff3232"
+                            />
+                            <Text style={styles.pomodoroText}>
+                              {numberOfPomodorosDone}/
+                            </Text>
+                            <MaterialCommunityIcons
+                              name="clock"
+                              size={14}
+                              color="#ff9999"
+                            />
+                            <Text
+                              style={[styles.pomodoroText, { marginRight: 5 }]}
+                            >
+                              {numberOfPomodoro}
+                            </Text>
+                          </View>
+                        )}
                       </View>
-                    )}
+                    </View>
                   </View>
-                </View>
-              </View>
-              <TouchableOpacity style={styles.closeButton}>
-                <AntDesign
-                  onPress={() => handleCloseTask()}
-                  name="closecircleo"
-                  size={24}
-                  color="gray"
-                />
+                </TouchableOpacity>
               </TouchableOpacity>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => handleCloseTask()}
+              >
+                <AntDesign name="closecircleo" size={24} color="gray" />
+              </TouchableOpacity>
+            </View>
           )}
           {extraWorkId && !workId && (
-            <TouchableOpacity
-              onPress={() => handleDoneExtra()}
-              style={styles.selectedTask}
+            <View
+              style={{ width: 280, flexDirection: "row", alignItems: "center" }}
             >
-              <TouchableOpacity
-                onPress={() => {}}
-                style={styles.circleContainer}
-              ></TouchableOpacity>
-              <View style={styles.taskDetailsContainer}>
-                <View style={styles.taskDetails}>
-                  <Text style={styles.workName}>{extraWorkName}</Text>
-                </View>
+              <View style={styles.selectedTask} onPress={() => setChoose(true)}>
+                <TouchableOpacity
+                  style={{ flexDirection: "row" }}
+                  onPress={() => handleDoneExtra()}
+                >
+                  <TouchableOpacity
+                    onPress={() => {}}
+                    style={styles.circleContainer}
+                  ></TouchableOpacity>
+                  <View style={styles.taskDetailsContainer}>
+                    <View style={styles.taskDetails}>
+                      <Text style={styles.workName}>{extraWorkName}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>{" "}
               </View>
               <TouchableOpacity
                 style={styles.closeButton}
@@ -315,7 +326,7 @@ const Focus = () => {
               >
                 <AntDesign name="closecircleo" size={24} color="gray" />
               </TouchableOpacity>
-            </TouchableOpacity>
+            </View>
           )}
         </TouchableOpacity>
 
@@ -370,12 +381,12 @@ const Focus = () => {
               <Text style={{ color: "white", fontSize: 10 }}>Timer Mode</Text>
             </View>
           </View>
-          <View style={styles.settingsIcon}>
+          <TouchableOpacity onPress={() => navigation.navigate('FullScreen')} style={styles.settingsIcon}>
             <Octicons name="screen-full" size={20} color="white" />
             <View style={styles.textMode}>
               <Text style={{ color: "white", fontSize: 10 }}>Full Screen</Text>
             </View>
-          </View>
+          </TouchableOpacity>
           <View style={styles.settingsIcon}>
             <FontAwesome5 name="itunes-note" size={20} color="white" />
             <View style={{ marginTop: 5 }}>
@@ -405,14 +416,14 @@ const Focus = () => {
                   key={option.key}
                   style={[
                     styles.timerModeOption,
-                    option.key === mode && {
+                    option.key === selectedMode && {
                       backgroundColor: "#FFC0CB",
                     },
                   ]}
                   onPress={() => handleSelectMode(option.key)}
                 >
                   <Text style={styles.timerModeText}>{option.label}</Text>
-                  {option.key === mode && (
+                  {option.key === selectedMode && (
                     <AntDesign
                       name="checkcircle"
                       size={20}
@@ -428,6 +439,12 @@ const Focus = () => {
                   onPress={() => setModalVisible(false)}
                 >
                   <Text style={styles.buttonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, styles.okButton]}
+                  onPress={() => handleSubmitMode(false)}
+                >
+                  <Text style={styles.buttonText}>Ok</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -538,6 +555,7 @@ const styles = StyleSheet.create({
   },
   okButton: {
     backgroundColor: "red",
+    paddingHorizontal: 35,
   },
   buttonText: {
     color: "white",
@@ -572,7 +590,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#fff",
     width: "75%",
-    alignSelf: "center",
     borderRadius: 10,
   },
   circleContainer: {
@@ -611,9 +628,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   closeButton: {
-    position: "absolute",
-    right: -70,
-    top: 5,
+    marginLeft: 40,
   },
 });
 

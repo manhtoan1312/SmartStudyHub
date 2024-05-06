@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Modal,
   Animated,
-  Dimensions,
+  Dimensions,SafeAreaView
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import ThemeBody from "../../components/ThemeBody";

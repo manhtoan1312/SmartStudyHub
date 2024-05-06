@@ -6,7 +6,7 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
-  Alert,
+  Alert,SafeAreaView
 } from "react-native";
 import { AntDesign, Fontisto } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";

@@ -7,7 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
+  Alert,SafeAreaView
 } from "react-native";
 import { FontAwesome, EvilIcons } from "@expo/vector-icons";
 import { AuthenToRecover, ResendOTP } from "../../services/AccountService";

@@ -8,7 +8,7 @@ import {
   Alert,
   FlatList,
   Modal,
-  ScrollView
+  ScrollView,SafeAreaView
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -33,17 +33,21 @@ const SoundDone = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [soundList, setSoundList] = useState([]);
   const [deletedSoundList, setDeletedSoundList] = useState([]);
-  const [selectedSound, setSelectedSound] = useState({});
+  const [selectedSound, setSelectedSound] = useState({
+    id: 1,
+    nameSound: "Default Bell",
+    url: "https://res.cloudinary.com/dnj5purhu/video/upload/v1702956713/SmartStudyHub/SOUNDDONE/DEFAULT/DefaultBell_vh2hg0.mp3",
+    statusSound: "DEFAULT",
+    createdDate: 1701129600000,
+    status: "ACTIVE"
+});
   const [soundObject, setSoundObject] = useState(null);
-  const [noneSelected, setNoneSelected] = useState(false);
   const [checkRole, setCheckRole] = useState(false);
 
   const fetchData = async () => {
     const sound = await AsyncStorage.getItem("soundDone");
     if (sound) {
       setSelectedSound(JSON.parse(sound));
-    } else {
-      setNoneSelected(true);
     }
     if (soundObject) {
       await soundObject.stopAsync();
@@ -99,8 +103,7 @@ const SoundDone = ({ navigation }) => {
       await soundObject.stopAsync();
     }
 
-    setSelectedSound(sound);
-    setNoneSelected(false);
+    setSelectedSound(sound)
     const newSoundObject = new Audio.Sound();
     try {
       await newSoundObject.loadAsync({ uri: sound.url });
@@ -110,15 +113,6 @@ const SoundDone = ({ navigation }) => {
     } catch (error) {
       console.error("Error playing sound:", error);
     }
-  };
-
-  const handleNone = async () => {
-    if (soundObject) {
-      await soundObject.stopAsync();
-    }
-    setSelectedSound({});
-    setNoneSelected(true);
-    await AsyncStorage.removeItem("soundDone");
   };
 
   const handleOption = (sound) => {
@@ -297,16 +291,6 @@ const SoundDone = ({ navigation }) => {
               style={styles.addItem}
             >
               <Text style={styles.bodyText}>+ Add Sound</Text>
-            </TouchableOpacity>
-            {/* Hiển thị mục "None" */}
-            <TouchableOpacity
-              onPress={() => handleNone()}
-              style={[styles.addItem, noneSelected && styles.selectedItem]}
-            >
-              <Text style={[styles.bodyText]}>None</Text>
-              {noneSelected && (
-                <MaterialIcons name="check" size={24} color="orange" />
-              )}
             </TouchableOpacity>
             {soundList?.map((item) => (
               <SoundItem

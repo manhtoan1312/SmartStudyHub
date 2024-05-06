@@ -25,9 +25,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { setFocus } from "../slices/focusSlice";
 
 const WorkActive = ({ workItem, reload, navigation }) => {
-  const [extraVisible, setExtraVisible] = useState(false)
-  const {defaultTimePomodoro} = useSelector((state) => state.focus)
-  const dispatch = useDispatch()
+  const [extraVisible, setExtraVisible] = useState(false);
+  const { defaultTimePomodoro } = useSelector((state) => state.focus);
+  const dispatch = useDispatch();
   async function playSound() {
     const { sound } = await Audio.Sound.createAsync(
       require("../sound/Done.mp3")
@@ -147,32 +147,33 @@ const WorkActive = ({ workItem, reload, navigation }) => {
           numberOfPomodoro: workItem.numberOfPomodoros,
           numberOfPomodorosDone: workItem.numberOfPomodorosDone,
           pomodoroTime: workItem.timeOfPomodoro,
-          isPause:true, 
-          isStop:true,
-          secondsLeft: workItem.timeOfPomodoro *60
+          isPause: true,
+          isStop: true,
+          secondsLeft: workItem.timeOfPomodoro * 60,
         })
       );
-      navigation.navigate('Focus')
+      navigation.navigate("Focus");
     } catch (e) {
       Alert.alert("Error when save work", e);
     }
   };
   const playExtra = async (item) => {
     if (item.status === "ACTIVE") {
+      console.log(item)
       try {
         dispatch(
           setFocus({
             extraWorkId: item.id,
             extraWorkName: item.extraWorkName,
-            isPause:true, 
-            isStop:true,
+            isPause: true,
+            isStop: true,
             workId: null,
-          workName: null,
-          startTime: null,
-          numberOfPomodoro: null,
-          numberOfPomodorosDone: null,
-          pomodoroTime: null,
-          secondsLeft: workItem.timeOfPomodoro *60
+            workName: null,
+            startTime: null,
+            numberOfPomodoro: null,
+            numberOfPomodorosDone: null,
+            pomodoroTime: defaultTimePomodoro,
+            secondsLeft: defaultTimePomodoro * 60,
           })
         );
         navigation.navigate("Focus");
@@ -424,7 +425,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    marginRight:10,
+    marginRight: 10,
     backgroundColor: "white",
     borderRadius: 10,
     padding: 10,
@@ -462,7 +463,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     borderLeftColor: "lightgray",
     borderLeftWidth: 2,
-    marginVertical: 10,
+    marginVertical: 5,
   },
   extraWorkItem: {
     paddingLeft: 5,

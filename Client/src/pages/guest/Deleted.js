@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   Modal,
   StyleSheet,
-  ScrollView,
+  ScrollView,SafeAreaView
 } from "react-native";
 import {
   AntDesign,

@@ -7,7 +7,7 @@ import {
   Alert,
   FlatList,
   Modal,
-  ScrollView,
+  ScrollView,SafeAreaView
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";

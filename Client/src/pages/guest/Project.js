@@ -160,273 +160,275 @@ function Project({ navigation }) {
     }
   };
   return (
-    <ScrollView>
-      <View
-        style={s`bg-white justify-center items-center py-4 border-b-2 border-b-gray-200`}
-      >
-        <FontAwesome
-          style={s`absolute left-6`}
-          name="angle-left"
-          size={32}
-          onPress={() => handleBackBtn()}
-        />
-        <Text style={s`font-medium text-2xl`}>Projects</Text>
-      </View>
-      <View style={s`flex flex-col bg-white px-3`}>
-        <View style={s`flex flex-row justify-between py-2 mt-2`}>
-          <View style={s`flex flex-row`}>
-            <MaterialCommunityIcons
-              name="calendar-arrow-left"
-              size={24}
-              color="red"
+  
+      <ScrollView>
+        <View
+          style={s`bg-white justify-center items-center py-4 border-b-2 border-b-gray-200`}
+        >
+          <FontAwesome
+            style={s`absolute left-6`}
+            name="angle-left"
+            size={32}
+            onPress={() => handleBackBtn()}
+          />
+          <Text style={s`font-medium text-2xl`}>Projects</Text>
+        </View>
+        <View style={s`flex flex-col bg-white px-3`}>
+          <View style={s`flex flex-row justify-between py-2 mt-2`}>
+            <View style={s`flex flex-row`}>
+              <MaterialCommunityIcons
+                name="calendar-arrow-left"
+                size={24}
+                color="red"
+              />
+              <Text style={s`h-full flex items-center pl-2`}>Out of Date</Text>
+            </View>
+            <Switch
+              trackColor={{ false: "gray", true: "red" }}
+              thumbColor={"white"}
+              value={outOfDate}
+              onValueChange={() => setOutOfDate(!outOfDate)}
             />
-            <Text style={s`h-full flex items-center pl-2`}>Out of Date</Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={outOfDate}
-            onValueChange={() => setOutOfDate(!outOfDate)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <View style={s`flex flex-row`}>
-            <MaterialCommunityIcons
-              name="weather-sunset"
-              size={24}
-              color="orange"
+  
+          <View style={s`flex flex-row justify-between py-2`}>
+            <View style={s`flex flex-row`}>
+              <MaterialCommunityIcons
+                name="weather-sunset"
+                size={24}
+                color="orange"
+              />
+              <Text style={s`h-full flex items-center pl-2`}>Tomorrow</Text>
+            </View>
+            <Switch
+              trackColor={{ false: "gray", true: "red" }}
+              thumbColor={"white"}
+              value={tomorow}
+              onValueChange={() => setTomorow(!tomorow)}
             />
-            <Text style={s`h-full flex items-center pl-2`}>Tomorrow</Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={tomorow}
-            onValueChange={() => setTomorow(!tomorow)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <View style={s`flex flex-row`}>
-            <MaterialCommunityIcons
-              name="calendar-weekend-outline"
-              size={24}
-              color="purple"
+  
+          <View style={s`flex flex-row justify-between py-2`}>
+            <View style={s`flex flex-row`}>
+              <MaterialCommunityIcons
+                name="calendar-weekend-outline"
+                size={24}
+                color="purple"
+              />
+              <Text style={s`h-full flex items-center pl-2`}>This Week</Text>
+            </View>
+            <Switch
+              trackColor={{ false: "gray", true: "red" }}
+              thumbColor={"white"}
+              value={thisWeek}
+              onValueChange={() => setThisWeek(!thisWeek)}
             />
-            <Text style={s`h-full flex items-center pl-2`}>This Week</Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={thisWeek}
-            onValueChange={() => setThisWeek(!thisWeek)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <View style={s`flex flex-row`}>
-            <MaterialCommunityIcons
-              name="calendar-arrow-right"
-              size={24}
-              color="#00FF7F"
+  
+          <View style={s`flex flex-row justify-between py-2`}>
+            <View style={s`flex flex-row`}>
+              <MaterialCommunityIcons
+                name="calendar-arrow-right"
+                size={24}
+                color="#00FF7F"
+              />
+              <Text style={s`h-full flex items-center pl-2`}>Next 7 Days</Text>
+            </View>
+            <Switch
+              trackColor={{ false: "gray", true: "red" }}
+              thumbColor={"white"}
+              value={next7Day}
+              onValueChange={() => setnext7Day(!next7Day)}
             />
-            <Text style={s`h-full flex items-center pl-2`}>Next 7 Days</Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={next7Day}
-            onValueChange={() => setnext7Day(!next7Day)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <View style={s`flex flex-row`}>
-            <Feather name="flag" size={24} color="red" />
-            <Text style={s`h-full flex items-center pl-2`}>High Priority</Text>
-          </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={highPriority}
-            onValueChange={() => setHighPriority(!highPriority)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <View style={s`flex flex-row`}>
-            <Feather name="flag" size={24} color="yellow" />
-            <Text style={s`h-full flex items-center pl-2`}>
-              Normal Priority
-            </Text>
-          </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={mediumPriority}
-            onValueChange={() => setMediumPriority(!mediumPriority)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <View style={s`flex flex-row`}>
-            <Feather name="flag" size={24} color="green" />
-            <Text style={s`h-full flex items-center pl-2`}>Low Priority</Text>
-          </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={lowPriority}
-            onValueChange={() => setLowPriority(!lowPriority)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <View style={s`flex flex-row`}>
-            <MaterialCommunityIcons
-              name="calendar-check-outline"
-              size={24}
-              color="blue"
+  
+          <View style={s`flex flex-row justify-between py-2`}>
+            <View style={s`flex flex-row`}>
+              <Feather name="flag" size={24} color="red" />
+              <Text style={s`h-full flex items-center pl-2`}>High Priority</Text>
+            </View>
+            <Switch
+              trackColor={{ false: "gray", true: "red" }}
+              thumbColor={"white"}
+              value={highPriority}
+              onValueChange={() => setHighPriority(!highPriority)}
             />
-            <Text style={s`h-full flex items-center pl-2`}>Planned</Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={planed}
-            onValueChange={() => setPlaned(!planed)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <View style={s`flex flex-row`}>
-            <MaterialCommunityIcons
-              name="select-all"
-              size={24}
-              color="orange"
+  
+          <View style={s`flex flex-row justify-between py-2`}>
+            <View style={s`flex flex-row`}>
+              <Feather name="flag" size={24} color="yellow" />
+              <Text style={s`h-full flex items-center pl-2`}>
+                Normal Priority
+              </Text>
+            </View>
+            <Switch
+              trackColor={{ false: "gray", true: "red" }}
+              thumbColor={"white"}
+              value={mediumPriority}
+              onValueChange={() => setMediumPriority(!mediumPriority)}
             />
-            <Text style={s`h-full flex items-center pl-2`}>All</Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={all}
-            onValueChange={() => setAll(!all)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <View style={s`flex flex-row`}>
-            <MaterialCommunityIcons
-              name="calendar-text-outline"
-              size={24}
-              color="purple"
+  
+          <View style={s`flex flex-row justify-between py-2`}>
+            <View style={s`flex flex-row`}>
+              <Feather name="flag" size={24} color="green" />
+              <Text style={s`h-full flex items-center pl-2`}>Low Priority</Text>
+            </View>
+            <Switch
+              trackColor={{ false: "gray", true: "red" }}
+              thumbColor={"white"}
+              value={lowPriority}
+              onValueChange={() => setLowPriority(!lowPriority)}
             />
-            <Text style={s`h-full flex items-center pl-2`}>Someday</Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={someDay}
-            onValueChange={() => setSomeDay(!someDay)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <View style={s`flex flex-row`}>
-            <MaterialIcons name="event" size={24} color="#00FF7F" />
-            <Text style={s`h-full flex items-center pl-2`}>Event</Text>
-          </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={event}
-            onValueChange={() => setEvent(!event)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
-          <View style={s`flex flex-row`}>
-            <MaterialCommunityIcons
-              name="calendar-check-outline"
-              size={24}
-              color="green"
+  
+          <View style={s`flex flex-row justify-between py-2`}>
+            <View style={s`flex flex-row`}>
+              <MaterialCommunityIcons
+                name="calendar-check-outline"
+                size={24}
+                color="blue"
+              />
+              <Text style={s`h-full flex items-center pl-2`}>Planned</Text>
+            </View>
+            <Switch
+              trackColor={{ false: "gray", true: "red" }}
+              thumbColor={"white"}
+              value={planed}
+              onValueChange={() => setPlaned(!planed)}
             />
-            <Text style={s`h-full flex items-center pl-2`}>Done</Text>
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={done}
-            onValueChange={() => setDone(!done)}
-          />
-        </View>
-        <View style={s`flex flex-row justify-between py-2`}>
-          <View style={s`flex flex-row`}>
-            <EvilIcons name="trash" size={24} color="red" />
-            <Text style={s`h-full flex items-center pl-2`}>Deleted</Text>
+  
+          <View style={s`flex flex-row justify-between py-2`}>
+            <View style={s`flex flex-row`}>
+              <MaterialCommunityIcons
+                name="select-all"
+                size={24}
+                color="orange"
+              />
+              <Text style={s`h-full flex items-center pl-2`}>All</Text>
+            </View>
+            <Switch
+              trackColor={{ false: "gray", true: "red" }}
+              thumbColor={"white"}
+              value={all}
+              onValueChange={() => setAll(!all)}
+            />
           </View>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={deleted}
-            onValueChange={() => setDeleted(!deleted)}
-          />
-        </View>
-        {listProject && (
-          <View style={styles.projectList}>
-            <Text style={styles.projectListTitle}>Projects</Text>
-            {listProject.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={styles.projectItemContainer}
-                onPress={() => handleChange(item)}
-              >
-                {/* Circle with colorCode */}
-                <View
-                  style={[
-                    styles.colorCircle,
-                    { backgroundColor: item.colorCode },
-                  ]}
-                />
-
-                {/* Project Name */}
-                <View style={styles.projectNameContainer}>
-                  <Text
+  
+          <View style={s`flex flex-row justify-between py-2`}>
+            <View style={s`flex flex-row`}>
+              <MaterialCommunityIcons
+                name="calendar-text-outline"
+                size={24}
+                color="purple"
+              />
+              <Text style={s`h-full flex items-center pl-2`}>Someday</Text>
+            </View>
+            <Switch
+              trackColor={{ false: "gray", true: "red" }}
+              thumbColor={"white"}
+              value={someDay}
+              onValueChange={() => setSomeDay(!someDay)}
+            />
+          </View>
+  
+          <View style={s`flex flex-row justify-between py-2`}>
+            <View style={s`flex flex-row`}>
+              <MaterialIcons name="event" size={24} color="#00FF7F" />
+              <Text style={s`h-full flex items-center pl-2`}>Event</Text>
+            </View>
+            <Switch
+              trackColor={{ false: "gray", true: "red" }}
+              thumbColor={"white"}
+              value={event}
+              onValueChange={() => setEvent(!event)}
+            />
+          </View>
+  
+          <View style={s`flex flex-row justify-between py-2`}>
+            <View style={s`flex flex-row`}>
+              <MaterialCommunityIcons
+                name="calendar-check-outline"
+                size={24}
+                color="green"
+              />
+              <Text style={s`h-full flex items-center pl-2`}>Done</Text>
+            </View>
+            <Switch
+              trackColor={{ false: "gray", true: "red" }}
+              thumbColor={"white"}
+              value={done}
+              onValueChange={() => setDone(!done)}
+            />
+          </View>
+          <View style={s`flex flex-row justify-between py-2`}>
+            <View style={s`flex flex-row`}>
+              <EvilIcons name="trash" size={24} color="red" />
+              <Text style={s`h-full flex items-center pl-2`}>Deleted</Text>
+            </View>
+            <Switch
+              trackColor={{ false: "gray", true: "red" }}
+              thumbColor={"white"}
+              value={deleted}
+              onValueChange={() => setDeleted(!deleted)}
+            />
+          </View>
+          {listProject && (
+            <View style={styles.projectList}>
+              <Text style={styles.projectListTitle}>Projects</Text>
+              {listProject.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.projectItemContainer}
+                  onPress={() => handleChange(item)}
+                >
+                  {/* Circle with colorCode */}
+                  <View
                     style={[
-                      styles.projectName,
-                      item.status === "COMPLETED" && styles.completedProject,
-                    ]}
-                  >
-                    {item.projectName}
-                  </Text>
-                </View>
-
-                {/* Status Buttons */}
-                <View style={styles.statusButtonsContainer}>
-                  <TouchableOpacity
-                    onPress={() => handleChange(item)}
-                    style={[
-                      styles.statusCircle,
-                      {
-                        backgroundColor:
-                          item.status === "ACTIVE" ? "transparent" : "green",
-                      },
+                      styles.colorCircle,
+                      { backgroundColor: item.colorCode },
                     ]}
                   />
-                  <TouchableOpacity
-                    onPress={() => confirmDeleteProject(item.id)}
-                  >
-                    <MaterialIcons name="delete" size={24} color="gray" />
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
-      </View>
-    </ScrollView>
+  
+                  {/* Project Name */}
+                  <View style={styles.projectNameContainer}>
+                    <Text
+                      style={[
+                        styles.projectName,
+                        item.status === "COMPLETED" && styles.completedProject,
+                      ]}
+                    >
+                      {item.projectName}
+                    </Text>
+                  </View>
+  
+                  {/* Status Buttons */}
+                  <View style={styles.statusButtonsContainer}>
+                    <TouchableOpacity
+                      onPress={() => handleChange(item)}
+                      style={[
+                        styles.statusCircle,
+                        {
+                          backgroundColor:
+                            item.status === "ACTIVE" ? "transparent" : "green",
+                        },
+                      ]}
+                    />
+                    <TouchableOpacity
+                      onPress={() => confirmDeleteProject(item.id)}
+                    >
+                      <MaterialIcons name="delete" size={24} color="gray" />
+                    </TouchableOpacity>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
+      </ScrollView>
+ 
   );
 }
 

@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Alert,
   Dimensions,
-  TextInput,
+  TextInput,SafeAreaView
 } from "react-native";
 import { Fontisto } from "@expo/vector-icons";
 import {

@@ -1,19 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { Alert, SafeAreaView, StyleSheet } from "react-native";
+import { Alert, SafeAreaView, StyleSheet, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from "react-redux";
 import { setFocus } from "../slices/focusSlice";
 import Navigator from "../routes";
 import { Audio } from "expo-av";
 import { CreatePomodoro } from "../services/Guest/PomodoroService";
+import getRole from "../services/RoleService";
+import { UpdateTimeLastUse } from "../services/GuestService";
 
 const MainPage = () => {
   const dispatch = useDispatch();
   const {
     isStop,
     isPause,
-    workName,
     secondsLeft,
     mode,
     pomodoroTime,
@@ -23,13 +24,12 @@ const MainPage = () => {
     autoStartPo,
     autoStartBreak,
     disableBreakTime,
-    type,
     startTime,
     workMode,
     workId,
     extraWorkId,
     countWork,
-    extraWorkName,
+    defaultTimePomodoro
   } = useSelector((state) => state.focus);
 
   const soundObjectRef = useRef(null); 
@@ -86,27 +86,7 @@ const MainPage = () => {
             })
           );
 
-          console.log(
-            isStop,
-            isPause,
-            workName,
-            secondsLeft,
-            mode,
-            pomodoroTime,
-            shortBreakTime,
-            longBreakTime,
-            breakAfter,
-            autoStartPo,
-            autoStartBreak,
-            disableBreakTime,
-            type,
-            startTime,
-            workMode,
-            workId,
-            extraWorkId,
-            countWork,
-            extraWorkName
-          );
+         
         }
       } catch (error) {
         console.log(error);
@@ -122,9 +102,9 @@ const MainPage = () => {
   useEffect(() => {
     let interval;
     if (!isPause) {
-      interval = setInterval(() => {
+      interval = setInterval(async () => {
         if (workMode === "work") {
-          playWorkingSound();
+          await playWorkingSound();
           if (mode === "+") {
             dispatch(setFocus({ secondsLeft: secondsLeft + 1 }));
           } else {
@@ -150,7 +130,7 @@ const MainPage = () => {
     return () => clearInterval(interval);
   }, [isPause, isStop, secondsLeft, mode, dispatch]);
 
-  const playWorkingSound = async () => {
+  const playWorkingSound = async () => {   
     if (!soundObjectRef.current) {
       const sound = await AsyncStorage.getItem("focusSound");
       if (sound) {
@@ -208,12 +188,15 @@ const MainPage = () => {
         }
         if (countWork === 0 || countWork % breakAfter !== 0) {
           newSecondsLeft = shortBreakTime * 60;
+          newMode = "shortBreak";
         } else {
           newSecondsLeft = longBreakTime * 60;
+          newMode = "longBreak";
+
         }
         newCountWork++;
       }
-      newMode = "break";
+      
     } else {
       if (autoStartPo) {
         newStop = false;
@@ -228,14 +211,23 @@ const MainPage = () => {
       workMode: newMode,
       countWork: newCountWork,
     };
-
+    console.log(newMode)
     dispatch(setFocus(focusPayload));
   };
 
   useEffect(() => {
-    if (secondsLeft === 0) {
+    const updateTime = async () => {
+      const role = await getRole()
+      const id = await AsyncStorage.getItem('id')
+      if(!role && id) {
+        const response = await UpdateTimeLastUse() 
+        if(!response.success) {
+          console.log("Error update time last use, message:", response.message)
+        }
+      }
     }
-  }, [secondsLeft]);
+    updateTime()
+  }, [])
 
   return (
     <NavigationContainer>

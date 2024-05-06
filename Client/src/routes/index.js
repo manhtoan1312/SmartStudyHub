@@ -52,6 +52,8 @@ import RankingUser from "../pages/guest/RankingUser";
 import TFAOTP from "../pages/guest/2FAOTP";
 import RecoverStep2 from "../pages/guest/RecoverStep2";
 import CreatePomodoro from "../pages/guest/CreatePomodoro";
+import ProjectDoneDetail from "../pages/guest/ProjectDoneDetail";
+import FullScreenMode from "../pages/guest/FullScreenMode";
 
 const Stack = createStackNavigator();
 
@@ -108,6 +110,8 @@ const Navigator = () => (
     <Stack.Screen name="2FA" component={TFAOTP} />
     <Stack.Screen name="RecoverStep2" component={RecoverStep2} />
     <Stack.Screen name="CreatePomodoro" component={CreatePomodoro} />
+    <Stack.Screen name="ProjectDoneDetail" component={ProjectDoneDetail} />
+    <Stack.Screen name="FullScreen" component={FullScreenMode} />
   </Stack.Navigator>
 );
 

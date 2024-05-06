@@ -5,7 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
+  Alert,SafeAreaView
 } from "react-native";
 import { ResendOTP, register } from "../../services/AccountService";
 import { FontAwesome } from "@expo/vector-icons";

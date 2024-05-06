@@ -10,7 +10,7 @@ import { s } from "react-native-wind";
 
 function PREMIUM({ navigation }) {
   return (
-    <SafeAreaView>
+    <View>
       <View
         style={s`bg-white justify-center items-center py-4 border-b-2 border-b-gray-200`}
       >
@@ -148,7 +148,7 @@ function PREMIUM({ navigation }) {
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

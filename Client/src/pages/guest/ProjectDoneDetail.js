@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   StyleSheet,
@@ -19,23 +19,20 @@ import AddWorkModal from "../../components/AddWorkModal";
 import HeaderDetail from "../../components/HeaderDetail";
 import { GetDetailProject } from "../../services/Guest/ProjectService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  CreateWork,
-  GetWorkByType,
-  SortWork,
-} from "../../services/Guest/WorkService";
-import ImageFocus from "../../components/Image_Focus";
+import { CreateWork, SortWork } from "../../services/Guest/WorkService";
 import { useIsFocused } from "@react-navigation/native";
 import SortWorkModal from "../../components/SortWorkModal";
+import ImageFocus from "../../components/Image_Focus";
+import { useRef } from "react";
 import getRole from "../../services/RoleService";
-const ThisWeek = ({ navigation }) => {
+const ProjectDoneDetail = ({ route, navigation }) => {
+  const id = route.params.id;
   const [project, setProject] = useState(null);
   const [workName, setWorkName] = useState(null);
   const [doneVisible, setDoneVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [closeKeyboard, setCloseKeyboard] = useState(false);
-  const [preName, setPreName] = useState(null);
   const [sortModalVisible, setSortModalVisible] = useState(false);
   const [sortType, setSortType] = useState("");
   const [isSort, setIsSort] =useState(false)
@@ -49,6 +46,33 @@ const ThisWeek = ({ navigation }) => {
     };
     fetchDataOnFocus();
   }, [isFocused]);
+  useEffect(() => {
+    fetchData();
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      (event) => {
+        const keyboardHeight = event.endCoordinates.height;
+        setKeyboardHeight(keyboardHeight);
+      }
+    );
+    return () => {
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
+  const fetchData = async () => {
+    const response = await GetDetailProject(id);
+    if (response.success) {
+      setProject(response.data);
+      if (isSort && sortType) {
+        handleSortWork(sortType, response.data);
+      }
+    } else {
+      Alert.alert("Error when get project detail!", response.message);
+      navigation.navigate("Home");
+    }
+  };
+
   const handleSortWork = async (type, pro) => {
     setSortModalVisible(false);
     setIsSort(true)
@@ -70,38 +94,6 @@ const ThisWeek = ({ navigation }) => {
       console.log(response2.message);
     }
     setSortType(type);
-  };  useEffect(() => {
-    fetchData();
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      (event) => {
-        const keyboardHeight = event.endCoordinates.height;
-        setKeyboardHeight(keyboardHeight);
-      }
-    );
-    return () => {
-      keyboardDidShowListener.remove();
-    };
-  }, []);
-
-  const fetchData = async () => {
-    const role = await getRole();
-    let id;
-    if (role) {
-      id = role.id;
-    } else {
-      id = await AsyncStorage.getItem("id");
-    }
-    const response = await GetWorkByType("THISWEEK", id);
-    if (response.success) {
-      setProject(response.data);
-      if (isSort && sortType) {
-        handleSortWork(sortType, response.data);
-      }
-    } else {
-      Alert.alert("Error when get THISWEEK work!", response.message);
-      navigation.navigate("Home");
-    }
   };
 
   const handleClosekeyboard = () => {
@@ -125,17 +117,18 @@ const ThisWeek = ({ navigation }) => {
     } else {
       id = await AsyncStorage.getItem("id");
     }
-    const settings = await AsyncStorage.getItem("settings");
+    const settings = await AsyncStorage.getItem("Settings");
     let time = 25;
     if (settings) {
       const parsedData = JSON.parse(settings);
       time = parsedData.pomodoroTime;
     }
+    console.log(numberOfPomodoros);
     if (workName) {
       const tagslist = tags.map((id) => ({ id: id }));
       const response = await CreateWork(
         id,
-        projectId,
+        projectId ? projectId : null,
         tagslist,
         workName,
         priority,
@@ -159,6 +152,7 @@ const ThisWeek = ({ navigation }) => {
     await fetchData();
   };
   
+
   return (
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -171,7 +165,9 @@ const ThisWeek = ({ navigation }) => {
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                   <Ionicons name="chevron-back-outline" size={24} color="gray" />
                 </TouchableOpacity>
-                <Text style={{ fontSize: 18, fontWeight: "400" }}>THISWEEK</Text>
+                <Text style={{ fontSize: 18, fontWeight: "400" }}>
+                  {project.projectName}
+                </Text>
                 <TouchableOpacity onPress={() => setSortModalVisible(true)}>
                   <AntDesign name="filter" size={24} color="gray" />
                 </TouchableOpacity>
@@ -263,20 +259,11 @@ const ThisWeek = ({ navigation }) => {
             </>
           )}
         </ScrollView>
-        {modalVisible && (
-          <AddWorkModal
-            onDone={handleDone}
-            closeKeyboard={closeKeyboard}
-            keyboardHeight={keyboardHeight}
-            handlecloseKeyboard={handleClosekeyboard}
-            project={project}
-            type="THISWEEK"
-          />
-        )}
+  
         {sortModalVisible && (
           <SortWorkModal
             isVisible={sortModalVisible}
-            page={""}
+            page={"project"}
             onChoose={(type) => {
               handleSortWork(type, project);
             }}
@@ -331,4 +318,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ThisWeek;
+export default ProjectDoneDetail;

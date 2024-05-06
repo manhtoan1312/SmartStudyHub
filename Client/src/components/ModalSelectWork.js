@@ -18,7 +18,7 @@ import {
   GetWorkByType,
 } from "../services/Guest/WorkService";
 import getRole from "../services/RoleService";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setFocus } from "../slices/focusSlice";
 
 const ModalSelectWork = ({ isVisible, play, onClose }) => {
@@ -40,7 +40,7 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
     "HighPriority",
   ]);
   const [data, setData] = useState([]);
-
+  const { defaultTimePomodoro } = useSelector((state) => state.focus);
   useEffect(() => {
     fetchDataFPT(selectedType);
   }, [selectedType, isVisible]);
@@ -107,7 +107,7 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
 
   const onSelect = async (workItem, type, play) => {
     try {
-      if(type==='WORK') {
+      if (type === "WORK") {
         dispatch(
           setFocus({
             workId: workItem.id,
@@ -118,30 +118,31 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
             pomodoroTime: workItem.timeOfPomodoro,
             isPause: true,
             isStop: true,
-            secondsLeft: workItem.timeOfPomodoro*60
+            secondsLeft: workItem.timeOfPomodoro * 60,
           })
         );
-      }
-      else{
+      } else {
         dispatch(
           setFocus({
             workId: null,
-            workName: nulll,
+            workName: null,
             startTime: null,
             numberOfPomodoro: 0,
             numberOfPomodorosDone: 0,
-            pomodoroTime: workItem.timeOfPomodoro,
+            pomodoroTime: defaultTimePomodoro,
             isPause: true,
             isStop: true,
-            secondsLeft: workItem.timeOfPomodoro*60,
-          extraWorkId: workItem?.extraWorkId,
-          extraWorkName: workItem?.extraWorkName,
+            secondsLeft: defaultTimePomodoro * 60,
+            extraWorkId: workItem?.extraWorkId,
+            extraWorkName: workItem?.extraWorkName,
+            extraWorkId:workItem?.id
           })
         );
       }
       if(play) {
-        dispatch(setFocus({isPause: false,
-          isStop: false,}))
+        dispatch(setFocus({isPause:false,
+          isStop:false
+        }))
       }
       onClose();
     } catch (e) {
@@ -152,7 +153,7 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
     if (data.length > 0) {
       return data?.map((workItem) => (
         <TouchableOpacity key={workItem.id} style={styles.workItem}>
-          <WorkItem workItem={workItem} onSelect={onSelect}/>
+          <WorkItem workItem={workItem} onSelect={onSelect} />
         </TouchableOpacity>
       ));
     }

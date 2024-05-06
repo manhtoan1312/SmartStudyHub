@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Image,
   Alert,
-  ScrollView,
+  ScrollView,SafeAreaView
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";

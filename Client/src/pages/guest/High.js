@@ -11,6 +11,7 @@ import {
   Platform,
   TextInput,
   TouchableWithoutFeedback,
+  SafeAreaView,
 } from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import WorkActive from "../../components/WorkActive";
@@ -37,7 +38,7 @@ const High = ({ navigation }) => {
   const [preName, setPreName] = useState(null);
   const [sortModalVisible, setSortModalVisible] = useState(false);
   const [sortType, setSortType] = useState("");
-  const [isSort, setIsSort] =useState(false)
+  const [isSort, setIsSort] = useState(false);
   const inputRef = useRef(null);
 
   const isFocused = useIsFocused();
@@ -89,7 +90,7 @@ const High = ({ navigation }) => {
   };
   const handleSortWork = async (type, pro) => {
     setSortModalVisible(false);
-    setIsSort(true)
+    setIsSort(true);
     const body1 = JSON.stringify(pro?.listWorkActive);
     const body2 = JSON.stringify(pro?.listWorkCompleted);
     const response = await SortWork(body1, type);
@@ -97,7 +98,7 @@ const High = ({ navigation }) => {
 
     if (response.success) {
       const worksSortedArray = response.data || [];
-      setProject((pre) =>( {...pre,workActive: worksSortedArray }));
+      setProject((pre) => ({ ...pre, workActive: worksSortedArray }));
     } else {
       console.log(response.message);
     }
@@ -158,7 +159,7 @@ const High = ({ navigation }) => {
   const handleReload = async () => {
     await fetchData();
   };
-  
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -202,26 +203,28 @@ const High = ({ navigation }) => {
                   }}
                 />
               </TouchableOpacity>
-              {isSort ? (project.workActive?.map((workItem) => (
-                <View key={workItem?.key}>
-                  <Text>{workItem?.key}</Text>
-                  {workItem?.worksSorted?.map((item) => (
+              {isSort
+                ? project.workActive?.map((workItem) => (
+                    <View key={workItem?.key}>
+                      <Text>{workItem?.key}</Text>
+                      {workItem?.worksSorted?.map((item) => (
+                        <WorkActive
+                          key={item.id}
+                          workItem={item}
+                          reload={handleReload}
+                          navigation={navigation}
+                        />
+                      ))}
+                    </View>
+                  ))
+                : project.listWorkActive?.map((workItem) => (
                     <WorkActive
-                  key={item.id}
-                  workItem={item}
-                  reload={handleReload}
-                  navigation={navigation}
-                />
+                      key={workItem.id}
+                      workItem={workItem}
+                      reload={handleReload}
+                      navigation={navigation}
+                    />
                   ))}
-                  </View>
-              ))): (project.listWorkActive?.map((workItem) => (
-                <WorkActive
-                  key={workItem.id}
-                  workItem={workItem}
-                  reload={handleReload}
-                  navigation={navigation}
-                />
-              )))}
               <TouchableOpacity
                 style={styles.buttonComplete}
                 onPress={() => setDoneVisible(!doneVisible)}
@@ -239,26 +242,28 @@ const High = ({ navigation }) => {
                 />
               </TouchableOpacity>
               {doneVisible &&
-                (isSort ? (project.workCompleted?.map((workItem) => (
-                  <View key={workItem?.key}>
-                    <Text>{workItem?.key}</Text>
-                    {workItem?.worksSorted?.map((item) => (
+                (isSort
+                  ? project.workCompleted?.map((workItem) => (
+                      <View key={workItem?.key}>
+                        <Text>{workItem?.key}</Text>
+                        {workItem?.worksSorted?.map((item) => (
+                          <WorkDone
+                            key={item.id}
+                            workItem={item}
+                            reload={handleReload}
+                            navigation={navigation}
+                          />
+                        ))}
+                      </View>
+                    ))
+                  : project.listWorkCompleted?.map((workItem) => (
                       <WorkDone
-                      key={item.id}
-                      workItem={item}
-                      reload={handleReload}
-                      navigation={navigation}
-                    />
-                    ))}
-                    </View>
-                ))) : (project.listWorkCompleted?.map((workItem) => (
-                  <WorkDone
-                    key={workItem.id}
-                    workItem={workItem}
-                    reload={handleReload}
-                    navigation={navigation}
-                  />
-                ))))}
+                        key={workItem.id}
+                        workItem={workItem}
+                        reload={handleReload}
+                        navigation={navigation}
+                      />
+                    )))}
             </View>
           </>
         )}

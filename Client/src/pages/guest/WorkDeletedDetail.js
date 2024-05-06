@@ -8,6 +8,7 @@ import {
   FlatList,
   Alert,
   ScrollView,
+  SafeAreaView,
 } from "react-native";
 import {
   MaterialIcons,

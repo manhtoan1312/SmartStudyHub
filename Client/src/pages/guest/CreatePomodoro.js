@@ -14,7 +14,7 @@ import {
   View,
   Text,
   Touchable,
-  Alert,
+  Alert,SafeAreaView
 } from "react-native";
 import {
   AntDesign,

@@ -7,7 +7,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableWithoutFeedback,
-  Keyboard,Clipboard,Alert
+  Keyboard,Clipboard,Alert, SafeAreaView
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 

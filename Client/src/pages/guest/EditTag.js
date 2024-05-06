@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  TextInput,
+  TextInput,SafeAreaView
 } from "react-native";
 import { AntDesign, Fontisto } from "@expo/vector-icons";
 import {

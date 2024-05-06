@@ -7,6 +7,7 @@ import {
   Alert,
   TextInput,
   ScrollView,
+  SafeAreaView,
 } from "react-native";
 import { Fontisto, Entypo, AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";

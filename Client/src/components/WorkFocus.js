@@ -13,8 +13,8 @@ const WorkItem = ({ workItem, onSelect }) => {
   const playWork = () => {
     onSelect(workItem, "WORK", true);
   }
-  const playExtra = () => {
-    onSelect(workItem, "EXTRA", true);
+  const playExtra = (item) => {
+    onSelect(item, "EXTRA", true);
   }
   return (
     <View>
@@ -59,7 +59,7 @@ const WorkItem = ({ workItem, onSelect }) => {
                   {extraWork.extraWorkName}
                 </Text>
               </View>
-              <TouchableOpacity style={styles.playButton} onPress={playExtra}>
+              <TouchableOpacity style={styles.playButton} onPress={() => playExtra(extraWork)}>
                 <Ionicons
                   name="ios-play-circle-sharp"
                   size={26}

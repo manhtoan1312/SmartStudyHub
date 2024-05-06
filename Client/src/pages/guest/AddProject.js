@@ -6,7 +6,7 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
-  Alert,
+  Alert,SafeAreaView
 } from "react-native";
 import { Fontisto } from "@expo/vector-icons";
 import { CreateProject } from "../../services/Guest/ProjectService";

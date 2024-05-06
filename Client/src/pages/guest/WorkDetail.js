@@ -8,6 +8,7 @@ import {
   FlatList,
   Alert,
   ScrollView,
+  SafeAreaView,
 } from "react-native";
 import {
   MaterialIcons,
@@ -256,17 +257,19 @@ const WorkDetail = ({ route, navigation }) => {
 
   const handleStartPomodoro = async () => {
     dispatch(
-      setFocus({
-        workId: workItem.id,
-        workName: workItem.workName,
-        startTime: workItem?.startTime,
-        numberOfPomodoro: workItem.numberOfPomodoro,
-        numberOfPomodorosDone: workItem.numberOfPomodorosDone,
-        pomodoroTime: workItem.timeOfPomodoro,
+      setFocus({ 
+        workId: work.id,
+        workName: work.workName,
+        startTime: work?.startTime,
+        numberOfPomodoro: work.numberOfPomodoro,
+        numberOfPomodorosDone: work.numberOfPomodorosDone,
+        pomodoroTime: work.timeOfPomodoro,
         isPause:true, 
         isStop:true
       })
     );
+    setMoreOptionsModalVisible(false)
+    navigation.navigate('Focus')
   };
   const handleCreatePomodoro = async () => {
     setMoreOptionsModalVisible(false)

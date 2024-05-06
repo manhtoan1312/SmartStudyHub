@@ -7,7 +7,7 @@ import {
   Keyboard,
   Text,
   Alert,
-  FlatList,
+  FlatList,SafeAreaView
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SearchByWorkName } from "../../services/Guest/WorkService";

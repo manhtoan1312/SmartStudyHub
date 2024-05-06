@@ -6,7 +6,7 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
-  Alert,
+  Alert,SafeAreaView
 } from "react-native";
 import { Fontisto, Entypo, AntDesign } from "@expo/vector-icons";
 import { GetProjectForAddFolder } from "../../services/Guest/ProjectService";

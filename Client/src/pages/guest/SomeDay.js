@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
-  TouchableWithoutFeedback,
+  TouchableWithoutFeedback,SafeAreaView
 } from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import WorkActive from "../../components/WorkActive";
@@ -144,105 +144,106 @@ const SomeDay = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView style={styles.container}>
-        {project && (
-          <>
-            <View style={styles.header}>
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Ionicons name="chevron-back-outline" size={24} color="gray" />
-              </TouchableOpacity>
-              <Text style={{ fontSize: 18, fontWeight: "400" }}>SOME DAY</Text>
-              <TouchableOpacity onPress={() => setSortModalVisible(true)}>
-                <AntDesign name="filter" size={24} color="gray" />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.body}>
-              <View style={styles.detail}>
-                <HeaderDetail
-                  totalTimeWork={project.totalTimeWork}
-                  totalWorkActive={project.totalWorkActive}
-                  totalTimePassed={project.totalTimePassed}
-                  totalWorkCompleted={project.totalWorkCompleted}
-                />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView style={styles.container}>
+          {project && (
+            <>
+              <View style={styles.header}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                  <Ionicons name="chevron-back-outline" size={24} color="gray" />
+                </TouchableOpacity>
+                <Text style={{ fontSize: 18, fontWeight: "400" }}>SOME DAY</Text>
+                <TouchableOpacity onPress={() => setSortModalVisible(true)}>
+                  <AntDesign name="filter" size={24} color="gray" />
+                </TouchableOpacity>
               </View>
-              {isSort ? (project.workActive?.map((workItem) => (
-                <View key={workItem?.key}>
-                  <Text>{workItem?.key}</Text>
-                  {workItem?.worksSorted?.map((item) => (
-                    <WorkActive
-                  key={item.id}
-                  workItem={item}
-                  reload={handleReload}
-                  navigation={navigation}
-                />
-                  ))}
-                  </View>
-              ))): (project.listWorkActive?.map((workItem) => (
-                <WorkActive
-                  key={workItem.id}
-                  workItem={workItem}
-                  reload={handleReload}
-                  navigation={navigation}
-                />
-              )))}
-              <TouchableOpacity
-                style={styles.buttonComplete}
-                onPress={() => setDoneVisible(!doneVisible)}
-              >
-                <Text style={{ fontSize: 12, color: "#666666" }}>
-                  {doneVisible
-                    ? "Hide completed tasks"
-                    : "Displays completed tasks"}
-                </Text>
-                <AntDesign
-                  name={doneVisible ? "up" : "down"}
-                  size={15}
-                  color="#666666"
-                  style={{ marginLeft: 5 }}
-                />
-              </TouchableOpacity>
-              {doneVisible &&
-                (isSort ? (project.workCompleted?.map((workItem) => (
+              <View style={styles.body}>
+                <View style={styles.detail}>
+                  <HeaderDetail
+                    totalTimeWork={project.totalTimeWork}
+                    totalWorkActive={project.totalWorkActive}
+                    totalTimePassed={project.totalTimePassed}
+                    totalWorkCompleted={project.totalWorkCompleted}
+                  />
+                </View>
+                {isSort ? (project.workActive?.map((workItem) => (
                   <View key={workItem?.key}>
                     <Text>{workItem?.key}</Text>
                     {workItem?.worksSorted?.map((item) => (
-                      <WorkDone
-                      key={item.id}
-                      workItem={item}
-                      reload={handleReload}
-                      navigation={navigation}
-                    />
+                      <WorkActive
+                    key={item.id}
+                    workItem={item}
+                    reload={handleReload}
+                    navigation={navigation}
+                  />
                     ))}
                     </View>
-                ))) : (project.listWorkCompleted?.map((workItem) => (
-                  <WorkDone
+                ))): (project.listWorkActive?.map((workItem) => (
+                  <WorkActive
                     key={workItem.id}
                     workItem={workItem}
                     reload={handleReload}
                     navigation={navigation}
                   />
-                ))))}
-            </View>
-          </>
+                )))}
+                <TouchableOpacity
+                  style={styles.buttonComplete}
+                  onPress={() => setDoneVisible(!doneVisible)}
+                >
+                  <Text style={{ fontSize: 12, color: "#666666" }}>
+                    {doneVisible
+                      ? "Hide completed tasks"
+                      : "Displays completed tasks"}
+                  </Text>
+                  <AntDesign
+                    name={doneVisible ? "up" : "down"}
+                    size={15}
+                    color="#666666"
+                    style={{ marginLeft: 5 }}
+                  />
+                </TouchableOpacity>
+                {doneVisible &&
+                  (isSort ? (project.workCompleted?.map((workItem) => (
+                    <View key={workItem?.key}>
+                      <Text>{workItem?.key}</Text>
+                      {workItem?.worksSorted?.map((item) => (
+                        <WorkDone
+                        key={item.id}
+                        workItem={item}
+                        reload={handleReload}
+                        navigation={navigation}
+                      />
+                      ))}
+                      </View>
+                  ))) : (project.listWorkCompleted?.map((workItem) => (
+                    <WorkDone
+                      key={workItem.id}
+                      workItem={workItem}
+                      reload={handleReload}
+                      navigation={navigation}
+                    />
+                  ))))}
+              </View>
+            </>
+          )}
+        </ScrollView>
+        {sortModalVisible && (
+          <SortWorkModal
+            isVisible={sortModalVisible}
+            page={"duedate"}
+            onChoose={(type) => {
+              handleSortWork(type, project);
+            }}
+            onClose={() => setSortModalVisible(false)}
+            type={sortType}
+          />
         )}
-      </ScrollView>
-      {sortModalVisible && (
-        <SortWorkModal
-          isVisible={sortModalVisible}
-          page={"duedate"}
-          onChoose={(type) => {
-            handleSortWork(type, project);
-          }}
-          onClose={() => setSortModalVisible(false)}
-          type={sortType}
-        />
-      )}
-      <ImageFocus />
-    </KeyboardAvoidingView>
+        <ImageFocus />
+      </KeyboardAvoidingView>
+
   );
   x;
 };

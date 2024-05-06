@@ -10,7 +10,7 @@ import {
   Modal,
   StyleSheet,
   Alert,
-  ScrollView,
+  ScrollView,SafeAreaView
 } from "react-native";
 import {
   AntDesign,
@@ -105,13 +105,15 @@ const DoneDetail = ({ navigation }) => {
     toggleModal();
   };
   const handleCreatePomodoro = () => {
-    navigation.navigate('CreatePomodoro', {work:{
-      id:-1,
-      projectId:-1,
-      workName:'None',
-      projectName:'None',
-    }})
-  }
+    navigation.navigate("CreatePomodoro", {
+      work: {
+        id: -1,
+        projectId: -1,
+        workName: "None",
+        projectName: "None",
+      },
+    });
+  };
   const translatePomodoro = (listPo) => {
     if (listPo) {
       const dateArray = [];
@@ -139,6 +141,20 @@ const DoneDetail = ({ navigation }) => {
     }
   };
 
+  const renderDay = (day) => {
+    const options = { weekday: "short", month: "numeric", day: "numeric" };
+    let dateStart = new Date(day);
+    let date = dateStart.toLocaleDateString("en-US", options);
+
+    return (
+      <View
+        style={{ flexDirection: "row", alignItems: "center", paddingBottom: 5 }}
+      >
+        <Text style={{ color: "black", fontSize: 20 }}>{date}</Text>
+      </View>
+    );
+  };
+
   const isSameDay = (date1, date2) => {
     const d1 = new Date(date1);
     const d2 = new Date(date2);
@@ -164,20 +180,27 @@ const DoneDetail = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Three dots button */}
-        <View style={{flexDirection:'row'}}>
-          <TouchableOpacity onPress={handleCreatePomodoro} style={{marginRight:10}}>
-          <MaterialCommunityIcons name="clock-edit-outline" size={24} color="black" />
+        <View style={{ flexDirection: "row" }}>
+          <TouchableOpacity
+            onPress={handleCreatePomodoro}
+            style={{ marginRight: 10 }}
+          >
+            <MaterialCommunityIcons
+              name="clock-edit-outline"
+              size={24}
+              color="black"
+            />
           </TouchableOpacity>
           <TouchableOpacity onPress={toggleModal}>
-        
-          <MaterialIcons name="more-vert" size={24} color="black" />
-        </TouchableOpacity></View>
+            <MaterialIcons name="more-vert" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Modal for category options */}
       <Modal transparent={true} visible={isModalVisible} animationType="slide">
         <TouchableOpacity style={styles.modal}>
-        <TouchableOpacity
+          <TouchableOpacity
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Pomodoro")}
           >
@@ -201,7 +224,7 @@ const DoneDetail = ({ navigation }) => {
             />
             <Text style={styles.modalText}>Work</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Project")}
@@ -227,12 +250,39 @@ const DoneDetail = ({ navigation }) => {
       {selectedCategory === "Work" && (
         <ScrollView>
           {listwork?.map((item) => (
-            <WorkCompleted
-              key={item.id}
-              workItem={item}
-              reload={fetchData}
-              navigation={navigation}
-            />
+            <View>
+              <View
+                style={{ flex: 1, flexDirection: "column", paddingLeft: 10, paddingTop:10}}
+              >
+                {renderDay(item.date)}
+                <View style={styles.time}>
+                  <Text style={{ color: "gray" }}>
+                    Focus time: {item?.timeFocus} Minute
+                  </Text>
+                  <Text style={{ color: "gray" }}>
+                    Work Completed: {item.totalWorkCompleted}{" "}
+                    {item.totalWorkCompleted > 1 ? "Missions" : "Mission"}
+                  </Text>
+                </View>
+
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingLeft: 5,
+                  }}
+                ></View>
+              </View>
+              {item?.works.map((work) => (
+                <WorkCompleted
+                  key={work.id}
+                  workItem={work}
+                  reload={fetchData}
+                  navigation={navigation}
+                />
+              ))}
+            </View>
           ))}
         </ScrollView>
       )}
@@ -253,12 +303,38 @@ const DoneDetail = ({ navigation }) => {
       {selectedCategory === "Project" && (
         <ScrollView>
           {listProject?.map((item, index) => (
+            <View>
+            <View
+              style={{ flex: 1, flexDirection: "column", paddingLeft: 10 , paddingTop:10}}
+            >
+              {renderDay(item.endTime)}
+              <View style={styles.time}>
+                <Text style={{ color: "gray" }}>
+                  Time work: {item?.totalTimeWork} Minute
+                </Text>
+                <Text style={{ color: "gray" }}>
+                  Work Completed: {item.totalWorkCompleted}{" "}
+                  {item.totalWorkCompleted > 1 ? "Missions" : "Mission"}
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingLeft: 5,
+                }}
+              ></View>
+            </View>
             <ProjectDone
               key={index}
               projectItem={item}
               reload={fetchData}
               navigation={navigation}
             />
+          </View>
+            
           ))}
         </ScrollView>
       )}
@@ -303,6 +379,11 @@ const styles = StyleSheet.create({
   },
   icon: {
     paddingRight: 15,
+  },
+  time: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingRight: 10,
   },
 });
 

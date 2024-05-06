@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  TouchableHighlight,
+  TouchableHighlight,SafeAreaView
 } from "react-native";
 import { RankByFocusAllTime, RankByMonth } from "../../services/GuestService";
 import RankingBody from "../../components/RankingBody";

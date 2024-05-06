@@ -9,7 +9,7 @@ import {
   Alert,
   Animated,
   TouchableOpacity,
-  Linking,
+  Linking,SafeAreaView
 } from "react-native";
 import { s } from "react-native-wind";
 import {
@@ -30,7 +30,7 @@ import {
   CheckMaxProject,
   GetProjectForAddFolder,
 } from "../../services/Guest/ProjectService";
-import { CreateGuest } from "../../services/GuestService";
+import { CreateGuest, UpdateTimeLastUse } from "../../services/GuestService";
 import {
   CheckMaxFolder,
   GetAllFolder,
@@ -152,6 +152,7 @@ export default function Home({ navigation }) {
       }
       else{
         id = await AsyncStorage.getItem('id')
+        
       }
       if (name) {
         setEmail(name);

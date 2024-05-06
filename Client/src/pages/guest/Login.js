@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  Linking,
+  Linking,SafeAreaView
 } from "react-native";
 import {
   FontAwesome,
