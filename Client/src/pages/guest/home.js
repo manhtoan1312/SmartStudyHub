@@ -21,6 +21,7 @@ import {
   Fontisto,
   FontAwesome,
   MaterialIcons,
+  FontAwesome6,
 } from "@expo/vector-icons";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -459,7 +460,7 @@ if(role) {
               {email ? email : "Login"}
             </Text>
             <TouchableOpacity onPress={() => {navigation.navigate('PREMIUM')}}>
-              <FontAwesome5
+              <FontAwesome6
                 name="crown"
                 style={styles.itemRow}
                 size={20}

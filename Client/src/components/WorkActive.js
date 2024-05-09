@@ -12,6 +12,7 @@ import {
   Ionicons,
   FontAwesome5,
   AntDesign,
+  Octicons,
 } from "@expo/vector-icons";
 import { useState } from "react";
 import { DeleteWork, MarkCompleted } from "../services/Guest/WorkService";
@@ -159,7 +160,7 @@ const WorkActive = ({ workItem, reload, navigation }) => {
   };
   const playExtra = async (item) => {
     if (item.status === "ACTIVE") {
-      console.log(item)
+      console.log(item);
       try {
         dispatch(
           setFocus({
@@ -258,12 +259,7 @@ const WorkActive = ({ workItem, reload, navigation }) => {
                   >
                     {hasExtraWorks && (
                       <>
-                        <Ionicons
-                          name="md-git-branch-outline"
-                          style={{ transform: [{ rotate: "90deg" }] }}
-                          size={14}
-                          color="gray"
-                        />
+                        <Octicons name="git-branch" size={14} color="gray" />
                         <Text
                           style={{
                             marginLeft: 5,
@@ -294,11 +290,7 @@ const WorkActive = ({ workItem, reload, navigation }) => {
                 onPress={() => handlePlay()}
                 style={styles.playButton}
               >
-                <Ionicons
-                  name="ios-play-circle-sharp"
-                  size={26}
-                  color="#ff3232"
-                />
+                <AntDesign name="play" size={26} color="#ff3232" />
               </TouchableOpacity>
               {hasExtraWorks && (
                 <TouchableWithoutFeedback
@@ -393,11 +385,7 @@ const WorkActive = ({ workItem, reload, navigation }) => {
                             onPress={() => playExtra(item)}
                             style={styles.playButton}
                           >
-                            <Ionicons
-                              name="ios-play-circle-sharp"
-                              size={26}
-                              color="#ff3232"
-                            />
+                            <AntDesign name="play" size={26} color="#ff3232" />
                           </TouchableOpacity>
                         ) : (
                           <TouchableOpacity style={styles.playButton}>

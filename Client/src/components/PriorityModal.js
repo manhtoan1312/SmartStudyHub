@@ -1,11 +1,11 @@
 import React from "react";
 import { Modal, TouchableOpacity, Text, StyleSheet, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 const PriorityModal = ({ visible, onSelectPriority, onClose }) => {
   const priorities = [
-    { label: "High priority", color: "red", icon: "ios-flag", value:'HIGH' },
-    { label: "Normal Priority", color: "#e6e600", icon: "ios-flag" , value:'NORMAL'},
-    { label: "Low Priority", color: "green", icon: "ios-flag", value:'LOW' },
+    { label: "High priority", color: "red", icon: "flag", value:'HIGH' },
+    { label: "Normal Priority", color: "#e6e600", icon: "flag" , value:'NORMAL'},
+    { label: "Low Priority", color: "green", icon: "flag", value:'LOW' },
     { label: "None", color: "gray", icon: null, value:'NONE' },
   ];
 
@@ -29,7 +29,7 @@ const PriorityModal = ({ visible, onSelectPriority, onClose }) => {
                 onPress={() => onSelectPriority(priority.value)}
               >
                 {priority.icon && (
-                  <Ionicons
+                  <FontAwesome6
                     name={priority.icon}
                     size={24}
                     color={priority.color}

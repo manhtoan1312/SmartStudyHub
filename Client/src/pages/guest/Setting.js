@@ -10,7 +10,7 @@ import {
   StyleSheet,SafeAreaView
 } from "react-native";
 import { s } from "react-native-wind";
-import { AntDesign, FontAwesome5, Feather } from "@expo/vector-icons";
+import { AntDesign, FontAwesome5, Feather, FontAwesome6 } from "@expo/vector-icons";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import getRole from "../../services/RoleService";
@@ -413,7 +413,7 @@ export default function Setting({ navigation }) {
           onTouchEnd={() => toPREMIUM()}
         >
           <View style={s`flex flex-row`}>
-            <FontAwesome5
+            <FontAwesome6
               name="crown"
               style={s`text-lg font-medium pr-1 text-yellow-400`}
             />

@@ -12,6 +12,7 @@ import {
   AntDesign,
   Ionicons,
   FontAwesome5,
+  Octicons,
 } from "@expo/vector-icons";
 import { Audio } from "expo-av";
 import {
@@ -232,12 +233,7 @@ const WorkDone = ({ workItem, reload, navigation }) => {
                 >
                   {hasExtraWorks && (
                     <>
-                      <Ionicons
-                        name="md-git-branch-outline"
-                        style={{ transform: [{ rotate: "90deg" }] }}
-                        size={14}
-                        color="gray"
-                      />
+                      <Octicons name="git-branch" size={14} color="gray" />
                       <Text
                         style={{ marginLeft: 5, fontSize: 12, color: "gray" }}
                       >
@@ -353,11 +349,7 @@ const WorkDone = ({ workItem, reload, navigation }) => {
                           onPress={() => playExtra(item)}
                           style={styles.playButton}
                         >
-                          <Ionicons
-                            name="ios-play-circle-sharp"
-                            size={26}
-                            color="#ff3232"
-                          />
+                          <AntDesign name="play" size={26} color="#ff3232" />
                         </TouchableOpacity>
                       ) : (
                         <TouchableOpacity style={styles.playButton}>

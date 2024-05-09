@@ -283,7 +283,7 @@ const Out = ({ navigation }) => {
           isVisible={sortModalVisible}
           page={""}
           onChoose={(type) => {
-            handleSortWork(type, pro);
+            handleSortWork(type, project);
           }}
           onClose={() => setSortModalVisible(false)}
           type={sortType}

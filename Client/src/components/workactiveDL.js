@@ -13,6 +13,7 @@ import {
   FontAwesome5,
   AntDesign,
   EvilIcons,
+  Octicons
 } from "@expo/vector-icons";
 import { useState } from "react";
 import { DeleteWork, MarkCompleted } from "../services/Guest/WorkService";
@@ -250,12 +251,7 @@ const WorkactiveDL = ({ workItem, reload, navigation }) => {
                   >
                     {hasExtraWorks && (
                       <>
-                        <Ionicons
-                          name="md-git-branch-outline"
-                          style={{ transform: [{ rotate: "90deg" }] }}
-                          size={14}
-                          color="gray"
-                        />
+                        <Octicons name="git-branch" size={14} color="gray" />
                         <Text
                           style={{
                             marginLeft: 5,
@@ -286,11 +282,7 @@ const WorkactiveDL = ({ workItem, reload, navigation }) => {
                 onPress={() => handlePlay()}
                 style={styles.playButton}
               >
-                <Ionicons
-                  name="ios-play-circle-sharp"
-                  size={26}
-                  color="#ff3232"
-                />
+                <AntDesign name="play" size={26} color="#ff3232" />
               </TouchableOpacity>
               {hasExtraWorks && (
                 <TouchableWithoutFeedback

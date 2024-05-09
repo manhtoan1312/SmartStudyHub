@@ -21,18 +21,14 @@ import {
 } from "@expo/vector-icons";
 import { Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import ControlButtons from "../../components/ControlButton";
-import { Audio } from "expo-av";
-import { CreatePomodoro } from "../../services/Guest/PomodoroService";
 import ModalSelectWork from "../../components/ModalSelectWork";
 import { ExtraMarkCompleted } from "../../services/Guest/ExtraWork";
 import { MarkCompleted } from "../../services/Guest/WorkService";
-import getRole from "../../services/RoleService";
 import { useDispatch, useSelector } from "react-redux";
-import { setIsPlay } from "../../slices/isPlaySlice";
 import { setFocus } from "../../slices/focusSlice";
+import ModalSelectSound from "../../components/ModalSelectSound";
 const { width, height } = Dimensions.get("screen");
 
 const Focus = () => {
@@ -40,6 +36,7 @@ const Focus = () => {
   const [choose, setChoose] = useState(false);
   const [percentage, setPercentage] = useState(100);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isSoundVisible, setSoundVisible] = useState(false)
   const dispatch = useDispatch();
   const {
     isStop,
@@ -224,6 +221,14 @@ const Focus = () => {
     setPercentage(100);
     dispatch(setFocus({ mode: selectedMode, secondsLeft: second }));
   };
+  const handleOpenSound = () => {
+    if(!isPause) {
+      Alert.alert('Waring!!', 'You must pause pomodoro before change sound')
+    }
+    else{
+      setSoundVisible(true)
+    }
+  }
   return (
     <View style={styles.container}>
       <Image
@@ -318,7 +323,7 @@ const Focus = () => {
                       <Text style={styles.workName}>{extraWorkName}</Text>
                     </View>
                   </View>
-                </TouchableOpacity>{" "}
+                </TouchableOpacity>
               </View>
               <TouchableOpacity
                 style={styles.closeButton}
@@ -387,12 +392,12 @@ const Focus = () => {
               <Text style={{ color: "white", fontSize: 10 }}>Full Screen</Text>
             </View>
           </TouchableOpacity>
-          <View style={styles.settingsIcon}>
+          <TouchableOpacity onPress={handleOpenSound} style={styles.settingsIcon}>
             <FontAwesome5 name="itunes-note" size={20} color="white" />
             <View style={{ marginTop: 5 }}>
               <Text style={{ color: "white", fontSize: 10 }}>Sound</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -459,6 +464,10 @@ const Focus = () => {
         onClose={() => {
           handleClose();
         }}
+      />
+      <ModalSelectSound 
+      visible={isSoundVisible}
+      onClose={() => setSoundVisible(false)}
       />
     </View>
   );

@@ -18,6 +18,7 @@ import {
   FontAwesome5,
   Entypo,
   FontAwesome,
+  FontAwesome6,
 } from "@expo/vector-icons";
 import {
   DeleteWork,
@@ -240,7 +241,7 @@ const WorkDeletedDetail = ({ route, navigation }) => {
                 </View>
               </View>
               <TouchableOpacity>
-                <Ionicons name="ios-flag" size={24} color={colorflag()} />
+                <FontAwesome6 name="flag" size={24} color={colorflag()} />
               </TouchableOpacity>
             </View>
 
@@ -379,11 +380,7 @@ const WorkDeletedDetail = ({ route, navigation }) => {
                         <View style={{}}>
                           {item.status === "ACTIVE" ? (
                             <TouchableOpacity onPress={() => playExtra(item)}>
-                              <Ionicons
-                                name="ios-play-circle-sharp"
-                                size={28}
-                                color="#ff3232"
-                              />
+                              <AntDesign name="play" size={28} color="#ff3232" />
                             </TouchableOpacity>
                           ) : (
                             <TouchableOpacity>

@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, Ionicons, AntDesign } from "@expo/vector-icons";
 
 const WorkItem = ({ workItem, onSelect }) => {
   const handleSelect = () => {
@@ -42,7 +42,7 @@ const WorkItem = ({ workItem, onSelect }) => {
           )}
         </View>
         <TouchableOpacity style={styles.playButton} onPress={playWork}>
-          <Ionicons name="ios-play-circle-sharp" size={26} color="#ff3232" />
+        <AntDesign name="play" size={26} color="#ff3232" />
         </TouchableOpacity>
       </TouchableOpacity>
       {workItem.extraWorks.length > 0 &&
@@ -60,11 +60,7 @@ const WorkItem = ({ workItem, onSelect }) => {
                 </Text>
               </View>
               <TouchableOpacity style={styles.playButton} onPress={() => playExtra(extraWork)}>
-                <Ionicons
-                  name="ios-play-circle-sharp"
-                  size={26}
-                  color="#ff3232"
-                />
+              <AntDesign name="play" size={26} color="#ff3232" />
               </TouchableOpacity>
             </TouchableOpacity>
           ))}
