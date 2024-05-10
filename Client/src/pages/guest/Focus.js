@@ -18,6 +18,7 @@ import {
   Entypo,
   MaterialIcons,
   Ionicons,
+  FontAwesome6,
 } from "@expo/vector-icons";
 import { Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -380,7 +381,7 @@ const Focus = () => {
               <Ionicons name="hourglass-outline" size={20} color="white" />
             )}
             {mode === "+" && (
-              <FontAwesome5 name="hourglass-start" size={20} color="white" />
+              <FontAwesome6 name="hourglass-half" size={20} color="white" />
             )}
             <View style={styles.textMode}>
               <Text style={{ color: "white", fontSize: 10 }}>Timer Mode</Text>
