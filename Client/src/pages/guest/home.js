@@ -180,7 +180,7 @@ export default function Home({ navigation }) {
         };
         fetchDataId();
       } else {
-        console.log(id);
+        console.log('user id:',id);
       }
     } catch (error) {
       console.log(error);

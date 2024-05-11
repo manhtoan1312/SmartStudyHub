@@ -2,7 +2,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GetWorkCompleted } from "../../services/Guest/WorkService";
 import { useEffect, useState } from "react";
 import { GetPomodoro } from "../../services/Guest/PomodoroService";
-import { GetProjectByStatus } from "../../services/Guest/ProjectService";
+import {
+  GetProjectByStatus,
+  GetProjectCompletedNewVision,
+} from "../../services/Guest/ProjectService";
 import {
   View,
   Text,
@@ -10,7 +13,8 @@ import {
   Modal,
   StyleSheet,
   Alert,
-  ScrollView,SafeAreaView
+  ScrollView,
+  SafeAreaView,
 } from "react-native";
 import {
   AntDesign,
@@ -88,7 +92,7 @@ const DoneDetail = ({ navigation }) => {
     } else {
       id = await AsyncStorage.getItem("id");
     }
-    const Project = await GetProjectByStatus(id, "COMPLETED");
+    const Project = await GetProjectCompletedNewVision(id);
     if (Project.success) {
       setListProject(Project.data);
     } else {
@@ -252,7 +256,12 @@ const DoneDetail = ({ navigation }) => {
           {listwork?.map((item) => (
             <View>
               <View
-                style={{ flex: 1, flexDirection: "column", paddingLeft: 10, paddingTop:10}}
+                style={{
+                  flex: 1,
+                  flexDirection: "column",
+                  paddingLeft: 10,
+                  paddingTop: 10,
+                }}
               >
                 {renderDay(item.date)}
                 <View style={styles.time}>
@@ -303,38 +312,50 @@ const DoneDetail = ({ navigation }) => {
       {selectedCategory === "Project" && (
         <ScrollView>
           {listProject?.map((item, index) => (
-            <View>
-            <View
-              style={{ flex: 1, flexDirection: "column", paddingLeft: 10 , paddingTop:10}}
-            >
-              {renderDay(item.endTime)}
-              <View style={styles.time}>
-                <Text style={{ color: "gray" }}>
-                  Time work: {item?.totalTimeWork} Minute
-                </Text>
-                <Text style={{ color: "gray" }}>
-                  Work Completed: {item.totalWorkCompleted}{" "}
-                  {item.totalWorkCompleted > 1 ? "Missions" : "Mission"}
-                </Text>
-              </View>
-
+            <View key={index}>
               <View
                 style={{
                   flex: 1,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  paddingLeft: 5,
+                  flexDirection: "column",
+                  paddingLeft: 10,
+                  paddingTop: 10,
                 }}
-              ></View>
+              >
+                {renderDay(item.date)}
+                <View >
+                  <Text style={{ color: "gray" }}>
+                    Time work: {item?.timeFocus} Minute
+                  </Text>
+                  <View style={styles.time}>
+                    <Text style={{ color: "gray" }}>
+                      Work Completed: {item.totalWorkCompleted}
+                      {item.totalWorkCompleted > 1 ? "Missions" : "Mission"}
+                    </Text>
+                    <Text style={{ color: "gray" }}>
+                      Project Completed: {item.totalProjectCompleted}
+                      {item.totalProjectCompleted > 1 ? "Projects" : "Project"}
+                    </Text>
+                  </View>
+                </View>
+
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingLeft: 5,
+                  }}
+                ></View>
+              </View>
+              {item?.projects?.map((project, pIndex) => (
+                <ProjectDone
+                  key={pIndex}
+                  projectItem={project}
+                  reload={fetchData}
+                  navigation={navigation}
+                />
+              ))}
             </View>
-            <ProjectDone
-              key={index}
-              projectItem={item}
-              reload={fetchData}
-              navigation={navigation}
-            />
-          </View>
-            
           ))}
         </ScrollView>
       )}

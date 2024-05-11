@@ -24,6 +24,7 @@ import {
 import { Swipeable } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
 import { setFocus } from "../slices/focusSlice";
+import WorkRepeat from "./WorkRepeat";
 
 const WorkActive = ({ workItem, reload, navigation }) => {
   const [extraVisible, setExtraVisible] = useState(false);
@@ -206,205 +207,237 @@ const WorkActive = ({ workItem, reload, navigation }) => {
   };
   return (
     <View>
-      <Swipeable renderRightActions={renderRightActionsForWork}>
-        <TouchableOpacity
-          onPress={() => updateWork()}
-          style={{ flexDirection: "column", marginVertical: 5 }}
-        >
-          <View style={styles.container}>
-            {renderCirle()}
-            <View style={styles.content}>
-              <View
-                style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
-              >
-                <Text style={styles.workName}>{workItem.workName} </Text>
-                {workItem.tags?.map((item, index) => (
-                  <Text key={index} style={{ color: item.colorCode }}>
-                    #{item.tagName}
-                  </Text>
-                ))}
-              </View>
-              {(hasExtraWorks ||
-                workItem.numberOfPomodoros !== 0 ||
-                workItem.statusWork !== "SOMEDAY") && (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  {workItem.numberOfPomodoros !== 0 && (
-                    <View style={styles.pomodoroContainer}>
-                      <MaterialCommunityIcons
-                        name="clock-check"
-                        size={14}
-                        color="#ff3232"
-                      />
-                      <Text style={styles.pomodoroText}>
-                        {workItem.numberOfPomodorosDone}/
-                      </Text>
-                      <MaterialCommunityIcons
-                        name="clock"
-                        size={14}
-                        color="#ff9999"
-                      />
-                      <Text style={[styles.pomodoroText, { marginRight: 5 }]}>
-                        {workItem.numberOfPomodoros}
-                      </Text>
-                    </View>
-                  )}
-                  {workItem.statusWork !== "SOMEDAY" && renderDay()}
+      {workItem?.unitRepeat ? (
+        <WorkRepeat
+          workItem={workItem}
+          reload={reload}
+          navigation={navigation}
+        />
+      ) : (
+        <View>
+          <Swipeable renderRightActions={renderRightActionsForWork}>
+            <TouchableOpacity
+              onPress={() => updateWork()}
+              style={{ flexDirection: "column", marginVertical: 5 }}
+            >
+              <View style={styles.container}>
+                {renderCirle()}
+                <View style={styles.content}>
                   <View
                     style={{
                       flex: 1,
                       flexDirection: "row",
                       alignItems: "center",
-                      paddingLeft: 5,
                     }}
                   >
-                    {hasExtraWorks && (
-                      <>
-                        <Octicons name="git-branch" size={14} color="gray" />
-                        <Text
-                          style={{
-                            marginLeft: 5,
-                            fontSize: 12,
-                            color: "gray",
-                          }}
-                        >
-                          {`${
-                            workItem.extraWorks.filter(
-                              (extraWork) => extraWork.status === "COMPLETED"
-                            ).length
-                          }/${workItem.extraWorks.length}`}
-                        </Text>
-                      </>
-                    )}
+                    <Text style={styles.workName}>{workItem.workName} </Text>
+                    {workItem.tags?.map((item, index) => (
+                      <Text key={index} style={{ color: item.colorCode }}>
+                        #{item.tagName}
+                      </Text>
+                    ))}
                   </View>
-                </View>
-              )}
-            </View>
-            <View
-              style={{
-                flex: 1,
-                flexDirection: "row",
-                justifyContent: "flex-end",
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => handlePlay()}
-                style={styles.playButton}
-              >
-                <AntDesign name="play" size={26} color="#ff3232" />
-              </TouchableOpacity>
-              {hasExtraWorks && (
-                <TouchableWithoutFeedback
-                  onPress={() => setExtraVisible(!extraVisible)}
-                >
-                  <AntDesign
-                    name={extraVisible ? "up" : "down"}
-                    size={20}
-                    color="gray"
-                    style={{ marginLeft: 5, paddingTop: 3 }}
-                  />
-                </TouchableWithoutFeedback>
-              )}
-            </View>
-          </View>
-        </TouchableOpacity>
-      </Swipeable>
-      <View>
-        {extraVisible && (
-          <View
-            style={{
-              backgroundColor: "white",
-              borderRadius: 10,
-              marginTop: 10,
-            }}
-          >
-            <View style={styles.extraContainer}>
-              {workItem.extraWorks?.map((item) => (
-                <View key={item.id}>
-                  <Swipeable
-                    renderRightActions={renderRightActionsForExtraWork(item.id)}
-                  >
-                    <TouchableOpacity
-                      onPress={() => playExtra(workItem)}
-                      style={{ flexDirection: "column", marginVertical: 5 }}
+                  {(hasExtraWorks ||
+                    workItem.numberOfPomodoros !== 0 ||
+                    workItem.statusWork !== "SOMEDAY") && (
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
                     >
-                      <View style={styles.extraWorkItem} key={item.id}>
-                        <View style={{ flexDirection: "row" }}>
-                          <TouchableOpacity
-                            onPress={() =>
-                              CompletedExtraWork(item.id, item.status)
-                            }
+                      {workItem.numberOfPomodoros !== 0 && (
+                        <View style={styles.pomodoroContainer}>
+                          <MaterialCommunityIcons
+                            name="clock-check"
+                            size={14}
+                            color="#ff3232"
+                          />
+                          <Text style={styles.pomodoroText}>
+                            {workItem.numberOfPomodorosDone}/
+                          </Text>
+                          <MaterialCommunityIcons
+                            name="clock"
+                            size={14}
+                            color="#ff9999"
+                          />
+                          <Text
+                            style={[styles.pomodoroText, { marginRight: 5 }]}
                           >
-                            {item.status === "COMPLETED" ? (
-                              <AntDesign
-                                name="checkcircle"
-                                size={20}
-                                color="#00cc00"
-                              />
-                            ) : (
-                              <View
-                                style={[styles.circle, { borderColor: "gray" }]}
-                              />
-                            )}
-                          </TouchableOpacity>
-                          <View
-                            style={{ alignItems: "center", paddingLeft: 5 }}
-                          >
+                            {workItem.numberOfPomodoros}
+                          </Text>
+                        </View>
+                      )}
+                      {workItem.statusWork !== "SOMEDAY" && renderDay()}
+                      <View
+                        style={{
+                          flex: 1,
+                          flexDirection: "row",
+                          alignItems: "center",
+                          paddingLeft: 5,
+                        }}
+                      >
+                        {hasExtraWorks && (
+                          <>
+                            <Octicons
+                              name="git-branch"
+                              size={14}
+                              color="gray"
+                            />
                             <Text
                               style={{
-                                textDecorationLine:
-                                  item.status === "COMPLETED"
-                                    ? "line-through"
-                                    : "none",
+                                marginLeft: 5,
+                                fontSize: 12,
+                                color: "gray",
                               }}
                             >
-                              {item.extraWorkName}
+                              {`${
+                                workItem.extraWorks.filter(
+                                  (extraWork) =>
+                                    extraWork.status === "COMPLETED"
+                                ).length
+                              }/${workItem.extraWorks.length}`}
                             </Text>
-                            {item.numberOfPomodoros > 0 && (
-                              <View
-                                style={{
-                                  flexDirection: "row",
-                                  alignItems: "center",
-                                }}
-                              >
-                                {[...Array(item.numberOfPomodoros)].map(
-                                  (_, index) => (
-                                    <MaterialCommunityIcons
-                                      key={index}
-                                      name="clock"
-                                      size={14}
-                                      color="#ff9999"
-                                    />
-                                  )
-                                )}
-                              </View>
-                            )}
-                          </View>
-                        </View>
-                        {item.status === "ACTIVE" ? (
-                          <TouchableOpacity
-                            onPress={() => playExtra(item)}
-                            style={styles.playButton}
-                          >
-                            <AntDesign name="play" size={26} color="#ff3232" />
-                          </TouchableOpacity>
-                        ) : (
-                          <TouchableOpacity style={styles.playButton}>
-                            <AntDesign
-                              name="checkcircle"
-                              size={26}
-                              color="#00cc00"
-                            />
-                          </TouchableOpacity>
+                          </>
                         )}
                       </View>
-                    </TouchableOpacity>
-                  </Swipeable>
+                    </View>
+                  )}
                 </View>
-              ))}
-            </View>
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => handlePlay()}
+                    style={styles.playButton}
+                  >
+                    <AntDesign name="play" size={26} color="#ff3232" />
+                  </TouchableOpacity>
+                  {hasExtraWorks && (
+                    <TouchableWithoutFeedback
+                      onPress={() => setExtraVisible(!extraVisible)}
+                    >
+                      <AntDesign
+                        name={extraVisible ? "up" : "down"}
+                        size={20}
+                        color="gray"
+                        style={{ marginLeft: 5, paddingTop: 3 }}
+                      />
+                    </TouchableWithoutFeedback>
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+          </Swipeable>
+          <View>
+            {extraVisible && (
+              <View
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: 10,
+                  marginTop: 10,
+                }}
+              >
+                <View style={styles.extraContainer}>
+                  {workItem.extraWorks?.map((item) => (
+                    <View key={item.id}>
+                      <Swipeable
+                        renderRightActions={renderRightActionsForExtraWork(
+                          item.id
+                        )}
+                      >
+                        <TouchableOpacity
+                          onPress={() => playExtra(workItem)}
+                          style={{ flexDirection: "column", marginVertical: 5 }}
+                        >
+                          <View style={styles.extraWorkItem} key={item.id}>
+                            <View style={{ flexDirection: "row" }}>
+                              <TouchableOpacity
+                                onPress={() =>
+                                  CompletedExtraWork(item.id, item.status)
+                                }
+                              >
+                                {item.status === "COMPLETED" ? (
+                                  <AntDesign
+                                    name="checkcircle"
+                                    size={20}
+                                    color="#00cc00"
+                                  />
+                                ) : (
+                                  <View
+                                    style={[
+                                      styles.circle,
+                                      { borderColor: "gray" },
+                                    ]}
+                                  />
+                                )}
+                              </TouchableOpacity>
+                              <View
+                                style={{ alignItems: "center", paddingLeft: 5 }}
+                              >
+                                <Text
+                                  style={{
+                                    textDecorationLine:
+                                      item.status === "COMPLETED"
+                                        ? "line-through"
+                                        : "none",
+                                  }}
+                                >
+                                  {item.extraWorkName}
+                                </Text>
+                                {item.numberOfPomodoros > 0 && (
+                                  <View
+                                    style={{
+                                      flexDirection: "row",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    {[...Array(item.numberOfPomodoros)].map(
+                                      (_, index) => (
+                                        <MaterialCommunityIcons
+                                          key={index}
+                                          name="clock"
+                                          size={14}
+                                          color="#ff9999"
+                                        />
+                                      )
+                                    )}
+                                  </View>
+                                )}
+                              </View>
+                            </View>
+                            {item.status === "ACTIVE" ? (
+                              <TouchableOpacity
+                                onPress={() => playExtra(item)}
+                                style={styles.playButton}
+                              >
+                                <AntDesign
+                                  name="play"
+                                  size={26}
+                                  color="#ff3232"
+                                />
+                              </TouchableOpacity>
+                            ) : (
+                              <TouchableOpacity style={styles.playButton}>
+                                <AntDesign
+                                  name="checkcircle"
+                                  size={26}
+                                  color="#00cc00"
+                                />
+                              </TouchableOpacity>
+                            )}
+                          </View>
+                        </TouchableOpacity>
+                      </Swipeable>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
           </View>
-        )}
-      </View>
+        </View>
+      )}
     </View>
   );
 };

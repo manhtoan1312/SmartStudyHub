@@ -3,6 +3,7 @@ import { View, Text, Modal, TouchableOpacity, ScrollView } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { GetAllTagOfUser } from "../services/Guest/TagService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import getRole from "../services/RoleService";
 
 const TagModal = ({
   isVisible,
@@ -17,7 +18,11 @@ const TagModal = ({
   const [tagList, setTagList] = useState([]);
   useEffect(() => {
     const fecthData = async () => {
-      const id = await AsyncStorage.getItem("id");
+      const role = await getRole()
+      let id = await AsyncStorage.getItem("id");
+      if(role){
+        id= role.id
+      }
       const response = await GetAllTagOfUser(id);
       if (response?.success) {
         setTagList(response?.data);

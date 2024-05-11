@@ -128,7 +128,7 @@ const PomodoroCompleted = ({ pomoItem, reload, navigation }) => {
                       { color: item.mode === "SPECIFIED" ? "black" : "red" },
                     ]}
                   >
-                    {item.pomodoroName}{" "}
+                    {item.pomodoroName}
                   </Text>
                   
                 </View>

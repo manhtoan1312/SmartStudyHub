@@ -43,17 +43,13 @@ const AddWorkModal = ({
   const [selectedProject, setSelectedProject] = useState(
     project ? project : { id: null, projectName: "Task" }
   );
-  const [selectedTag, setSelectedTag] = useState(tagId ? [tagId] : []);
+  const [selectedTag, setSelectedTag] = useState(tagId ? [{ id: tagId }] : []);
   const [isTagListModalVisible, setIsTagListModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [onDateChange, setOnDateChange] = useState(false);
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  
-  const defaultTime = new Date();
-  defaultTime.setHours(23);
-  defaultTime.setMinutes(59);
 
   useEffect(() => {
     const fetchDataOnFocus = async () => {
@@ -84,36 +80,38 @@ const AddWorkModal = ({
   };
   useEffect(() => {
     fetchData();
-    setSelectedDate(getDefaultTime(type));
+    getDefaultTime();
   }, [type]);
 
-  const getDefaultTime = (type) => {
-    const defaultTime = new Date();
-    defaultTime.setSeconds(0);
-    defaultTime.setMilliseconds(0);
-
-    if (type === "TODAY") {
-      defaultTime.setHours(23);
-      defaultTime.setMinutes(59);
-    } else if (type === "TOMORROW") {
-      defaultTime.setDate(defaultTime.getDate() + 1);
-      defaultTime.setHours(23);
-      defaultTime.setMinutes(59);
-    } else if (type === "NEXT7DAY") {
-      defaultTime.setDate(defaultTime.getDate() + 7);
-      defaultTime.setHours(23);
-      defaultTime.setMinutes(59);
-    } else if (type === "THISWEEK") {
-      defaultTime.setDate(defaultTime.getDate() + (7 - defaultTime.getDay()));
-      defaultTime.setHours(23);
-      defaultTime.setMinutes(59);
+  const getDefaultTime = () => {
+    if (onDateChange) {
+      return;
     } else {
-      defaultTime.setDate(defaultTime.getDate() + 1);
-      defaultTime.setHours(23);
-      defaultTime.setMinutes(59);
-    }
+      const defaultTime = new Date();
+      defaultTime.setSeconds(0);
+      defaultTime.setMilliseconds(0);
 
-    return defaultTime.getTime();
+      let hoursToAdd = 2;
+      let currentHours = defaultTime.getHours();
+      let newHours = currentHours + hoursToAdd;
+      if (newHours >= 24) {
+        newHours = 23;
+        defaultTime.setMinutes(59);
+      }
+
+      defaultTime.setHours(newHours);
+      if (type === "TODAY") {
+      } else if (type === "TOMORROW ") {
+        defaultTime.setDate(defaultTime.getDate() + 1);
+      } else if (type === "NEXT7DAY") {
+        defaultTime.setDate(defaultTime.getDate() + 7);
+      } else if (type === "THISWEEK") {
+        defaultTime.setDate(defaultTime.getDate() + (7 - defaultTime.getDay()));
+      } else {
+        defaultTime.setDate(defaultTime.getDate() + 1);
+      }
+      setSelectedDate(defaultTime.getTime());
+    }
   };
 
   const handleDonePress = () => {
@@ -389,7 +387,6 @@ const AddWorkModal = ({
     setShowPicker(true);
   };
   const handleDateTimeConfirm = (dateTime) => {
-    setOnDateChange(true);
     setSelectedDate(dateTime);
     hideDateTimePicker();
     setOnDateChange(true);
@@ -479,21 +476,14 @@ const AddWorkModal = ({
         {renderProjectListModal()}
         {renderTagModal()}
 
-        <DateTimePicker
-          visible={showPicker}
-          onSelectTime={(value) => handleDateTimeConfirm(value)}
-          onClose={hideDateTimePicker}
-          defaultTime={defaultTime}
-        />
-        {/* {showPicker && (
+        {showPicker && (
           <DateTimePicker
-            isVisible={true}
-            mode="datetime"
-            date={selectedDate}
-            onConfirm={(value) => handleDateTimeConfirm(value)}
-            onCancel={hideDateTimePicker}
+            visible={showPicker}
+            onSelectTime={(value) => handleDateTimeConfirm(value)}
+            onClose={hideDateTimePicker}
+            defaultTime={selectedDate}
           />
-        )} */}
+        )}
       </View>
     </TouchableWithoutFeedback>
   );

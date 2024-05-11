@@ -281,6 +281,27 @@ const RecoverProject = async (id) => {
   }
 };
 
+const GetProjectCompletedNewVision = async (id) => {
+  try {
+    const response = await fetch(`${uri}/get-project-completed?userId=${id}`, {
+      method: "get",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    if (response.status === 200) {
+      return { success: true, data: data.data };
+    } else {
+      return { success: false, message: data.meta.message };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
 export {
   CreateProject,
   UpdateProject,
@@ -293,6 +314,6 @@ export {
   MarkCompleteProject,
   GetDetailProject,
   DeleteCompletelyProject,
-  RecoverProject
-
+  RecoverProject,
+  GetProjectCompletedNewVision,
 };

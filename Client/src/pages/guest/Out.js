@@ -186,7 +186,7 @@ const Out = ({ navigation }) => {
                   totalWorkCompleted={project.totalWorkCompleted}
                 />
               </View>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.input}
                 onPress={() => inputRef.current.focus()}
               >
@@ -202,7 +202,7 @@ const Out = ({ navigation }) => {
                     setCloseKeyboard(false);
                   }}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               {isSort
                 ? project.workActive?.map((workItem) => (
                     <View key={workItem?.key}>
@@ -268,7 +268,7 @@ const Out = ({ navigation }) => {
           </>
         )}
       </ScrollView>
-      {modalVisible && (
+      {/* {modalVisible && (
         <AddWorkModal
           onDone={handleDone}
           closeKeyboard={closeKeyboard}
@@ -277,7 +277,7 @@ const Out = ({ navigation }) => {
           project={project}
           type="OUTOFDATE"
         />
-      )}
+      )} */}
       {sortModalVisible && (
         <SortWorkModal
           isVisible={sortModalVisible}

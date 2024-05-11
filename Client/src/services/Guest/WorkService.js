@@ -9,7 +9,7 @@ const CreateWork = async (
   priority,
   dueDate,
   numberOfPomodoros,
-  timeOfPomodoro,
+  timeOfPomodoro
 ) => {
   try {
     const response = await fetch(`${uri}/create`, {
@@ -26,6 +26,11 @@ const CreateWork = async (
         dueDate,
         numberOfPomodoros,
         timeOfPomodoro,
+        "typeRepeat": null,
+        "unitRepeat": null, 
+        "amountRepeat": null, 
+        "daysOfWeekRepeat": null, 
+    
       }),
     });
 
@@ -57,7 +62,11 @@ const UpdateWork = async (
   note,
   status,
   tags,
-  extraWorks
+  extraWorks,
+  typeRepeat,
+  unitRepeat,
+  amountRepeat,
+  daysOfWeekRepeat
 ) => {
   try {
     const response = await fetch(`${uri}/update`, {
@@ -82,6 +91,10 @@ const UpdateWork = async (
         status,
         tags,
         extraWorks,
+        typeRepeat,
+        unitRepeat,
+        amountRepeat,
+        daysOfWeekRepeat,
       }),
     });
 

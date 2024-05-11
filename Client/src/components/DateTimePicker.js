@@ -5,7 +5,6 @@ import DatePickerModal from "react-native-modal-datetime-picker";
 
 const DateTimePicker = ({ visible, onSelectTime, onClose, defaultTime }) => {
   const [selectedDate, setSelectedDate] = useState(getToday);
-
   const [selectedTime, setSelectedTime] = useState(new Date(defaultTime));
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
 
@@ -14,7 +13,7 @@ const DateTimePicker = ({ visible, onSelectTime, onClose, defaultTime }) => {
   };
 
   function getToday() {
-    const today = new Date();
+    const today = new Date(defaultTime);
     const year = today.getFullYear();
     const month = (today.getMonth() + 1).toString().padStart(2, "0");
     const day = today.getDate().toString().padStart(2, "0");

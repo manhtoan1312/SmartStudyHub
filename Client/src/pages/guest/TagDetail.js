@@ -261,7 +261,7 @@ const TagDetail = ({ route, navigation }) => {
             closeKeyboard={closeKeyboard}
             keyboardHeight={keyboardHeight}
             handlecloseKeyboard={handleClosekeyboard}
-            tagId={tag}
+            tagId={id}
           />
         )}
         {sortModalVisible && (

@@ -10,7 +10,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
-  TouchableWithoutFeedback,SafeAreaView
+  TouchableWithoutFeedback,
+  SafeAreaView,
 } from "react-native";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import WorkActive from "../../components/WorkActive";
@@ -28,14 +29,17 @@ import ImageFocus from "../../components/Image_Focus";
 import { useIsFocused } from "@react-navigation/native";
 import SortWorkModal from "../../components/SortWorkModal";
 import getRole from "../../services/RoleService";
-const SomeDay = ({ navigation }) => {
+const Today = ({ navigation }) => {
   const [project, setProject] = useState(null);
   const [workName, setWorkName] = useState(null);
   const [doneVisible, setDoneVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [closeKeyboard, setCloseKeyboard] = useState(false);
   const [sortModalVisible, setSortModalVisible] = useState(false);
+  const inputRef = useRef(null);
   const [sortType, setSortType] = useState("");
-
-  const [isSort, setIsSort] =useState(false)
+  const [isSort, setIsSort] = useState(false);
   const isFocused = useIsFocused();
   useEffect(() => {
     const fetchDataOnFocus = async () => {
@@ -45,28 +49,19 @@ const SomeDay = ({ navigation }) => {
     };
     fetchDataOnFocus();
   }, [isFocused]);
-  const handleSortWork = async (type, pro) => {
-    setSortModalVisible(false);
-    setIsSort(true)
-    const body1 = JSON.stringify(pro?.listWorkActive);
-    const body2 = JSON.stringify(pro?.listWorkCompleted);
-    const response = await SortWork(body1, type);
-    const response2 = await SortWork(body2, type);
-
-    if (response.success) {
-      const worksSortedArray = response.data || [];
-      setProject((pre) =>( {...pre,workActive: worksSortedArray }));
-    } else {
-      console.log(response.message);
-    }
-    if (response2.success) {
-      const worksSortedArray = response2.data || [];
-      setProject((prev) => ({ ...prev, workCompleted: worksSortedArray }));
-    } else {
-      console.log(response2.message);
-    }
-    setSortType(type);
-  };
+  useEffect(() => {
+    fetchData();
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      (event) => {
+        const keyboardHeight = event.endCoordinates.height;
+        setKeyboardHeight(keyboardHeight);
+      }
+    );
+    return () => {
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   const fetchData = async () => {
     const role = await getRole();
@@ -83,14 +78,43 @@ const SomeDay = ({ navigation }) => {
         handleSortWork(sortType, response.data);
       }
     } else {
-      Alert.alert("Error when get Someday work!", response.message);
+      Alert.alert("Error when get Today work!", response.message);
       navigation.navigate("Home");
     }
+  };
+
+  const handleReload = async () => {
+    await fetchData();
+    // if (isSort && sortType) {
+    //   handleSortWork(sortType);
+    // }
   };
 
   const handleClosekeyboard = () => {
     setCloseKeyboard(true);
     Keyboard.dismiss();
+  };
+  const handleSortWork = async (type, pro) => {
+    setSortModalVisible(false);
+    setIsSort(true);
+    const body1 = JSON.stringify(pro?.listWorkActive);
+    const body2 = JSON.stringify(pro?.listWorkCompleted);
+    const response = await SortWork(body1, type);
+    const response2 = await SortWork(body2, type);
+
+    if (response.success) {
+      const worksSortedArray = response.data || [];
+      setProject((pre) => ({ ...pre, workActive: worksSortedArray }));
+    } else {
+      console.log(response.message);
+    }
+    if (response2.success) {
+      const worksSortedArray = response2.data || [];
+      setProject((prev) => ({ ...prev, workCompleted: worksSortedArray }));
+    } else {
+      console.log(response2.message);
+    }
+    setSortType(type);
   };
 
   const handleDone = async (
@@ -127,7 +151,6 @@ const SomeDay = ({ navigation }) => {
         numberOfPomodoros,
         time
       );
-
       if (!response.success) {
         Alert.alert("Create Work Error", response.message);
       } else {
@@ -139,113 +162,138 @@ const SomeDay = ({ navigation }) => {
     }
   };
 
-  const handleReload = async () => {
-    await fetchData();
-  };
-
   return (
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
-        <ScrollView style={styles.container}>
-          {project && (
-            <>
-              <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                  <Ionicons name="chevron-back-outline" size={24} color="gray" />
-                </TouchableOpacity>
-                <Text style={{ fontSize: 18, fontWeight: "400" }}>SOME DAY</Text>
-                <TouchableOpacity onPress={() => setSortModalVisible(true)}>
-                  <AntDesign name="filter" size={24} color="gray" />
-                </TouchableOpacity>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <ScrollView style={styles.container}>
+        {project && (
+          <>
+            <View style={styles.header}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Ionicons name="chevron-back-outline" size={24} color="gray" />
+              </TouchableOpacity>
+              <Text style={{ fontSize: 18, fontWeight: "400" }}>SOME DAY</Text>
+              <TouchableOpacity onPress={() => setSortModalVisible(true)}>
+                <AntDesign name="filter" size={24} color="gray" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.body}>
+              <View style={styles.detail}>
+                <HeaderDetail
+                  totalTimeWork={project.totalTimeWork}
+                  totalWorkActive={project.totalWorkActive}
+                  totalTimePassed={project.totalTimePassed}
+                  totalWorkCompleted={project.totalWorkCompleted}
+                />
               </View>
-              <View style={styles.body}>
-                <View style={styles.detail}>
-                  <HeaderDetail
-                    totalTimeWork={project.totalTimeWork}
-                    totalWorkActive={project.totalWorkActive}
-                    totalTimePassed={project.totalTimePassed}
-                    totalWorkCompleted={project.totalWorkCompleted}
-                  />
-                </View>
-                {isSort ? (project.workActive?.map((workItem) => (
-                  <View key={workItem?.key}>
-                    <Text>{workItem?.key}</Text>
-                    {workItem?.worksSorted?.map((item) => (
-                      <WorkActive
-                    key={item.id}
-                    workItem={item}
-                    reload={handleReload}
-                    navigation={navigation}
-                  />
-                    ))}
-                    </View>
-                ))): (project.listWorkActive?.map((workItem) => (
-                  <WorkActive
-                    key={workItem.id}
-                    workItem={workItem}
-                    reload={handleReload}
-                    navigation={navigation}
-                  />
-                )))}
-                <TouchableOpacity
-                  style={styles.buttonComplete}
-                  onPress={() => setDoneVisible(!doneVisible)}
-                >
-                  <Text style={{ fontSize: 12, color: "#666666" }}>
-                    {doneVisible
-                      ? "Hide completed tasks"
-                      : "Displays completed tasks"}
-                  </Text>
-                  <AntDesign
-                    name={doneVisible ? "up" : "down"}
-                    size={15}
-                    color="#666666"
-                    style={{ marginLeft: 5 }}
-                  />
-                </TouchableOpacity>
-                {doneVisible &&
-                  (isSort ? (project.workCompleted?.map((workItem) => (
+              <TouchableOpacity
+                style={styles.input}
+                onPress={() => inputRef.current.focus()}
+              >
+                <AntDesign name="plus" size={24} color="black" />
+                <TextInput
+                  ref={inputRef}
+                  style={{ paddingLeft: 10 }}
+                  placeholder="Add a Work..."
+                  value={workName}
+                  onChangeText={(text) => setWorkName(text)}
+                  onFocus={() => {
+                    setModalVisible(true);
+                    setCloseKeyboard(false);
+                  }}
+                />
+              </TouchableOpacity>
+              {isSort
+                ? project.workActive?.map((workItem) => (
                     <View key={workItem?.key}>
                       <Text>{workItem?.key}</Text>
                       {workItem?.worksSorted?.map((item) => (
-                        <WorkDone
-                        key={item.id}
-                        workItem={item}
-                        reload={handleReload}
-                        navigation={navigation}
-                      />
+                        <WorkActive
+                          key={item.id}
+                          workItem={item}
+                          reload={handleReload}
+                          navigation={navigation}
+                        />
                       ))}
-                      </View>
-                  ))) : (project.listWorkCompleted?.map((workItem) => (
-                    <WorkDone
+                    </View>
+                  ))
+                : project.listWorkActive?.map((workItem) => (
+                    <WorkActive
                       key={workItem.id}
                       workItem={workItem}
                       reload={handleReload}
                       navigation={navigation}
                     />
-                  ))))}
-              </View>
-            </>
-          )}
-        </ScrollView>
-        {sortModalVisible && (
-          <SortWorkModal
-            isVisible={sortModalVisible}
-            page={"duedate"}
-            onChoose={(type) => {
-              handleSortWork(type, project);
-            }}
-            onClose={() => setSortModalVisible(false)}
-            type={sortType}
-          />
+                  ))}
+              <TouchableOpacity
+                style={styles.buttonComplete}
+                onPress={() => setDoneVisible(!doneVisible)}
+              >
+                <Text style={{ fontSize: 12, color: "#666666" }}>
+                  {doneVisible
+                    ? "Hide completed tasks"
+                    : "Displays completed tasks"}
+                </Text>
+                <AntDesign
+                  name={doneVisible ? "up" : "down"}
+                  size={15}
+                  color="#666666"
+                  style={{ marginLeft: 5 }}
+                />
+              </TouchableOpacity>
+              {doneVisible &&
+                (isSort
+                  ? project.workCompleted?.map((workItem) => (
+                      <View key={workItem?.key}>
+                        <Text>{workItem?.key}</Text>
+                        {workItem?.worksSorted?.map((item) => (
+                          <WorkDone
+                            key={item.id}
+                            workItem={item}
+                            reload={handleReload}
+                            navigation={navigation}
+                          />
+                        ))}
+                      </View>
+                    ))
+                  : project.listWorkCompleted?.map((workItem) => (
+                      <WorkDone
+                        key={workItem.id}
+                        workItem={workItem}
+                        reload={handleReload}
+                        navigation={navigation}
+                      />
+                    )))}
+            </View>
+          </>
         )}
-        <ImageFocus />
-      </KeyboardAvoidingView>
-
+      </ScrollView>
+      {modalVisible && (
+        <AddWorkModal
+          onDone={handleDone}
+          closeKeyboard={closeKeyboard}
+          keyboardHeight={keyboardHeight}
+          handlecloseKeyboard={handleClosekeyboard}
+          project={project}
+          type="SOMEDAY"
+        />
+      )}
+      {sortModalVisible && (
+        <SortWorkModal
+          isVisible={sortModalVisible}
+          page={""}
+          onChoose={(type) => {
+            handleSortWork(type, project);
+          }}
+          onClose={() => setSortModalVisible(false)}
+          type={sortType}
+        />
+      )}
+      <ImageFocus />
+    </KeyboardAvoidingView>
   );
-  x;
 };
 
 const styles = StyleSheet.create({
@@ -288,4 +336,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SomeDay;
+export default Today;

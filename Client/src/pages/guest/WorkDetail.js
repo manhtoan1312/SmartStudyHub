@@ -19,6 +19,8 @@ import {
   Entypo,
   FontAwesome,
   FontAwesome6,
+  EvilIcons,
+  Fontisto,
 } from "@expo/vector-icons";
 import {
   DeleteWork,
@@ -35,7 +37,6 @@ import { TextInput } from "react-native-gesture-handler";
 import PriorityModal from "../../components/PriorityModal";
 import TagSelectionModal from "../../components/TagSelectionModal";
 import ChangePomodoro from "../../components/ChangePomodoro";
-import CalendarPicker from "../../components/CalendarPicker";
 import DateTimePicker from "../../components/DateTimePicker";
 import {
   CreateExtraWork,
@@ -45,6 +46,7 @@ import {
 import getRole from "../../services/RoleService";
 import { setFocus } from "../../slices/focusSlice";
 import { useDispatch } from "react-redux";
+import RepeatSelection from "./RepeatSelection";
 
 const WorkDetail = ({ route, navigation }) => {
   const id = route.params.id;
@@ -63,7 +65,8 @@ const WorkDetail = ({ route, navigation }) => {
   const [dateTimePickerVisible, setDateTimePickerVisible] = useState(false);
   const [extraWorkName, setExtraWorkName] = useState("");
   const [note, setNote] = useState(work?.note || "");
-  const dispatch = useDispatch()
+  const [isRepeatVisible, setRepeatVisible] = useState(false);
+  const dispatch = useDispatch();
   const defaultTime = new Date();
   defaultTime.setHours(23);
   defaultTime.setMinutes(59);
@@ -182,9 +185,7 @@ const WorkDetail = ({ route, navigation }) => {
   };
 
   const showDateTimePicker = () => {
-    if (!work.isRemindered) {
-      setDateTimePickerVisible(true);
-    }
+    setDateTimePickerVisible(true);
   };
 
   const hideDateTimePicker = () => {
@@ -192,7 +193,11 @@ const WorkDetail = ({ route, navigation }) => {
   };
 
   const openSelectDueDate = () => {
-      setCalendarVisible(true);
+    setCalendarVisible(true);
+  };
+
+  const handleOpenRepeatSelection = () => {
+    setRepeatVisible(true);
   };
 
   const handleSelectDueDate = (date) => {
@@ -200,13 +205,9 @@ const WorkDetail = ({ route, navigation }) => {
     const today = new Date();
     const tomorrow = new Date();
     tomorrow.setDate(today.getDate() + 1);
-    let statusWork = "PLANNED";
-    if (
-      selectedDateObject.getFullYear() === today.getFullYear() &&
-      selectedDateObject.getMonth() === today.getMonth() &&
-      selectedDateObject.getDate() === today.getDate()
-    ) {
-      statusWork = "TODAY";
+    let statusWork = "TODAY";
+    if (today.getTime() > selectedDateObject.getTime()) {
+      statusWork = "OUTOFDATE";
     } else if (
       selectedDateObject.getFullYear() === tomorrow.getFullYear() &&
       selectedDateObject.getMonth() === tomorrow.getMonth() &&
@@ -217,8 +218,7 @@ const WorkDetail = ({ route, navigation }) => {
 
     selectedDateObject.setHours(23);
     selectedDateObject.setMinutes(59);
-    selectedDateObject.setSeconds(59);
-    selectedDateObject.setMilliseconds(999);
+    selectedDateObject.setSeconds(0);
     const updateWork = { ...work };
     updateWork.dueDate = selectedDateObject.getTime();
     updateWork.statusWork = statusWork;
@@ -258,27 +258,27 @@ const WorkDetail = ({ route, navigation }) => {
 
   const handleStartPomodoro = async () => {
     dispatch(
-      setFocus({ 
+      setFocus({
         workId: work.id,
         workName: work.workName,
         startTime: work?.startTime,
         numberOfPomodoro: work.numberOfPomodoro,
         numberOfPomodorosDone: work.numberOfPomodorosDone,
         pomodoroTime: work.timeOfPomodoro,
-        isPause:true, 
-        isStop:true
+        isPause: true,
+        isStop: true,
       })
     );
-    setMoreOptionsModalVisible(false)
-    navigation.navigate('Focus')
+    setMoreOptionsModalVisible(false);
+    navigation.navigate("Focus");
   };
   const handleCreatePomodoro = async () => {
-    setMoreOptionsModalVisible(false)
+    setMoreOptionsModalVisible(false);
     await updateWork();
-    navigation.navigate('CreatePomodoro',{
-      work:work
-    })
-  }
+    navigation.navigate("CreatePomodoro", {
+      work: work,
+    });
+  };
   const colorflag = () => {
     if (work) {
       if (work?.priority === "HIGH") {
@@ -307,7 +307,6 @@ const WorkDetail = ({ route, navigation }) => {
   };
   const deleteDueDate = () => {
     const updateWork = { ...work };
-    updateWork.dueDate = null;
     updateWork.statusWork = "SOMEDAY";
     setWork(updateWork);
   };
@@ -382,7 +381,9 @@ const WorkDetail = ({ route, navigation }) => {
           null,
           updatedWorkdata.workName,
           updatedWorkdata.priority,
-          updatedWorkdata.dueDate,
+          updatedWorkdata.statusWork === "SOMEDAY"
+            ? null
+            : updatedWorkdata.dueDate,
           updatedWorkdata.timeWillAnnounce
             ? updatedWorkdata.timeWillAnnounce
             : null,
@@ -393,10 +394,24 @@ const WorkDetail = ({ route, navigation }) => {
           note,
           updatedWorkdata.status,
           updatedWorkdata.tags,
-          updatedWorkdata.extraWorks
+          updatedWorkdata.extraWorks,
+          updatedWorkdata?.typeRepeat ? updatedWorkdata?.typeRepeat : null,
+          updatedWorkdata?.unitRepeat ? updatedWorkdata?.unitRepeat : null,
+          updatedWorkdata?.amountRepeat ? updatedWorkdata?.amountRepeat : null,
+          updatedWorkdata?.daysOfWeekRepeat
+            ? updatedWorkdata?.daysOfWeekRepeat
+            : null
         );
 
         if (response.success) {
+          console.log(
+            "----------------------DATA AFTER UPDATE WORK----------------------"
+          );
+          console.log(response.data);
+          console.log(
+            "------------------------------------------------------------------"
+          );
+
           setWork(response.data);
         } else {
           Alert.alert("Update Work Error", response.message);
@@ -450,14 +465,14 @@ const WorkDetail = ({ route, navigation }) => {
             setFocus({
               extraWorkId: item.id,
               extraWorkName: item.extraWorkName,
-              isPause:true, 
-              isStop:true,
+              isPause: true,
+              isStop: true,
               workId: null,
-            workName: null,
-            startTime: null,
-            numberOfPomodoro: null,
-            numberOfPomodorosDone: null,
-            pomodoroTime: null,
+              workName: null,
+              startTime: null,
+              numberOfPomodoro: null,
+              numberOfPomodorosDone: null,
+              pomodoroTime: null,
             })
           );
           navigation.navigate("Focus");
@@ -488,6 +503,8 @@ const WorkDetail = ({ route, navigation }) => {
       }
     }
   };
+
+  const renderRepeatTime = () => {};
 
   return (
     <View style={{ flex: 1 }}>
@@ -569,19 +586,24 @@ const WorkDetail = ({ route, navigation }) => {
             onSubmit={changePomodoro}
           />
         )}
+
         {work && (
-          <CalendarPicker
-            isVisible={calendarVisible}
-            onSelectDate={handleSelectDueDate}
-            onClose={() => setCalendarVisible(false)}
+          <DateTimePicker
+            visible={dateTimePickerVisible}
+            onSelectTime={handleDateTimePicked}
+            onClose={hideDateTimePicker}
+            defaultTime={defaultTime}
           />
         )}
-        <DateTimePicker
-          visible={dateTimePickerVisible}
-          onSelectTime={handleDateTimePicked}
-          onClose={hideDateTimePicker}
-          defaultTime={defaultTime}
-        />
+
+        {work && (
+          <DateTimePicker
+            visible={calendarVisible}
+            onSelectTime={handleSelectDueDate}
+            onClose={() => setCalendarVisible(false)}
+            defaultTime={work?.dueDate ? work?.dueDate : defaultTime}
+          />
+        )}
 
         <Modal
           animationType="slide"
@@ -684,7 +706,7 @@ const WorkDetail = ({ route, navigation }) => {
                 </View>
               </View>
               <TouchableOpacity onPress={() => showPriorityModal()}>
-              <FontAwesome6 name="flag" size={24} color={colorflag()} />
+                <FontAwesome6 name="flag" size={24} color={colorflag()} />
               </TouchableOpacity>
             </View>
 
@@ -750,7 +772,7 @@ const WorkDetail = ({ route, navigation }) => {
                   {work.statusWork !== "SOMEDAY" ? (
                     renderDay()
                   ) : (
-                    <Text>None</Text>
+                    <Text>SOME DAY</Text>
                   )}
                 </View>
               </TouchableOpacity>
@@ -767,7 +789,23 @@ const WorkDetail = ({ route, navigation }) => {
                   </View>
                 </View>
                 <View>
-                  {work.isRemindered ? renderTime() : <Text>No</Text>}
+                  <Text>{work.isRemindered ? renderTime() : "None"}</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleOpenRepeatSelection}
+                style={styles.content}
+              >
+                <View>
+                  <View style={styles.name}>
+                    <Fontisto name="spinner-refresh" size={24} color="gray" />
+                    <View style={{ justifyContent: "center" }}>
+                      <Text style={{ paddingLeft: 15 }}>Repeat</Text>
+                    </View>
+                  </View>
+                </View>
+                <View>
+                  <Text>{work?.typeRepeat ? renderRepeatTime() : "None"}</Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -872,6 +910,14 @@ const WorkDetail = ({ route, navigation }) => {
           </View>
         )}
       </ScrollView>
+      <RepeatSelection
+        visible={isRepeatVisible}
+        unitRepeat={work?.unitRepeat ? work?.unitRepeat : null}
+        amountRepeat={work?.amountRepeat ? work?.amountRepeat : null}
+        daysOfWeekRepeat={work?.daysOfWeekRepeat ? work?.daysOfWeekRepeat : null}
+        typeRepeat={work?.typeRepeat ? work?.typeRepeat : null}
+        onClose={() => setRepeatVisible(false)}
+      />
       <ImageFocus />
     </View>
   );
@@ -1066,18 +1112,18 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
 
-  startOption:{
+  startOption: {
     padding: 15,
     textAlign: "center",
     fontSize: 18,
-    color:"green",
+    color: "green",
   },
-  createOption:{
+  createOption: {
     padding: 15,
     textAlign: "center",
     fontSize: 18,
-    color:"green",
-  }
+    color: "green",
+  },
 });
 
 export default WorkDetail;

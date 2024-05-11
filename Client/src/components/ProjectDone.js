@@ -7,6 +7,7 @@ import { MaterialIcons, Feather } from "@expo/vector-icons";
 import WorkActive from "./WorkActive";
 import WorkCompleted from "./WorkCompleted";
 import WorkDeleted from "./WorkDeleted";
+import { Swipeable } from "react-native-gesture-handler";
 const ProjectDone = ({ projectItem, reload, navigation }) => {
   async function confirmDeleteProject() {
     const response = await DeleteProject(projectItem.id);
@@ -14,6 +15,23 @@ const ProjectDone = ({ projectItem, reload, navigation }) => {
       reload();
     }
   }
+
+  const renderRightActions = (progress, dragX) => {
+    const trans = dragX.interpolate({
+      inputRange: [0, 50, 100, 101],
+      outputRange: [0, 0, 0, 1],
+    });
+    return (
+      <View style={styles.statusButtonsContainer}>
+        <TouchableOpacity onPress={handleChange}>
+          <Feather name="refresh-ccw" size={24} color="gray" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => confirmDeleteProject(projectItem.id)}>
+          <MaterialIcons name="delete" size={24} color="gray" />
+        </TouchableOpacity>
+      </View>
+    );
+  };
   const handleChange = async () => {
     const response = await RecoverProject(projectItem.id);
     if (response.success) {
@@ -29,43 +47,43 @@ const ProjectDone = ({ projectItem, reload, navigation }) => {
 
   return (
     <View>
-      <TouchableOpacity
-        key={projectItem.id}
-        style={styles.projectItemContainer}
-        onPress={() => toDetail()}
-      >
-        {/* Circle with colorCode */}
-        <View
-          style={[
-            styles.colorCircle,
-            { backgroundColor: projectItem?.colorCode },
-          ]}
-        />
-
-        {/* Project Name */}
-        <View style={styles.projectNameContainer}>
-          <Text
+      <Swipeable renderRightActions={renderRightActions}>
+        <TouchableOpacity
+          key={projectItem.id}
+          style={styles.projectItemContainer}
+          onPress={() => toDetail()}
+        >
+          {/* Circle with colorCode */}
+          <View
             style={[
-              styles.projectName,
-              projectItem.status === "COMPLETED" && styles.completedProject,
+              styles.colorCircle,
+              { backgroundColor: projectItem?.colorCode },
             ]}
-          >
-            {projectItem.projectName}
-          </Text>
-        </View>
-
-        {/* Status Buttons */}
-        <View style={styles.statusButtonsContainer}>
-          <TouchableOpacity onPress={handleChange}>
-            <Feather name="refresh-ccw" size={24} color="gray" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => confirmDeleteProject(projectItem.id)}
-          >
-            <MaterialIcons name="delete" size={24} color="gray" />
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
+          />
+  
+          {/* Project Name */}
+          <View style={styles.projectNameContainer}>
+            <Text
+              style={[
+                styles.projectName,
+                projectItem.status === "COMPLETED" && styles.completedProject,
+              ]}
+            >
+              {projectItem.projectName}
+            </Text>
+          </View>
+          <View>
+            <Text>
+              Total time work: {projectItem?.totalTimeWork}
+            </Text>
+            <Text>
+              Total Work Completed: {projectItem?.totalWorkCompleted}
+            </Text>
+          </View>
+  
+          {/* Status Buttons */}
+        </TouchableOpacity>
+      </Swipeable>
       <View style={{ marginLeft: 30 }}>
         {projectItem?.listWorkActive?.map((item) => (
           <WorkActive
@@ -80,7 +98,7 @@ const ProjectDone = ({ projectItem, reload, navigation }) => {
             workItem={item}
             reload={reload}
             navigation={navigation}
-            key={item.id} 
+            key={item.id}
           />
         ))}
         {projectItem.listWorkDeleted?.map((item) => (
