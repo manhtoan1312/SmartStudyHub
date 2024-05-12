@@ -279,6 +279,10 @@ const WorkDetail = ({ route, navigation }) => {
       work: work,
     });
   };
+  const stringToNumberArray = (str) => {
+    return str.split(",").map(Number);
+  };
+
   const colorflag = () => {
     if (work) {
       if (work?.priority === "HIGH") {
@@ -914,7 +918,7 @@ const WorkDetail = ({ route, navigation }) => {
         visible={isRepeatVisible}
         unitRepeat={work?.unitRepeat ? work?.unitRepeat : null}
         amountRepeat={work?.amountRepeat ? work?.amountRepeat : null}
-        daysOfWeekRepeat={work?.daysOfWeekRepeat ? work?.daysOfWeekRepeat : null}
+        daysOfWeekRepeat={work?.daysOfWeekRepeat ? stringToNumberArray(work?.daysOfWeekRepeat) : []}
         typeRepeat={work?.typeRepeat ? work?.typeRepeat : null}
         onClose={() => setRepeatVisible(false)}
       />

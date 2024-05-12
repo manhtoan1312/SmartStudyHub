@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { AntDesign, Entypo } from "@expo/vector-icons";
 import { Modal, StyleSheet, TouchableOpacity, View, Text } from "react-native";
+import ModalCustomRepeat from "../../components/ModalCustomRepeat";
 
 const RepeatSelection = ({
   typeRepeat,
@@ -10,6 +11,12 @@ const RepeatSelection = ({
   visible,
   onClose,
 }) => {
+  const [selectedType, setSelectedType] = useState(typeRepeat);
+  const [customVisible, setCustomVisible] = useState(false);
+  const [selectedDaysOfWeekRepeat, setSelectedDaysOfWeekRepeat] =
+    useState(daysOfWeekRepeat);
+  const [selectedUnitRepeat, setSelectedUnitRepeat] = useState(unitRepeat);
+  const [selectedAmountRepeat, setSelectedAmounRepeat] = useState(amountRepeat);
   const optionList = [
     {
       label: "None",
@@ -44,17 +51,83 @@ const RepeatSelection = ({
       key: "EVERY SIX MONTH",
     },
   ];
+
+  const optionWeek = [
+    {
+      label: "Monday",
+      key: 2,
+    },
+    {
+      label: "Tuesday",
+      key: 3,
+    },
+    {
+      label: "Wednesday",
+      key: 4,
+    },
+    {
+      label: "Thursday",
+      key: 5,
+    },
+    {
+      label: "Friday",
+      key: 6,
+    },
+    {
+      label: "Saturday",
+      key: 7,
+    },
+    {
+      label: "Sunday",
+      key: 8,
+    },
+  ];
+
+  const handleCustom = () => {
+    setSelectedType("CUSTOM");
+    setCustomVisible(true);
+  };
+
+  const handleCloseCustom = (unit, amount, day) => {
+    setSelectedUnitRepeat(unit);
+    setSelectedAmounRepeat(amount);
+    setSelectedDaysOfWeekRepeat(day);
+    setCustomVisible(false);
+  };
+  const renderDay = () => {
+    const days = optionWeek
+      .filter((day) => selectedDaysOfWeekRepeat.includes(day.key))
+      .map((day) => day.label);
+    let formattedDays = days.join(", ");
+    const lastIndex = formattedDays.lastIndexOf(", ");
+    if (lastIndex !== -1) {
+      formattedDays =
+        formattedDays.substring(0, lastIndex) +
+        " and" +
+        formattedDays.substring(lastIndex + 1);
+    }
+    return `at ${formattedDays}.`;
+  };
+
+  const handleClose = () => {
+    onClose(
+      selectedType,
+      selectedUnitRepeat,
+      selectedAmountRepeat,
+      selectedDaysOfWeekRepeat
+    );
+  };
   return (
     <Modal
       visible={visible}
       transparent={true}
       animationType="slide"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <View style={styles.header}>
-            <TouchableOpacity onPress={onClose} style={styles.back}>
+            <TouchableOpacity onPress={handleClose} style={styles.back}>
               <AntDesign
                 name="left"
                 color="black"
@@ -67,27 +140,51 @@ const RepeatSelection = ({
           <View style={styles.body}>
             <View style={styles.repeatBody}>
               {optionList.map((item, index) => (
-                <View style={styles.repeatItem} key={index}>
+                <TouchableOpacity
+                  onPress={() => setSelectedType(item.key)}
+                  style={styles.repeatItem}
+                  key={index}
+                >
                   <Text style={styles.repeatText}>{item.label}</Text>
-                  {unitRepeat === item.key && (
+                  {selectedType === item.key && (
                     <Entypo name="check" size={20} color="orange" />
                   )}
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           </View>
           <View style={styles.repeatBody}>
-            <TouchableOpacity style={styles.repeatItem}>
+            <TouchableOpacity onPress={handleCustom} style={styles.repeatItem}>
               <Text>Custom</Text>
-              {unitRepeat === "CUSTOM" ? (
+              {selectedType === "CUSTOM" ? (
                 <Entypo name="check" size={20} color="orange" />
               ) : (
                 <AntDesign name="right" size={20} color="gray" />
               )}
             </TouchableOpacity>
           </View>
+          {selectedType === "CUSTOM" && (
+            <Text style={{ paddingHorizontal: 25, fontSize: 12 }}>
+              Repeat will start at every{" "}
+              {selectedAmountRepeat !== 1 ? `${selectedAmountRepeat} ` : ""}
+              {selectedUnitRepeat !== "WEEK" ||
+                (selectedDaysOfWeekRepeat.length < 7 &&
+                  selectedUnitRepeat.toLowerCase())}{" "}
+              {selectedUnitRepeat === "WEEK" &&
+                selectedDaysOfWeekRepeat.length > 1 &&
+                selectedDaysOfWeekRepeat.length < 7 &&
+                renderDay()}
+            </Text>
+          )}
         </View>
       </View>
+      <ModalCustomRepeat
+        unitRepeat={selectedUnitRepeat}
+        amountRepeat={selectedAmountRepeat}
+        daysOfWeekRepeat={selectedDaysOfWeekRepeat}
+        visible={customVisible}
+        onClose={handleCloseCustom}
+      />
     </Modal>
   );
 };
