@@ -203,8 +203,14 @@ const WorkDetail = ({ route, navigation }) => {
     setCalendarVisible(true);
   };
 
-  const handleOpenRepeatSelection = () => {
-    setRepeatVisible(true);
+  const handleOpenRepeatSelection = async() => {
+    const role = await getRole()
+    if(role && role.role==='PREMIUM'){
+      setRepeatVisible(true);
+    }
+    else{
+      navigation.navigate('PREMIUM')
+    }
   };
 
   const handleSelectDueDate = (date) => {
