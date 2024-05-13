@@ -47,6 +47,7 @@ import getRole from "../../services/RoleService";
 import { setFocus } from "../../slices/focusSlice";
 import { useDispatch } from "react-redux";
 import RepeatSelection from "./RepeatSelection";
+import RepeatWork from "../../services/PREMIUM/RepeatWorkService";
 
 const WorkDetail = ({ route, navigation }) => {
   const id = route.params.id;
@@ -78,6 +79,11 @@ const WorkDetail = ({ route, navigation }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (work?.workName) {
+      updateWork();
+    }
+  }, [work?.typeRepeat]);
   const fetchData = async () => {
     try {
       setNote("");
@@ -96,6 +102,7 @@ const WorkDetail = ({ route, navigation }) => {
 
       if (isMounted.current) {
         if (workResponse.success) {
+          console.log(workResponse.data);
           setWork(workResponse.data);
           setListTagSelected(workResponse.data.tags);
           setNote(workResponse.data?.note || "");
@@ -340,6 +347,20 @@ const WorkDetail = ({ route, navigation }) => {
       </TouchableOpacity>
     );
   };
+  const handleChangeRepeat = async (type, unit, amount, day) => {
+    console.log(type, unit, amount, day);
+    setRepeatVisible(false);
+    const workUpdate = { ...work };
+    workUpdate.typeRepeat = type;
+    if (type === "CUSTOM") {
+      workUpdate.unitRepeat = unit;
+      workUpdate.amountRepeat = amount;
+      const string = day.join(", ");
+      workUpdate.daysOfWeekRepeat = string;
+    }
+    setWork(workUpdate);
+  };
+
   function renderTime() {
     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const date = new Date(work.timeWillAnnounce);
@@ -460,6 +481,27 @@ const WorkDetail = ({ route, navigation }) => {
     }
   };
 
+  const handleRepeat = async () => {
+    await updateWork();
+    if (work.workName) {
+      if (work.status === "ACTIVE") {
+        const response = await RepeatWork(work.id);
+        if (response.success) {
+          fetchData();
+        } else {
+          Alert.alert("Repeat Work Error", response.message);
+        }
+      } else {
+        const response = await RecoverWork(work.id);
+        if (response.success) {
+          fetchData();
+        } else {
+          Alert.alert("Recover Work Error", response.message);
+        }
+      }
+    }
+  };
+
   const playExtra = async (item) => {
     await updateWork();
     if (work.workName) {
@@ -508,7 +550,82 @@ const WorkDetail = ({ route, navigation }) => {
     }
   };
 
-  const renderRepeatTime = () => {};
+  const renderRepeatTime = () => {
+    if (work?.typeRepeat !== "CUSTOM") {
+      return `Every ${work?.typeRepeat.toLowerCase()}`;
+    } else {
+      const arr = stringToNumberArray(work?.daysOfWeekRepeat);
+      const str = `Every${
+        work?.amountRepeat !== 1 ? ` ${work?.amountRepeat}` : ""
+      } ${
+        work?.unitRepeat !== "WEEK" ||
+        arr.length < 7 ||
+        work?.amountRepeat !== 1
+          ? String(work?.unitRepeat).toLowerCase()
+          : "day"
+      } ${
+        work?.unitRepeat === "WEEK" &&
+        arr.length > 1 &&
+        arr.length < 7 &&
+        renderAtTime(arr)
+      }`;
+      return str;
+    }
+  };
+  const renderAtTime = (arr) => {
+    const optionWeek = [
+      {
+        label: "Monday",
+        key: 2,
+      },
+      {
+        label: "Tuesday",
+        key: 3,
+      },
+      {
+        label: "Wednesday",
+        key: 4,
+      },
+      {
+        label: "Thursday",
+        key: 5,
+      },
+      {
+        label: "Friday",
+        key: 6,
+      },
+      {
+        label: "Saturday",
+        key: 7,
+      },
+      {
+        label: "Sunday",
+        key: 8,
+      },
+    ];
+    const days = optionWeek
+      .filter((day) => arr.includes(day.key))
+      .map((day) => day.label);
+    let formattedDays = days.join(", ");
+    const lastIndex = formattedDays.lastIndexOf(", ");
+    if (lastIndex !== -1) {
+      formattedDays =
+        formattedDays.substring(0, lastIndex) +
+        " and" +
+        formattedDays.substring(lastIndex + 1);
+    }
+    return `at ${formattedDays}.`;
+  };
+
+  const deleteRepeat = () => {
+    setWork({
+      ...work,
+      typeRepeat: null,
+      unitRepeat: null,
+      daysOfWeekRepeat: null,
+      amountRepeat: null,
+    });
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -661,7 +778,17 @@ const WorkDetail = ({ route, navigation }) => {
                     onPress={() => changeWorkState()}
                   >
                     {work.status === "ACTIVE" ? (
-                      <View style={styles.cirle}></View>
+                      work?.typeRepeat ? (
+                        <TouchableOpacity onPress={handleRepeat}>
+                          <Fontisto
+                            name="spinner-refresh"
+                            size={24}
+                            color="black"
+                          />
+                        </TouchableOpacity>
+                      ) : (
+                        <View style={styles.cirle}></View>
+                      )
                     ) : (
                       <Ionicons
                         name="checkmark-circle"
@@ -808,8 +935,27 @@ const WorkDetail = ({ route, navigation }) => {
                     </View>
                   </View>
                 </View>
-                <View>
-                  <Text>{work?.typeRepeat ? renderRepeatTime() : "None"}</Text>
+                <View
+                  style={{
+                    width: 200,
+                    flexDirection: "row",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: work?.typeRepeat ? 12 : 14,
+                      paddingRight: work?.typeRepeat ? 5 : 0,
+                    }}
+                  >
+                    {work?.typeRepeat ? renderRepeatTime() : "None"}
+                  </Text>
+                  {work?.typeRepeat && (
+                    <TouchableOpacity onPress={deleteRepeat}>
+                      <AntDesign name="closecircle" size={22} color="gray" />
+                    </TouchableOpacity>
+                  )}
                 </View>
               </TouchableOpacity>
             </View>
@@ -914,14 +1060,20 @@ const WorkDetail = ({ route, navigation }) => {
           </View>
         )}
       </ScrollView>
-      <RepeatSelection
-        visible={isRepeatVisible}
-        unitRepeat={work?.unitRepeat ? work?.unitRepeat : null}
-        amountRepeat={work?.amountRepeat ? work?.amountRepeat : null}
-        daysOfWeekRepeat={work?.daysOfWeekRepeat ? stringToNumberArray(work?.daysOfWeekRepeat) : []}
-        typeRepeat={work?.typeRepeat ? work?.typeRepeat : null}
-        onClose={() => setRepeatVisible(false)}
-      />
+      {work?.workName && (
+        <RepeatSelection
+          visible={isRepeatVisible}
+          unitRepeat={work?.unitRepeat ? work?.unitRepeat : null}
+          amountRepeat={work?.amountRepeat ? work?.amountRepeat : null}
+          daysOfWeekRepeat={
+            work?.daysOfWeekRepeat
+              ? stringToNumberArray(work?.daysOfWeekRepeat)
+              : []
+          }
+          typeRepeat={work?.typeRepeat ? work?.typeRepeat : null}
+          onClose={handleChangeRepeat}
+        />
+      )}
       <ImageFocus />
     </View>
   );

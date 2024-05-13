@@ -21,10 +21,10 @@ const ModalCustomRepeat = ({
   const [selectUnitVisible, setSelectUnitVisible] = useState(false);
   const [selectAmountVisible, setSelectAmountVisible] = useState(false);
   const [selectedUnitRepeat, setSelectedUnitRepeat] = useState(
-    unitRepeat ? unitRepeat : "DAY"
+    unitRepeat !== null ? unitRepeat : "DAY"
   );
   const [selectedAmountRepeat, setSelectedAmounRepeat] = useState(
-    amountRepeat ? amountRepeat : 1
+    amountRepeat !==null ? amountRepeat : 1
   );
   const [selectedDaysOfWeekRepeat, setSelectedDaysOfWeekRepeat] = useState(
     daysOfWeekRepeat.length > 0 ? daysOfWeekRepeat : [2]
@@ -170,8 +170,8 @@ const ModalCustomRepeat = ({
   };
 
   const handleClose = () => {
-    onClose(selectedUnitRepeat, selectedAmountRepeat, selectedDaysOfWeekRepeat)
-  }
+    onClose(selectedUnitRepeat, selectedAmountRepeat, selectedDaysOfWeekRepeat);
+  };
   return (
     <Modal
       visible={visible}
@@ -197,7 +197,7 @@ const ModalCustomRepeat = ({
               <View style={styles.repeatBody}>
                 {renderPicker(
                   "Frequency",
-                  String(selectedUnitRepeat).toLocaleLowerCase(),
+                  String(selectedUnitRepeat),
                   handleUnitRepeatChange,
                   optionUnitRepeat,
                   selectUnitVisible,
@@ -212,17 +212,19 @@ const ModalCustomRepeat = ({
                   amountList,
                   selectAmountVisible,
                   setSelectAmountVisible,
-                  String(selectedUnitRepeat).toLowerCase(),
-                  String(selectedUnitRepeat).toLowerCase()
+                  String(selectedUnitRepeat),
+                  String(selectedUnitRepeat)
                 )}
               </View>
             </View>
             <Text style={{ paddingHorizontal: 25, fontSize: 12 }}>
               Repeat will start at every{" "}
               {selectedAmountRepeat !== 1 ? `${selectedAmountRepeat} ` : ""}
-              {selectedUnitRepeat !== "WEEK" ||
-                (selectedDaysOfWeekRepeat.length < 7 &&
-                  selectedUnitRepeat.toLowerCase())}{" "}
+              {selectedAmountRepeat !== 1 ||
+              selectedUnitRepeat !== "WEEK" ||
+              selectedDaysOfWeekRepeat.length !== 7
+                ? selectedUnitRepeat
+                : "day"}{" "}
               {selectedUnitRepeat === "WEEK" &&
                 selectedDaysOfWeekRepeat.length > 1 &&
                 selectedDaysOfWeekRepeat.length < 7 &&

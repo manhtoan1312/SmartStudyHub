@@ -207,7 +207,7 @@ const WorkActive = ({ workItem, reload, navigation }) => {
   };
   return (
     <View>
-      {workItem?.unitRepeat ? (
+      {workItem?.typeRepeat ? (
         <WorkRepeat
           workItem={workItem}
           reload={reload}

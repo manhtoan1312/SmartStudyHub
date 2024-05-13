@@ -167,9 +167,11 @@ const RepeatSelection = ({
             <Text style={{ paddingHorizontal: 25, fontSize: 12 }}>
               Repeat will start at every{" "}
               {selectedAmountRepeat !== 1 ? `${selectedAmountRepeat} ` : ""}
-              {selectedUnitRepeat !== "WEEK" ||
-                (selectedDaysOfWeekRepeat.length < 7 &&
-                  selectedUnitRepeat.toLowerCase())}{" "}
+              {selectedAmountRepeat !== 1 ||
+              selectedUnitRepeat !== "WEEK" ||
+              selectedDaysOfWeekRepeat.length !== 7
+                ? selectedUnitRepeat
+                : "day"}{" "}
               {selectedUnitRepeat === "WEEK" &&
                 selectedDaysOfWeekRepeat.length > 1 &&
                 selectedDaysOfWeekRepeat.length < 7 &&
@@ -178,13 +180,15 @@ const RepeatSelection = ({
           )}
         </View>
       </View>
-      <ModalCustomRepeat
-        unitRepeat={selectedUnitRepeat}
-        amountRepeat={selectedAmountRepeat}
-        daysOfWeekRepeat={selectedDaysOfWeekRepeat}
-        visible={customVisible}
-        onClose={handleCloseCustom}
-      />
+      {selectedType === "CUSTOM" && (
+        <ModalCustomRepeat
+          unitRepeat={selectedUnitRepeat}
+          amountRepeat={selectedAmountRepeat}
+          daysOfWeekRepeat={selectedDaysOfWeekRepeat}
+          visible={customVisible}
+          onClose={handleCloseCustom}
+        />
+      )}
     </Modal>
   );
 };

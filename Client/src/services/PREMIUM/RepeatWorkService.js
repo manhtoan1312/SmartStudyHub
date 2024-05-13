@@ -11,7 +11,7 @@ const RepeatWork = async (id) => {
       const { token } = role;
 
       const response = await fetch(`${uri}/repeat?workId=${id}`, {
-        method: "get",
+        method: "put",
         headers: {
           "Content-Type": "application/json",
           authorization: `Bearer ${token}`,
