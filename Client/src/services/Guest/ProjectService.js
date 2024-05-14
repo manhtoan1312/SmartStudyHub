@@ -30,7 +30,15 @@ const CreateProject = async (id, folderId, name, color, iconUrl) => {
   }
 };
 
-const UpdateProject = async (id, folderId, name, color, iconUrl, status) => {
+const UpdateProject = async (
+  id,
+  folderId,
+  name,
+  color,
+  iconUrl,
+  status,
+  fId
+) => {
   try {
     const response = await fetch(`${uri}/update`, {
       method: "put",
@@ -44,6 +52,7 @@ const UpdateProject = async (id, folderId, name, color, iconUrl, status) => {
         folderId: folderId,
         status: status,
         iconUrl: iconUrl,
+        folderId: fId,
       }),
     });
 

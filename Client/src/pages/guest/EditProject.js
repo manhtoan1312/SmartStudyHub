@@ -6,9 +6,10 @@ import {
   StyleSheet,
   Alert,
   Dimensions,
-  TextInput,SafeAreaView
+  TextInput,
+  SafeAreaView,
 } from "react-native";
-import { Fontisto } from "@expo/vector-icons";
+import { Entypo, Fontisto } from "@expo/vector-icons";
 import {
   DeleteProject,
   GetDetailProject,
@@ -16,12 +17,16 @@ import {
   RecoverProject,
   UpdateProject,
 } from "../../services/Guest/ProjectService";
+import SelectFolderModal from "../../components/SelectFolderModal";
+import { useIsFocused } from "@react-navigation/native";
 
 const EditProjectPage = ({ route, navigation }) => {
   const projectId = route.params.id;
   const [color, setColor] = useState(null);
   const [name, setName] = useState(null);
   const [project, setProject] = useState(null);
+  const [folderVisible, setFolderVisible] = useState(false);
+  const [folderSelected, setFolderSelected] = useState(null);
   const colorOptions = [
     "#FF1493",
     "#00BFFF",
@@ -44,19 +49,27 @@ const EditProjectPage = ({ route, navigation }) => {
     "#696969",
     "#808080",
   ];
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await GetDetailProject(projectId);
-      if (response.success) {
-        console.log(response.data);
-        setProject(response.data);
-        setName(response.data.projectName);
-        setColor(response.data.colorCode);
+    const fetchDataOnFocus = async () => {
+      if (isFocused) {
+        await fetchData();
       }
     };
-    fetchData();
-  }, []);
+    fetchDataOnFocus();
+  }, [isFocused]);
+
+  const fetchData = async () => {
+    const response = await GetDetailProject(projectId);
+    if (response.success) {
+      setProject(response.data);
+      setName(response.data.projectName);
+      setColor(response.data.colorCode);
+      setFolderSelected(response.data.folderId);
+    }
+  };
+
   const isSelected = (selectedColor) => {
     return color === selectedColor;
   };
@@ -70,7 +83,7 @@ const EditProjectPage = ({ route, navigation }) => {
         Alert.alert("Error!", response.message);
       }
     }
-  }
+  };
 
   const handleDone = async () => {
     if (name) {
@@ -98,17 +111,13 @@ const EditProjectPage = ({ route, navigation }) => {
   };
 
   const handleRecover = async () => {
-    Alert.alert(
-      "Confirm action",
-      "Do you want to recover this project?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        { text: "OK", onPress: () => recoverProject() },
-      ]
-    );
+    Alert.alert("Confirm action", "Do you want to recover this project?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      { text: "OK", onPress: () => recoverProject() },
+    ]);
   };
   const confirmDeleteProject = async () => {
     const response = await DeleteProject(projectId);
@@ -120,14 +129,14 @@ const EditProjectPage = ({ route, navigation }) => {
   };
 
   const handleUpdate = async () => {
-    console.log(project.id, name, color, null, project.status);
     const response = await UpdateProject(
       project.id,
       null,
       name,
       color,
       project.iconUrl,
-      project.status
+      project.status,
+      folderSelected
     );
     if (response.success) {
       navigation.navigate("Home");
@@ -138,6 +147,26 @@ const EditProjectPage = ({ route, navigation }) => {
 
   const handleBack = () => {
     navigation.navigate("Home");
+  };
+
+  const handleSelectFolder =async (id) => {
+    
+    setFolderSelected(id);
+    const response = await UpdateProject(
+      project.id,
+      null,
+      name,
+      color,
+      project.iconUrl,
+      project.status,
+      id
+    );
+    if (response.success) {
+      console.log("------------------DATA AFTER UPDATE-----------------")
+      console.log(response.data)
+    } else {
+      Alert.alert("Error!", response.message);
+    }
   };
 
   return (
@@ -154,16 +183,25 @@ const EditProjectPage = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.content}>
-        <View style={[styles.colorPreview, { backgroundColor: color }]}></View>
-        <TextInput
-          style={[
-            styles.input,
-            project?.status === "COMPLETED" && name && styles.completedProject,
-          ]}
-          placeholder="Project Name"
-          value={name}
-          onChangeText={(e) => setName(e)}
-        />
+        <View style={{ flexDirection: "row" }}>
+          <View
+            style={[styles.colorPreview, { backgroundColor: color }]}
+          ></View>
+          <TextInput
+            style={[
+              styles.input,
+              project?.status === "COMPLETED" &&
+                name &&
+                styles.completedProject,
+            ]}
+            placeholder="Project Name"
+            value={name}
+            onChangeText={(e) => setName(e)}
+          />
+        </View>
+        <TouchableOpacity onPress={() => setFolderVisible(true)}>
+          <Entypo name="dots-three-horizontal" size={24} color="gray" />
+        </TouchableOpacity>
       </View>
       <View style={styles.colorOptions}>
         {[...Array(4)].map((_, row) => (
@@ -213,6 +251,15 @@ const EditProjectPage = ({ route, navigation }) => {
           </Text>
         </TouchableOpacity>
       </View>
+      {project && (
+        <SelectFolderModal
+          visible={folderVisible}
+          onSelect={handleSelectFolder}
+          onClose={() => setFolderVisible(false)}
+          navigation={navigation}
+          folderId={folderSelected}
+        />
+      )}
     </View>
   );
 };
@@ -240,7 +287,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "white",
     paddingVertical: 20,
-    paddingStart: 10,
+    paddingHorizontal: 10,
+    justifyContent: "space-between",
   },
   colorPreview: {
     width: 40,
@@ -306,7 +354,8 @@ const styles = StyleSheet.create({
   },
   doneButtonText: {
     color: "#4EE508",
-  },recoverButtonText: {
+  },
+  recoverButtonText: {
     color: "#60A9E5",
   },
   deleteButtonText: {

@@ -18,6 +18,7 @@ import {
 } from "react-native";
 import {
   AntDesign,
+  FontAwesome,
   FontAwesome5,
   MaterialCommunityIcons,
   MaterialIcons,
@@ -220,12 +221,7 @@ const DoneDetail = ({ navigation }) => {
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Work")}
           >
-            <FontAwesome5
-              name="tasks"
-              style={styles.icon}
-              size={18}
-              color="black"
-            />
+            <FontAwesome style={styles.icon} name="tasks" size={24} color="black" />
             <Text style={styles.modalText}>Work</Text>
           </TouchableOpacity>
 
