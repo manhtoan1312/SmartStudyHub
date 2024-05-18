@@ -740,19 +740,19 @@ if(role) {
               <Text>{taskDefaultData.pomodoro}</Text>
             </View>
           </TouchableOpacity>
-          {/* {event && (
-            <View style={styles.headers}>
+          {event && (
+            <TouchableOpacity onPress={()=> navigation.navigate('Event')} style={styles.headers}>
               <View style={styles.row}>
                 <MaterialIcons
                   name="event"
-                  style={styles.itemRow}
+                  style={styles.itemRow} 
                   size={20}
                   color="#32CD32"
                 />
                 <Text>Event</Text>
               </View>
-            </View>
-          )} */}
+            </TouchableOpacity>
+          )}
           {done && (
             <TouchableOpacity
               onPress={() => navigation.navigate("Done")}

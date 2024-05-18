@@ -144,7 +144,7 @@ const Focus = () => {
       setFocus({
         isPause: true,
         isStop: true,
-        secondsLeft: (workId ? pomodoroTime : defaultTimePomodoro) * 60,
+        secondsLeft: mode==='+' ? 0 :(workId ? pomodoroTime : defaultTimePomodoro) * 60,
       })
     );
   };

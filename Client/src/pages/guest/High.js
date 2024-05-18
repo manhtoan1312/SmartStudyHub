@@ -64,6 +64,12 @@ const High = ({ navigation }) => {
     };
   }, []);
 
+  const renderKey = (key) => {
+    if(sortType==='DUEDATE'){
+      return new Date(key).toISOString().split('T')[0];
+    }
+  }
+  
   const fetchData = async () => {
     const role = await getRole();
     let id;
@@ -206,7 +212,7 @@ const High = ({ navigation }) => {
               {isSort
                 ? project.workActive?.map((workItem) => (
                     <View key={workItem?.key}>
-                      <Text>{workItem?.key}</Text>
+                      <Text>{renderKey(workItem?.key)}</Text>
                       {workItem?.worksSorted?.map((item) => (
                         <WorkActive
                           key={item.id}
@@ -245,7 +251,7 @@ const High = ({ navigation }) => {
                 (isSort
                   ? project.workCompleted?.map((workItem) => (
                       <View key={workItem?.key}>
-                        <Text>{workItem?.key}</Text>
+                        <Text>{renderKey(workItem?.key)}</Text>
                         {workItem?.worksSorted?.map((item) => (
                           <WorkDone
                             key={item.id}

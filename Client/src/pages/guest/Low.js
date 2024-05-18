@@ -73,6 +73,12 @@ const Low = ({ navigation }) => {
     setSortType(type);
   };
 
+  const renderKey = (key) => {
+    if(sortType==='DUEDATE'){
+      return new Date(key).toISOString().split('T')[0];
+    }
+  }
+  
   useEffect(() => {
     fetchData();
     const keyboardDidShowListener = Keyboard.addListener(
@@ -208,7 +214,7 @@ const Low = ({ navigation }) => {
               {isSort
                 ? project.workActive?.map((workItem) => (
                     <View key={workItem?.key}>
-                      <Text>{workItem?.key}</Text>
+                      <Text>{renderKey(workItem?.key)}</Text>
                       {workItem?.worksSorted?.map((item) => (
                         <WorkActive
                           key={item.id}
@@ -247,7 +253,7 @@ const Low = ({ navigation }) => {
                 (isSort
                   ? project.workCompleted?.map((workItem) => (
                       <View key={workItem?.key}>
-                        <Text>{workItem?.key}</Text>
+                        <Text>{renderKey(workItem?.key)}</Text>
                         {workItem?.worksSorted?.map((item) => (
                           <WorkDone
                             key={item.id}

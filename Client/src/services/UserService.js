@@ -251,13 +251,12 @@ const getUserInfor = async () => {
   }
 };
 
-const CleanData = async (id) => {
+const CleanData = async () => {
   try {
     const role = await getRole();
-
     if (role) {
       const { token } = role;
-      const response = await fetch(`${uri}/cleandata?userId=${id}`, {
+      const response = await fetch(`${uri}/cleandata`, {
         method: "get",
         headers: {
           "Content-Type": "application/json",

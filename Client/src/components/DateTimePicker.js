@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Modal, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { Calendar } from "react-native-calendars";
 import DatePickerModal from "react-native-modal-datetime-picker";
@@ -8,6 +8,10 @@ const DateTimePicker = ({ visible, onSelectTime, onClose, defaultTime }) => {
   const [selectedTime, setSelectedTime] = useState(new Date(defaultTime));
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
 
+  useEffect(() => {
+    setSelectedTime(new Date(defaultTime));
+    setSelectedDate(getToday);
+  }, [defaultTime]);
   const handleDayPress = (day) => {
     setSelectedDate(day.dateString);
   };
@@ -68,7 +72,8 @@ const DateTimePicker = ({ visible, onSelectTime, onClose, defaultTime }) => {
                 onPress={showDatePicker}
               >
                 <Text style={styles.buttonText}>
-                  {selectedTime.getHours()}:{selectedTime.getMinutes()}
+                  {String(selectedTime.getHours()).padStart(2, "0")}:
+                  {String(selectedTime.getMinutes()).padStart(2, "0")}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -137,7 +142,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     textAlign: "center",
-    paddingHorizontal:20
+    paddingHorizontal: 20,
   },
 });
 

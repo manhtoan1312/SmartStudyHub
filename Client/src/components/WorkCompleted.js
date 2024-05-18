@@ -5,6 +5,7 @@ import {
   Text,
   StyleSheet,
   TouchableWithoutFeedback,
+  Alert,
 } from "react-native";
 import {
   MaterialCommunityIcons,

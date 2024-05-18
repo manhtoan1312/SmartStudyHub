@@ -172,14 +172,7 @@ const InforUser = ({ navigation }) => {
 
   const confirmDeleteData = async () => {
     closeMoreOptionsModal();
-    const role = await getRole();
-    let id;
-    if (role) {
-      id = role.id;
-    } else {
-      id = await AsyncStorage.getItem("id");
-    }
-    const rs = await CleanData(id);
+    const rs = await CleanData();
     Alert.alert("Announcement", rs.message);
     navigation.navigate("Home");
   };

@@ -152,6 +152,12 @@ const TagDetail = ({ route, navigation }) => {
     await fetchData();
   };
 
+  const renderKey = (key) => {
+    if(sortType==='DUEDATE'){
+      return new Date(key).toISOString().split('T')[0];
+    }
+  }
+
   return (
 
       <KeyboardAvoidingView
@@ -196,7 +202,7 @@ const TagDetail = ({ route, navigation }) => {
                 </TouchableOpacity>
                 {isSort ? (tag.workActive?.map((workItem) => (
                   <View key={workItem?.key}>
-                    <Text>{workItem?.key}</Text>
+                    <Text>{renderKey(workItem?.key)}</Text>
                     {workItem?.worksSorted?.map((item) => (
                       <WorkActive
                     key={item.id}
@@ -233,7 +239,7 @@ const TagDetail = ({ route, navigation }) => {
                 {doneVisible &&
                   (isSort ? (tag.workCompleted?.map((workItem) => (
                     <View key={workItem?.key}>
-                      <Text>{workItem?.key}</Text>
+                      <Text>{renderKey(workItem?.key)}</Text>
                       {workItem?.worksSorted?.map((item) => (
                         <WorkDone
                         key={item.id}

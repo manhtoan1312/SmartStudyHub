@@ -54,6 +54,7 @@ import RecoverStep2 from "../pages/guest/RecoverStep2";
 import CreatePomodoro from "../pages/guest/CreatePomodoro";
 import ProjectDoneDetail from "../pages/guest/ProjectDoneDetail";
 import FullScreenMode from "../pages/guest/FullScreenMode";
+import Event from "../pages/guest/Event";
 
 const Stack = createStackNavigator();
 
@@ -112,6 +113,7 @@ const Navigator = () => (
     <Stack.Screen name="CreatePomodoro" component={CreatePomodoro} />
     <Stack.Screen name="ProjectDoneDetail" component={ProjectDoneDetail} />
     <Stack.Screen name="FullScreen" component={FullScreenMode} />
+    <Stack.Screen name="Event" component={Event} />
   </Stack.Navigator>
 );
 

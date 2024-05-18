@@ -221,91 +221,91 @@ const WorkActive = ({ workItem, reload, navigation }) => {
               style={{ flexDirection: "column", marginVertical: 5 }}
             >
               <View style={styles.container}>
-                {renderCirle()}
-                <View style={styles.content}>
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Text style={styles.workName}>{workItem.workName} </Text>
-                    {workItem.tags?.map((item, index) => (
-                      <Text key={index} style={{ color: item.colorCode }}>
-                        #{item.tagName}
-                      </Text>
-                    ))}
-                  </View>
-                  {(hasExtraWorks ||
-                    workItem.numberOfPomodoros !== 0 ||
-                    workItem.statusWork !== "SOMEDAY") && (
+                
+                  {renderCirle()}
+                  <View style={styles.content}>
                     <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        width:300
+                      }}
                     >
-                      {workItem.numberOfPomodoros !== 0 && (
-                        <View style={styles.pomodoroContainer}>
-                          <MaterialCommunityIcons
-                            name="clock-check"
-                            size={14}
-                            color="#ff3232"
-                          />
-                          <Text style={styles.pomodoroText}>
-                            {workItem.numberOfPomodorosDone}/
-                          </Text>
-                          <MaterialCommunityIcons
-                            name="clock"
-                            size={14}
-                            color="#ff9999"
-                          />
-                          <Text
-                            style={[styles.pomodoroText, { marginRight: 5 }]}
-                          >
-                            {workItem.numberOfPomodoros}
-                          </Text>
-                        </View>
-                      )}
-                      {workItem.statusWork !== "SOMEDAY" && renderDay()}
+                      <Text style={styles.workName}>{workItem.workName} </Text>
+                      {workItem.tags?.map((item, index) => (
+                        <Text key={index} style={{ color: item.colorCode }}>
+                          #{item.tagName}
+                        </Text>
+                      ))}
+                    </View>
+                    {(hasExtraWorks ||
+                      workItem.numberOfPomodoros !== 0 ||
+                      workItem.statusWork !== "SOMEDAY") && (
                       <View
-                        style={{
-                          flex: 1,
-                          flexDirection: "row",
-                          alignItems: "center",
-                          paddingLeft: 5,
-                        }}
+                        style={{ flexDirection: "row", alignItems: "center" }}
                       >
-                        {hasExtraWorks && (
-                          <>
-                            <Octicons
-                              name="git-branch"
+                        {workItem.numberOfPomodoros !== 0 && (
+                          <View style={styles.pomodoroContainer}>
+                            <MaterialCommunityIcons
+                              name="clock-check"
                               size={14}
-                              color="gray"
+                              color="#ff3232"
+                            />
+                            <Text style={styles.pomodoroText}>
+                              {workItem.numberOfPomodorosDone}/
+                            </Text>
+                            <MaterialCommunityIcons
+                              name="clock"
+                              size={14}
+                              color="#ff9999"
                             />
                             <Text
-                              style={{
-                                marginLeft: 5,
-                                fontSize: 12,
-                                color: "gray",
-                              }}
+                              style={[styles.pomodoroText, { marginRight: 5 }]}
                             >
-                              {`${
-                                workItem.extraWorks.filter(
-                                  (extraWork) =>
-                                    extraWork.status === "COMPLETED"
-                                ).length
-                              }/${workItem.extraWorks.length}`}
+                              {workItem.numberOfPomodoros}
                             </Text>
-                          </>
+                          </View>
                         )}
+                        {workItem.statusWork !== "SOMEDAY" && renderDay()}
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            paddingLeft: 5,
+                          }}
+                        >
+                          {hasExtraWorks && (
+                            <>
+                              <Octicons
+                                name="git-branch"
+                                size={14}
+                                color="gray"
+                              />
+                              <Text
+                                style={{
+                                  marginLeft: 5,
+                                  fontSize: 12,
+                                  color: "gray",
+                                }}
+                              >
+                                {`${
+                                  workItem.extraWorks.filter(
+                                    (extraWork) =>
+                                      extraWork.status === "COMPLETED"
+                                  ).length
+                                }/${workItem.extraWorks.length}`}
+                              </Text>
+                            </>
+                          )}
+                        </View>
                       </View>
-                    </View>
-                  )}
-                </View>
+                    )}
+                  </View>
+              
                 <View
                   style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    justifyContent: "flex-end",
+                    flexDirection:'row'
                   }}
                 >
                   <TouchableOpacity
@@ -336,7 +336,6 @@ const WorkActive = ({ workItem, reload, navigation }) => {
                 style={{
                   backgroundColor: "white",
                   borderRadius: 10,
-                  marginTop: 10,
                 }}
               >
                 <View style={styles.extraContainer}>

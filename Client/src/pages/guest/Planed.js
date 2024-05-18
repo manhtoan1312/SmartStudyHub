@@ -162,6 +162,13 @@ const Planed = ({ navigation }) => {
     await fetchData();
   };
 
+  const renderKey = (key) => {
+    if(sortType==='DUEDATE'){
+      return new Date(key).toISOString().split('T')[0];
+    }
+  }
+  
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -208,7 +215,7 @@ const Planed = ({ navigation }) => {
               {isSort
                 ? project.workActive?.map((workItem) => (
                     <View key={workItem?.key}>
-                      <Text>{workItem?.key}</Text>
+                      <Text>{renderKey(workItem?.key)}</Text>
                       {workItem?.worksSorted?.map((item) => (
                         <WorkActive
                           key={item.id}
@@ -247,7 +254,7 @@ const Planed = ({ navigation }) => {
                 (isSort
                   ? project.workCompleted?.map((workItem) => (
                       <View key={workItem?.key}>
-                        <Text>{workItem?.key}</Text>
+                        <Text>{renderKey(workItem?.key)}</Text>
                         {workItem?.worksSorted?.map((item) => (
                           <WorkDone
                             key={item.id}

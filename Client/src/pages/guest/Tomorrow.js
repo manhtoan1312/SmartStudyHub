@@ -110,6 +110,12 @@ const Tomorror = ({ navigation }) => {
     Keyboard.dismiss();
   };
 
+  const renderKey = (key) => {
+    if(sortType==='DUEDATE'){
+      return new Date(key).toISOString().split('T')[0];
+    }
+  }
+  
   const handleDone = async (
     projectId,
     priority,
@@ -205,7 +211,7 @@ const Tomorror = ({ navigation }) => {
                 </TouchableOpacity>
                 {isSort ? (project.workActive?.map((workItem) => (
                   <View key={workItem?.key}>
-                    <Text>{workItem?.key}</Text>
+                    <Text>{renderKey(workItem?.key)}</Text>
                     {workItem?.worksSorted?.map((item) => (
                       <WorkActive
                     key={item.id}
@@ -242,7 +248,7 @@ const Tomorror = ({ navigation }) => {
                 {doneVisible &&
                   (isSort ? (project.workCompleted?.map((workItem) => (
                     <View key={workItem?.key}>
-                      <Text>{workItem?.key}</Text>
+                      <Text>{renderKey(workItem?.key)}</Text>
                       {workItem?.worksSorted?.map((item) => (
                         <WorkDone
                         key={item.id}

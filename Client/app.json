@@ -36,7 +36,7 @@
       "package": "your.bundle.identifier"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "bundler": "metro"
     }
   }
 }
