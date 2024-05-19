@@ -67,6 +67,7 @@ const WorkRepeat = ({ workItem, reload, navigation }) => {
     const response = await RepeatWork(workItem.id);
     if (response.success) {
       reload();
+      console.log('repeat Work Sucess')
     } else {
       Alert.alert("Mark repeat work Error!", response.message);
     }

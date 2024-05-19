@@ -32,9 +32,9 @@ import { useIsFocused } from "@react-navigation/native";
 import getRole from "../../services/RoleService";
 
 const DoneDetail = ({ navigation }) => {
-  const [listwork, setListWork] = useState();
-  const [listPomodoro, setListPomodoro] = useState();
-  const [listProject, setListProject] = useState();
+  const [listwork, setListWork] = useState([]);
+  const [listPomodoro, setListPomodoro] = useState([]);
+  const [listProject, setListProject] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("Pomodoro");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const isFocused = useIsFocused();
@@ -221,7 +221,12 @@ const DoneDetail = ({ navigation }) => {
             style={styles.modalItem}
             onPress={() => handleCategorySelect("Work")}
           >
-            <FontAwesome style={styles.icon} name="tasks" size={24} color="black" />
+            <FontAwesome
+              style={styles.icon}
+              name="tasks"
+              size={24}
+              color="black"
+            />
             <Text style={styles.modalText}>Work</Text>
           </TouchableOpacity>
 
@@ -289,6 +294,19 @@ const DoneDetail = ({ navigation }) => {
               ))}
             </View>
           ))}
+          {listwork?.length === 0 && (
+            <View
+              style={{
+                height: 100,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ fontSize: 24, fontWeight: 700, color: "gray" }}>
+                No Work Completed
+              </Text>
+            </View>
+          )}
         </ScrollView>
       )}
 
@@ -302,6 +320,19 @@ const DoneDetail = ({ navigation }) => {
               navigation={navigation}
             />
           ))}
+          {listPomodoro?.length === 0 && (
+            <View
+              style={{
+                height: 100,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ fontSize: 24, fontWeight: 700, color: "gray" }}>
+                No Pomodoro Completed
+              </Text>
+            </View>
+          )}
         </ScrollView>
       )}
 
@@ -318,7 +349,7 @@ const DoneDetail = ({ navigation }) => {
                 }}
               >
                 {renderDay(item.date)}
-                <View >
+                <View>
                   <Text style={{ color: "gray" }}>
                     Time work: {item?.timeFocus} Minute
                   </Text>
@@ -353,6 +384,19 @@ const DoneDetail = ({ navigation }) => {
               ))}
             </View>
           ))}
+          {listProject?.length === 0 && (
+            <View
+              style={{
+                height: 100,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ fontSize: 24, fontWeight: 700, color: "gray" }}>
+                No Project Completed
+              </Text>
+            </View>
+          )}
         </ScrollView>
       )}
 

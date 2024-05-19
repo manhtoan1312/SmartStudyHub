@@ -55,6 +55,7 @@ import CreatePomodoro from "../pages/guest/CreatePomodoro";
 import ProjectDoneDetail from "../pages/guest/ProjectDoneDetail";
 import FullScreenMode from "../pages/guest/FullScreenMode";
 import Event from "../pages/guest/Event";
+import CreateWorkPage from "../pages/guest/CreateWork";
 
 const Stack = createStackNavigator();
 
@@ -114,6 +115,7 @@ const Navigator = () => (
     <Stack.Screen name="ProjectDoneDetail" component={ProjectDoneDetail} />
     <Stack.Screen name="FullScreen" component={FullScreenMode} />
     <Stack.Screen name="Event" component={Event} />
+    <Stack.Screen name="CreateWork" component={CreateWorkPage} />
   </Stack.Navigator>
 );
 

@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   Modal,
   StyleSheet,
-  ScrollView,SafeAreaView
+  ScrollView,
+  SafeAreaView,
 } from "react-native";
 import {
   AntDesign,
@@ -32,9 +33,9 @@ import { useIsFocused } from "@react-navigation/native";
 import getRole from "../../services/RoleService";
 
 const DeletedDetail = ({ navigation }) => {
-  const [listWork, setListWork] = useState();
-  const [listFolder, setListFolder] = useState();
-  const [listProject, setListProject] = useState();
+  const [listWork, setListWork] = useState([]);
+  const [listFolder, setListFolder] = useState([]);
+  const [listProject, setListProject] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("Work");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const isFocused = useIsFocused();
@@ -192,6 +193,20 @@ const DeletedDetail = ({ navigation }) => {
               navigation={navigation}
             />
           ))}
+
+          {listWork?.length === 0 && (
+            <View
+              style={{
+                height: 100,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ fontSize: 24, fontWeight: 700, color: "gray" }}>
+                No Work Deleted
+              </Text>
+            </View>
+          )}
         </ScrollView>
       )}
 
@@ -205,6 +220,19 @@ const DeletedDetail = ({ navigation }) => {
               navigation={navigation}
             />
           ))}
+          {listFolder?.length === 0 && (
+            <View
+              style={{
+                height: 100,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ fontSize: 24, fontWeight: 700, color: "gray" }}>
+                No Folder Deleted
+              </Text>
+            </View>
+          )}
         </ScrollView>
       )}
 
@@ -218,6 +246,19 @@ const DeletedDetail = ({ navigation }) => {
               navigation={navigation}
             />
           ))}
+          {listProject?.length === 0 && (
+            <View
+              style={{
+                height: 100,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ fontSize: 24, fontWeight: 700, color: "gray" }}>
+                No Project Deleted
+              </Text>
+            </View>
+          )}
         </ScrollView>
       )}
 

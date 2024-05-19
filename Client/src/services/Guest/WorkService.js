@@ -66,7 +66,8 @@ const UpdateWork = async (
   typeRepeat,
   unitRepeat,
   amountRepeat,
-  daysOfWeekRepeat
+  daysOfWeekRepeat,
+  dateEndRepeat
 ) => {
   try {
     const response = await fetch(`${uri}/update`, {
@@ -95,6 +96,7 @@ const UpdateWork = async (
         unitRepeat,
         amountRepeat,
         daysOfWeekRepeat,
+        dateEndRepeat
       }),
     });
 

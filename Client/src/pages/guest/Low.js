@@ -233,6 +233,21 @@ const Low = ({ navigation }) => {
                       navigation={navigation}
                     />
                   ))}
+                  {project.listWorkActive.length === 0 && (
+                <View
+                  style={{
+                    height: 100,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{ fontSize: 24, fontWeight: 700, color: "gray" }}
+                  >
+                    No Work Active
+                  </Text>
+                </View>
+              )}
               <TouchableOpacity
                 style={styles.buttonComplete}
                 onPress={() => setDoneVisible(!doneVisible)}
@@ -272,6 +287,21 @@ const Low = ({ navigation }) => {
                         navigation={navigation}
                       />
                     )))}
+                    {project.listWorkCompleted.length === 0 && doneVisible && (
+                <View
+                  style={{
+                    height: 100,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{ fontSize: 24, fontWeight: 700, color: "gray" }}
+                  >
+                    No Work Completed
+                  </Text>
+                </View>
+              )}
             </View>
           </>
         )}

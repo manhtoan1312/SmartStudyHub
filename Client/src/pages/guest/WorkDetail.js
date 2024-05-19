@@ -9,6 +9,7 @@ import {
   Alert,
   ScrollView,
   SafeAreaView,
+  Switch,
 } from "react-native";
 import {
   MaterialIcons,
@@ -48,6 +49,7 @@ import { setFocus } from "../../slices/focusSlice";
 import { useDispatch } from "react-redux";
 import RepeatSelection from "./RepeatSelection";
 import RepeatWork from "../../services/PREMIUM/RepeatWorkService";
+import CalendarPicker from "../../components/CalendarPicker";
 
 const WorkDetail = ({ route, navigation }) => {
   const id = route.params.id;
@@ -67,6 +69,9 @@ const WorkDetail = ({ route, navigation }) => {
   const [extraWorkName, setExtraWorkName] = useState("");
   const [note, setNote] = useState(work?.note || "");
   const [isRepeatVisible, setRepeatVisible] = useState(false);
+  const [isSelectEndDateVisible, setSelectEndDateVisible] = useState(false);
+  const [isEndDateRepeat, setEndDateRepeat] = useState(false);
+
   const dispatch = useDispatch();
   const defaultTime = new Date();
   defaultTime.setHours(23);
@@ -84,6 +89,11 @@ const WorkDetail = ({ route, navigation }) => {
       updateWork();
     }
   }, [work?.typeRepeat]);
+  useEffect(() => {
+    if (!isSelectEndDateVisible && work?.workName) {
+      updateWork();
+    }
+  }, [isSelectEndDateVisible]);
   const fetchData = async () => {
     try {
       setNote("");
@@ -102,10 +112,10 @@ const WorkDetail = ({ route, navigation }) => {
 
       if (isMounted.current) {
         if (workResponse.success) {
-          console.log(workResponse.data);
           setWork(workResponse.data);
           setListTagSelected(workResponse.data.tags);
           setNote(workResponse.data?.note || "");
+          setEndDateRepeat(workResponse.data.dateEndRepeat ? true : false);
         }
 
         if (listProjectResponse.success) {
@@ -203,13 +213,13 @@ const WorkDetail = ({ route, navigation }) => {
     setCalendarVisible(true);
   };
 
-  const handleOpenRepeatSelection = async() => {
-    const role = await getRole()
-    if(role && role.role==='PREMIUM'){
+  const handleOpenRepeatSelection = async () => {
+    const role = await getRole();
+    if (role && role.role === "PREMIUM") {
+      console.log(role.token);
       setRepeatVisible(true);
-    }
-    else{
-      navigation.navigate('PREMIUM')
+    } else {
+      navigation.navigate("PREMIUM");
     }
   };
 
@@ -431,7 +441,8 @@ const WorkDetail = ({ route, navigation }) => {
           updatedWorkdata?.amountRepeat ? updatedWorkdata?.amountRepeat : null,
           updatedWorkdata?.daysOfWeekRepeat
             ? updatedWorkdata?.daysOfWeekRepeat
-            : null
+            : null,
+          updatedWorkdata?.dateEndRepeat ? updatedWorkdata.dateEndRepeat : null
         );
 
         if (response.success) {
@@ -493,6 +504,7 @@ const WorkDetail = ({ route, navigation }) => {
       if (work.status === "ACTIVE") {
         const response = await RepeatWork(work.id);
         if (response.success) {
+          console.log("repeat Work Success");
           fetchData();
         } else {
           Alert.alert("Repeat Work Error", response.message);
@@ -558,7 +570,7 @@ const WorkDetail = ({ route, navigation }) => {
 
   const renderRepeatTime = () => {
     if (work?.typeRepeat !== "CUSTOM") {
-      return `Every ${work?.typeRepeat.toLowerCase()}`;
+      return `${work?.typeRepeat.toLowerCase()}`;
     } else {
       const arr = stringToNumberArray(work?.daysOfWeekRepeat);
       const str = `Every${
@@ -631,8 +643,52 @@ const WorkDetail = ({ route, navigation }) => {
       daysOfWeekRepeat: null,
       amountRepeat: null,
     });
+    setEndDateRepeat(false);
   };
 
+  const renderEndDate = () => {
+    if (work?.dateEndRepeat) {
+      return new Date(work?.dateEndRepeat).toISOString().split("T")[0];
+    } else {
+      const updateWorkItem = { ...work };
+      const defaultTime = new Date();
+      defaultTime.setSeconds(0);
+      defaultTime.setMilliseconds(0);
+      let hoursToAdd = 2;
+      let currentHours = defaultTime.getHours();
+      let newHours = currentHours + hoursToAdd;
+      if (newHours >= 24) {
+        newHours = 23;
+        defaultTime.setMinutes(59);
+      }
+      defaultTime.setHours(newHours);
+      updateWorkItem.dateEndRepeat = defaultTime.getTime();
+      setWork(updateWorkItem);
+      return new Date(defaultTime).toISOString().split("T")[0];
+    }
+  };
+
+  const handleOpenEndDateRepeat = () => {
+    setSelectEndDateVisible(!isSelectEndDateVisible);
+  };
+
+  const handleSelectRepeatEndDate = (date) => {
+    const selectedDate = new Date(date);
+    selectedDate.setHours(23, 59);
+    const endOfDayTimestamp = selectedDate.getTime();
+    const updateWorkItem = { ...work };
+    updateWorkItem.dateEndRepeat = endOfDayTimestamp;
+    setWork(updateWorkItem);
+    setSelectEndDateVisible(false);
+  };
+
+  useEffect(() => {
+    if (!isEndDateRepeat) {
+      const updateWorkItem = { ...work };
+      updateWorkItem.dateEndRepeat = null;
+      setWork(updateWorkItem);
+    }
+  }, [isEndDateRepeat]);
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -774,7 +830,7 @@ const WorkDetail = ({ route, navigation }) => {
             </View>
           </View>
         </Modal>
-        {work && (
+        {work?.workName && (
           <View>
             <View style={styles.namecontainer}>
               <View>
@@ -964,6 +1020,36 @@ const WorkDetail = ({ route, navigation }) => {
                   )}
                 </View>
               </TouchableOpacity>
+              {work?.typeRepeat && (
+                <TouchableOpacity
+                  style={styles.content}
+                  onPress={handleOpenEndDateRepeat}
+                >
+                  <View>
+                    <View style={styles.name}>
+                      <Entypo name="bell" size={24} color="gray" />
+                      <View
+                        style={{
+                          justifyContent: "center",
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text style={{ paddingLeft: 15 }}>Date End Repeat</Text>
+                        {isEndDateRepeat && <Text>: {renderEndDate()}</Text>}
+                      </View>
+                    </View>
+                  </View>
+                  <View>
+                    <Switch
+                      trackColor={{ false: "gray", true: "red" }}
+                      thumbColor={"white"}
+                      value={isEndDateRepeat}
+                      onValueChange={() => setEndDateRepeat(!isEndDateRepeat)}
+                    />
+                  </View>
+                </TouchableOpacity>
+              )}
             </View>
             <View style={styles.namecontainer}>
               <View style={{ flex: 1 }}>
@@ -1078,6 +1164,14 @@ const WorkDetail = ({ route, navigation }) => {
           }
           typeRepeat={work?.typeRepeat ? work?.typeRepeat : null}
           onClose={handleChangeRepeat}
+        />
+      )}
+      {work?.workName && (
+        <CalendarPicker
+          isVisible={isSelectEndDateVisible}
+          onSelectDate={handleSelectRepeatEndDate}
+          inititalDate={work?.dateEndRepeat}
+          onClose={() => setSelectEndDateVisible(false)}
         />
       )}
       <ImageFocus />

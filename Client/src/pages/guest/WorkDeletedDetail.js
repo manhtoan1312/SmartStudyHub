@@ -18,7 +18,7 @@ import {
   FontAwesome5,
   Entypo,
   FontAwesome,
-  FontAwesome6,
+  FontAwesome6,Fontisto
 } from "@expo/vector-icons";
 import {
   DeleteWork,
@@ -152,6 +152,25 @@ const WorkDeletedDetail = ({ route, navigation }) => {
     );
   }
 
+  const renderEndDate = () => {
+    if (work?.dateEndRepeat) {
+      return new Date(work?.dateEndRepeat).toISOString().split("T")[0];
+    }
+  };
+
+  const changeWorkState = async() => {
+    const response = await RecoverWork(work.id)
+    if(response.success){
+      fetchData()
+      setTimeout(()=> {
+        navigation.goBack()
+      },1500)
+    }
+    else{
+      Alert.alert("Error when recover:",response.message)
+    }
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -179,7 +198,7 @@ const WorkDeletedDetail = ({ route, navigation }) => {
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={styles.buttonMore}
-                onPress={handleDeleteWork}
+                onPress={changeWorkState}
               >
                 <Text style={styles.moreOption}>Recover work</Text>
               </TouchableOpacity>
@@ -205,27 +224,35 @@ const WorkDeletedDetail = ({ route, navigation }) => {
           </View>
         </Modal>
 
-        {work && (
+        {work?.workName && (
           <View>
             <View style={styles.namecontainer}>
               <View>
                 <View style={styles.name}>
-                  <TouchableOpacity style={{ justifyContent: "center" }}>
-                    <AntDesign name="closecircle" size={24} color="red" />
+                  <TouchableOpacity
+                    style={{ justifyContent: "center" }}
+                    onPress={() => changeWorkState()}
+                  >
+                    
+                      <Ionicons
+                        name="checkmark-circle"
+                        size={24}
+                        color="green"
+                      />
+                   
                   </TouchableOpacity>
                   <View>
                     <Text
                       style={{
-                        textDecorationLine: "line-through",
+                        textDecorationLine:
+                          "line-through",
                         fontSize: 15,
                         paddingLeft: 10,
                       }}
-                    >
-                      {work.workName}
-                    </Text>
-
+                      
+                    >{work.workName}</Text>
                     <View style={styles.tagsContainer}>
-                      {work.tags?.map((tag) => (
+                      {work?.tags.map((tag) => (
                         <TouchableOpacity
                           key={tag.id}
                           style={[
@@ -234,8 +261,17 @@ const WorkDeletedDetail = ({ route, navigation }) => {
                           ]}
                         >
                           <Text style={styles.tagText}>{tag.tagName} </Text>
+
+                          <View style={{ justifyContent: "center" }}>
+                            <Ionicons name="close" size={12} color="#fff" />
+                          </View>
                         </TouchableOpacity>
                       ))}
+                      <TouchableOpacity
+                        style={[styles.tag, { backgroundColor: "green" }]}
+                      >
+                        <Text style={styles.tagText}>+ Add Tag</Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
                 </View>
@@ -247,7 +283,9 @@ const WorkDeletedDetail = ({ route, navigation }) => {
 
             <View style={styles.bodycontainer}>
               <View>
-                <TouchableOpacity style={styles.content}>
+                <TouchableOpacity
+                  style={styles.content}
+                >
                   <View>
                     <View style={styles.name}>
                       <AntDesign name="clockcircle" size={24} color="gray" />
@@ -288,24 +326,28 @@ const WorkDeletedDetail = ({ route, navigation }) => {
                   </View>
                 </TouchableOpacity>
               </View>
-              <TouchableOpacity style={styles.content}>
+              <TouchableOpacity
+                style={styles.content}
+              >
                 <View>
-                  <View style={styles.name}>
+                  <TouchableOpacity style={styles.name}>
                     <AntDesign name="calendar" size={24} color="gray" />
                     <View style={{ justifyContent: "center" }}>
                       <Text style={{ paddingLeft: 15 }}>Due Date</Text>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 </View>
                 <View>
                   {work.statusWork !== "SOMEDAY" ? (
                     renderDay()
                   ) : (
-                    <Text>None</Text>
+                    <Text>SOME DAY</Text>
                   )}
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.content}>
+              <TouchableOpacity
+                style={styles.content}
+              >
                 <View>
                   <View style={styles.name}>
                     <Entypo name="bell" size={24} color="gray" />
@@ -315,150 +357,147 @@ const WorkDeletedDetail = ({ route, navigation }) => {
                   </View>
                 </View>
                 <View>
-                  {work.isRemindered ? renderTime() : <Text>False</Text>}
+                  <Text>{work.isRemindered ? renderTime() : "None"}</Text>
                 </View>
               </TouchableOpacity>
-            </View>
-            <View style={styles.container2}>
-              <View>
+              <TouchableOpacity
+                style={styles.content}
+              >
+                <View>
+                  <View style={styles.name}>
+                    <Fontisto name="spinner-refresh" size={24} color="gray" />
+                    <View style={{ justifyContent: "center" }}>
+                      <Text style={{ paddingLeft: 15 }}>Repeat</Text>
+                    </View>
+                  </View>
+                </View>
                 <View
                   style={{
-                    flex: 1,
+                    width: 200,
                     flexDirection: "row",
-                    justifyContent: "space-between",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
                   }}
                 >
-                  {work.extraWorks.length > 0 &&
-                    work.extraWorks.map((item) => (
-                      <View style={styles.content} key={item.id}>
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
+                  <Text
+                    style={{
+                      fontSize: work?.typeRepeat ? 12 : 14,
+                      paddingRight: work?.typeRepeat ? 5 : 0,
+                    }}
+                  >
+                    {work?.typeRepeat ? renderRepeatTime() : "None"}
+                  </Text>
+                  {work?.typeRepeat && (
+                    <TouchableOpacity>
+                      <AntDesign name="closecircle" size={22} color="gray" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              </TouchableOpacity>
+              {work?.typeRepeat && (
+                <TouchableOpacity
+                  style={styles.content}
+                >
+                  <View>
+                    <View style={styles.name}>
+                      <Entypo name="bell" size={24} color="gray" />
+                      <View
+                        style={{
+                          justifyContent: "center",
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text style={{ paddingLeft: 15 }}>Date End Repeat</Text>
+                        {isEndDateRepeat && <Text>: {renderEndDate()}</Text>}
+                      </View>
+                    </View>
+                  </View>
+                  <View>
+                    <Switch
+                      trackColor={{ false: "gray", true: "red" }}
+                      thumbColor={"white"}
+                      value={work?.dateEndRepeat!== null ? true : false }
+                    />
+                  </View>
+                </TouchableOpacity>
+              )}
+            </View>
+            <View style={styles.namecontainer}>
+              <View style={{ flex: 1 }}>
+                {work.extraWorks.length > 0 &&
+                  work.extraWorks.map((item) => (
+                    <View style={styles.extra} key={item.id}>
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        <TouchableOpacity
                         >
-                          <TouchableOpacity>
-                            {item.status === "COMPLETED" ? (
-                              <AntDesign
-                                style={{ marginRight: 5 }}
-                                name="checkcircle"
-                                size={24}
-                                color="#00cc00"
-                              />
-                            ) : (
-                              <View
-                                style={[styles.cirle, { borderColor: "gray" }]}
-                              />
-                            )}
-                          </TouchableOpacity>
-                          <View style={{ paddingLeft: 10 }}>
+                          {item.status === "COMPLETED" ? (
+                            <AntDesign
+                              style={{ marginRight: 5 }}
+                              name="checkcircle"
+                              size={24}
+                              color="#00cc00"
+                            />
+                          ) : (
+                            <View
+                              style={[styles.cirle, { borderColor: "gray" }]}
+                            />
+                          )}
+                        </TouchableOpacity>
+                        <View style={{ paddingLeft: 10 }}>
+                          <View
+                            style={{
+                              alignItems: "center",
+                            }}
+                          >
+                            <Text>{item.extraWorkName}</Text>
+                          </View>
+                          {item.numberOfPomodoros > 0 && (
                             <View
                               style={{
+                                flexDirection: "row",
                                 alignItems: "center",
                               }}
                             >
-                              <Text>{item.extraWorkName}</Text>
+                              {[...Array(item.numberOfPomodoros)].map(
+                                (_, index) => (
+                                  <MaterialCommunityIcons
+                                    key={index}
+                                    name="clock"
+                                    size={14}
+                                    color="#ff9999"
+                                  />
+                                )
+                              )}
                             </View>
-                            {item.numberOfPomodoros > 0 && (
-                              <View
-                                style={{
-                                  flexDirection: "row",
-                                  alignItems: "center",
-                                }}
-                              >
-                                {[...Array(item.numberOfPomodoros)].map(
-                                  (_, index) => (
-                                    <MaterialCommunityIcons
-                                      key={index}
-                                      name="clock"
-                                      size={14}
-                                      color="#ff9999"
-                                    />
-                                  )
-                                )}
-                              </View>
-                            )}
-                          </View>
-                        </View>
-                        <View style={{}}>
-                          {item.status === "ACTIVE" ? (
-                            <TouchableOpacity onPress={() => playExtra(item)}>
-                              <AntDesign name="play" size={28} color="#ff3232" />
-                            </TouchableOpacity>
-                          ) : (
-                            <TouchableOpacity>
-                              <AntDesign
-                                name="checkcircle"
-                                size={24}
-                                color="#00cc00"
-                              />
-                            </TouchableOpacity>
                           )}
                         </View>
                       </View>
-                    ))}
-                  {work.status === "ACTIVE" && (
-                    <View style={styles.addExtraWorkContainer}>
-                      <AntDesign name="plus" size={24} color="gray" />
-                      <TextInput
-                        style={styles.extraWorkInput}
-                        placeholder="Add Extra Work"
-                        value={extraWorkName}
-                        onChangeText={(text) => setExtraWorkName(text)}
-                        returnKeyType="done"
-                        onSubmitEditing={addExtraWork}
-                      />
-                    </View>
-                  )}
-                </View>
-                <View>
-                  {work.extraWorksDeleted.length > 0 &&
-                    work.extraWorksDeleted.map((item) => (
-                      <View style={styles.content} key={item.id}>
-                        <View
-                          style={{ flexDirection: "row", alignItems: "center" }}
-                        >
+                      <View style={{}}>
+                        {item.status === "ACTIVE" ? (
+                          <TouchableOpacity>
+                            <AntDesign name="play" size={28} color="#ff3232" />
+                          </TouchableOpacity>
+                        ) : (
                           <TouchableOpacity>
                             <AntDesign
-                              name="closecircle"
+                              name="checkcircle"
                               size={24}
-                              color="red"
+                              color="#00cc00"
                             />
                           </TouchableOpacity>
-                          <View style={{ paddingLeft: 10 }}>
-                            <View
-                              style={{
-                                alignItems: "center",
-                              }}
-                            >
-                              <Text>{item.extraWorkName}</Text>
-                            </View>
-                            {item.numberOfPomodoros > 0 && (
-                              <View
-                                style={{
-                                  flexDirection: "row",
-                                  alignItems: "center",
-                                }}
-                              >
-                                {[...Array(item.numberOfPomodoros)].map(
-                                  (_, index) => (
-                                    <MaterialCommunityIcons
-                                      key={index}
-                                      name="clock"
-                                      size={14}
-                                      color="#ff9999"
-                                    />
-                                  )
-                                )}
-                              </View>
-                            )}
-                          </View>
-                        </View>
+                        )}
                       </View>
-                    ))}
-                </View>
+                    </View>
+                  ))}
               </View>
             </View>
             <View style={styles.namecontainer}>
-              <Text style={styles.noteInput}>{work.note}</Text>
+              <Text>{work.note}</Text>
             </View>
+            <View style={{ height: 120 }}></View>
           </View>
         )}
       </ScrollView>
@@ -565,12 +604,6 @@ const styles = StyleSheet.create({
     alignContent: "space-between",
     alignItems: "center",
   },
-  container2: {
-    marginTop: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 20,
-    backgroundColor: "white",
-  },
   bodycontainer: {
     marginTop: 20,
     paddingHorizontal: 15,
@@ -637,6 +670,42 @@ const styles = StyleSheet.create({
   },
   extraWorkInput: {
     paddingLeft: 10,
+  },
+  extra: {
+    flex: 1,
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+  },
+  buttonStart: {
+    width: 300,
+    borderRadius: 20,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: "green",
+    backgroundColor: "white",
+  },
+  buttonCreate: {
+    width: 300,
+    borderRadius: 20,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: "green",
+    backgroundColor: "white",
+  },
+
+  startOption: {
+    padding: 15,
+    textAlign: "center",
+    fontSize: 18,
+    color: "green",
+  },
+  createOption: {
+    padding: 15,
+    textAlign: "center",
+    fontSize: 18,
+    color: "green",
   },
 });
 

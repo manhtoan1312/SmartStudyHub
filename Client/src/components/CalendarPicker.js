@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import { View, Modal, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { Calendar } from "react-native-calendars";
 
-const CalendarPicker = ({ isVisible, onSelectDate, onClose }) => {
+const CalendarPicker = ({ isVisible, onSelectDate, onClose, inititalDate }) => {
   const [selectedDate, setSelectedDate] = useState(getToday());
 
   function getToday() {
-    const today = new Date();
+    let today = new Date();
+    if (inititalDate) {
+      today = new Date(inititalDate);
+    }
     const year = today.getFullYear();
     const month = (today.getMonth() + 1).toString().padStart(2, "0");
     const day = today.getDate().toString().padStart(2, "0");
@@ -32,7 +35,7 @@ const CalendarPicker = ({ isVisible, onSelectDate, onClose }) => {
     >
       <View style={styles.modalContainer}>
         <View style={{ backgroundColor: "white", padding: 16 }}>
-          <View style={{ alignItems: "center", paddingTop:16}}>
+          <View style={{ alignItems: "center", paddingTop: 16 }}>
             <Text style={styles.title}>Select Due Date</Text>
           </View>
 
@@ -41,17 +44,17 @@ const CalendarPicker = ({ isVisible, onSelectDate, onClose }) => {
             markedDates={{ [selectedDate]: { selected: true } }}
           />
 
-          <View style={{flexDirection:'row', paddingBottom:20}}>
-              <TouchableOpacity
-                style={styles.confirmButton}
-                onPress={handleConfirm}
-              >
-                <Text style={styles.buttonText}>Confirm</Text>
-              </TouchableOpacity>
-    
-              <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                <Text style={styles.buttonText}>Close</Text>
-              </TouchableOpacity>
+          <View style={{ flexDirection: "row", paddingBottom: 20 }}>
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={handleConfirm}
+            >
+              <Text style={styles.buttonText}>Confirm</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+              <Text style={styles.buttonText}>Close</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -71,20 +74,20 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   confirmButton: {
-    flex:1,
+    flex: 1,
     marginTop: 16,
     backgroundColor: "#007BFF",
     padding: 12,
     borderRadius: 8,
-    marginHorizontal:10
+    marginHorizontal: 10,
   },
   closeButton: {
-    flex:1,
+    flex: 1,
     marginTop: 16,
     backgroundColor: "#ddd",
     padding: 12,
     borderRadius: 8,
-    marginHorizontal:10
+    marginHorizontal: 10,
   },
   buttonText: {
     color: "white",
