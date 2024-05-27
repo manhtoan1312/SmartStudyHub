@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   Alert,
-  TouchableHighlight,SafeAreaView
+  Animated,
 } from "react-native";
 import { RankByFocusAllTime, RankByMonth } from "../../services/GuestService";
 import RankingBody from "../../components/RankingBody";
@@ -21,13 +21,27 @@ function RankingUser({ navigation }) {
   const [pageSize] = useState(10);
   const [allLength, setAllLength] = useState(0);
   const [length30, setLength30] = useState(0);
+  const underlinePosition = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    fetchData30Days();
+    fetchDataAll();
+  }, []);
+
+  useEffect(() => {
+    Animated.timing(underlinePosition, {
+      toValue: mode === 1 ? 0 : 1,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  }, [mode]);
 
   const fetchData30Days = async () => {
     const response = await RankByMonth(page30, pageSize);
     if (response.success) {
       setList30Days(response.data);
-      setLength30(response.data.totalUsers);   
-      setPage30(prevPage => prevPage + 1);
+      setLength30(response.data.totalUsers);
+      setPage30((prevPage) => prevPage + 1);
     } else {
       Alert.alert("Error!!", response.message);
     }
@@ -38,7 +52,7 @@ function RankingUser({ navigation }) {
     if (response.success) {
       setListAll(response.data);
       setAllLength(response.data.totalUsers);
-      setAllPage(prevPage => prevPage + 1);
+      setAllPage((prevPage) => prevPage + 1);
     } else {
       Alert.alert("Error!!", response.message);
     }
@@ -46,6 +60,7 @@ function RankingUser({ navigation }) {
 
   const fetchDataAllNext = async () => {
     if (pageSize * allPage >= allLength) {
+      // No more data to load
     } else {
       const response = await RankByFocusAllTime(allPage, pageSize);
       if (response.success) {
@@ -55,7 +70,7 @@ function RankingUser({ navigation }) {
           ...response.data.allUsers,
         ];
         setListAll(updatedListAll);
-        setAllPage(prevPage => prevPage + 1);
+        setAllPage((prevPage) => prevPage + 1);
       } else {
         Alert.alert("Error!!", response.message);
       }
@@ -64,7 +79,7 @@ function RankingUser({ navigation }) {
 
   const fetchData30Next = async () => {
     if (pageSize * page30 >= length30) {
-      
+      // No more data to load
     } else {
       const response = await RankByMonth(page30, pageSize);
       if (response.success) {
@@ -74,17 +89,12 @@ function RankingUser({ navigation }) {
           ...response.data.allUsers,
         ];
         setList30Days(updatedList30);
-        setPage30(prevPage => prevPage + 1);
+        setPage30((prevPage) => prevPage + 1);
       } else {
         Alert.alert("Error!!", response.message);
       }
     }
   };
-
-  useEffect(() => {
-    fetchData30Days();
-    fetchDataAll();
-  }, []);
 
   const loadMoreData = async () => {
     if (mode === 2) {
@@ -93,6 +103,12 @@ function RankingUser({ navigation }) {
       fetchData30Next();
     }
   };
+
+  const underlineLeft = underlinePosition.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0%", "50%"],
+  });
+
   return (
     <View style={{ backgroundColor: "#eeeeee", flex: 1, height: "100%" }}>
       <View style={styles.header}>
@@ -121,19 +137,26 @@ function RankingUser({ navigation }) {
             All
           </Text>
         </TouchableOpacity>
+        <Animated.View
+          style={[
+            styles.underline,
+            {
+              left: underlineLeft,
+            },
+          ]}
+        />
       </View>
       {mode === 1 ? (
         <View>
-          <RankingBody
-            listUser={list30Days.allUsers}
-            onEndList={loadMoreData}
-          />
+          <RankingBody listUser={list30Days.allUsers} onEndList={loadMoreData} />
         </View>
       ) : (
         <RankingBody listUser={listAll.allUsers} onEndList={loadMoreData} />
       )}
       <View style={styles.user}>
-        <RankingUserItem user={mode===1 ? list30Days.userCurrent : listAll.userCurrent} />
+        <RankingUserItem
+          user={mode === 1 ? list30Days.userCurrent : listAll.userCurrent}
+        />
       </View>
     </View>
   );
@@ -152,9 +175,9 @@ const styles = StyleSheet.create({
   },
   bar: {
     flexDirection: "row",
-    color: "#F1EDED",
     backgroundColor: "white",
     paddingTop: 10,
+    position: "relative",
   },
   modeSelected: {
     borderColor: "#FA6408",
@@ -168,6 +191,13 @@ const styles = StyleSheet.create({
   mode: {
     width: "50%",
     alignItems: "center",
+  },
+  underline: {
+    position: "absolute",
+    bottom: 0,
+    height: 2,
+    width: "50%",
+    backgroundColor: "#FA6408",
   },
   user: {
     position: "absolute",

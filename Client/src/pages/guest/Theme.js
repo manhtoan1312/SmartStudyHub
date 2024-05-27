@@ -6,29 +6,36 @@ import {
   StyleSheet,
   Modal,
   Animated,
-  Dimensions,SafeAreaView
+  Dimensions,
+  Alert,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import ThemeBody from "../../components/ThemeBody";
 import DeletedThemeBody from "../../components/DeletedThemeBody";
 import getRole from "../../services/RoleService";
+import DeleteAllFileByType from "../../services/PREMIUM/FilePremiumService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Theme = ({ navigation }) => {
   const [selectedMode, setSelectedMode] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [slideAnim] = useState(new Animated.Value(0));
   const [checkRole, setCheckRole] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); // Key to trigger re-renders
+
   const screenWidth = Dimensions.get("window").width;
+
   useEffect(() => {
     const fetchRole = async () => {
       const role = await getRole();
-      console.log(role)
+      console.log(role);
       if (role && role?.role === "PREMIUM") {
         setCheckRole(true);
       }
     };
     fetchRole();
   }, []);
+
   const handleModeChange = (mode) => {
     setSelectedMode(mode);
     setModalVisible(false);
@@ -47,6 +54,29 @@ const Theme = ({ navigation }) => {
       setModalVisible(!modalVisible);
     }
   };
+
+  const handleDeleteAllTheme = () => {
+    Alert.alert(
+      "Confirm action",
+      "Are you sure you want to delete all themes?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Ok", onPress: () => confirmDelete() },
+      ]
+    );
+  };
+
+  const confirmDelete = async () => {
+    setModalVisible(!modalVisible);
+    const response = await DeleteAllFileByType("THEME");
+    if (response.success) {
+      Alert.alert("Action success", "Delete all themes successfully");
+      setRefreshKey((prevKey) => prevKey + 1); 
+    } else {
+      Alert.alert("Action fail", response.message);
+    }
+  };
+
   return (
     <View style={{ backgroundColor: "#eeeeee", flex: 1 }}>
       <View style={styles.header}>
@@ -87,13 +117,19 @@ const Theme = ({ navigation }) => {
             >
               <Text>Deleted Themes</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modeItem}
+              onPress={() => handleDeleteAllTheme()}
+            >
+              <Text>Delete All Themes</Text>
+            </TouchableOpacity>
           </View>
         </TouchableOpacity>
       </Modal>
       {selectedMode === 0 ? (
-        <ThemeBody navigation={navigation} />
+        <ThemeBody navigation={navigation} refreshKey={refreshKey} />
       ) : (
-        <DeletedThemeBody />
+        <DeletedThemeBody refreshKey={refreshKey} />
       )}
     </View>
   );

@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import getRole from "../RoleService";
 
 const uri =
@@ -50,7 +51,7 @@ const CreateEvent = async (
 };
 
 const UpdateEvent = async (
-  userId,
+  id,
   eventName,
   startTime,
   endTime,
@@ -69,7 +70,7 @@ const UpdateEvent = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        userId,
+        id,
         eventName,
         startTime,
         endTime,
@@ -119,7 +120,7 @@ const getEventDetail = async (id) => {
 const deleteEvent = async (id) => {
   try {
     const response = await fetch(`${uri}/delete/${id}`, {
-      method: "get",
+      method: "delete",
       headers: {
         "Content-Type": "application/json",
       },

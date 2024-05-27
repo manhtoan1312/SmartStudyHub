@@ -21,7 +21,7 @@ import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import getRole from "../../services/RoleService";
 import { Picker } from "react-native-wheel-pick";
-import { DeleteGuest } from "../../services/GuestService";
+import { DeleteGuest, UpdateTimeLastUse } from "../../services/GuestService";
 import ClearData from "../../services/ClearData";
 import { useDispatch, useSelector } from "react-redux";
 import { setFocus } from "../../slices/focusSlice";
@@ -353,6 +353,10 @@ export default function Setting({ navigation }) {
 
   const submitLogOut = async () => {
     await ClearData();
+    const response = await UpdateTimeLastUse();
+    if (!response.success) {
+      Alert.alert("Update time last use fail");
+    }
     navigation.navigate("Home");
   };
   const submitDelete = async () => {

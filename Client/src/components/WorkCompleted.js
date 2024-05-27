@@ -20,23 +20,34 @@ import ExtraCompleted from "./ExtraCompleted";
 
 const WorkCompleted = ({ workItem, reload, navigation }) => {
   const renderDoneTime = () => {
-    if(workItem.startTime=== workItem.endTime) {
-      return(
-        <View style={{justifyContent:'center', alignItems:'center', paddingRight:5}}>
+    if (workItem.startTime === workItem.endTime) {
+      return (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            paddingRight: 5,
+          }}
+        >
           <Text>{renderTime(workItem.startTime)}</Text>
           <Text>|</Text>
           <Text>{renderTime(workItem.endTime)}</Text>
         </View>
-      )
-    }
-    else{
-      return(
-        <View style={{justifyContent:'center', alignItems:'center', paddingRight:5}}>
+      );
+    } else {
+      return (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            paddingRight: 5,
+          }}
+        >
           <Text>{renderTime(workItem.endTime)}</Text>
         </View>
-      )
+      );
     }
-  }
+  };
   const renderDay = () => {
     const dueDate = workItem.statusWork;
     const options = { weekday: "short", month: "numeric", day: "numeric" };
@@ -44,7 +55,6 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
     let dateStart = new Date(workItem.endTime);
     dateStart.setDate(dateStart.getDate());
     let date = dateStart.toLocaleDateString("en-US", options);
-    console.log(date);
     if (dueDate === "TODAY") {
       color = "green";
       date = "Today";
@@ -167,7 +177,7 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
                     alignItems: "center",
                   }}
                 >
-                  {( workItem.numberOfPomodoros !== 0 ||
+                  {(workItem.numberOfPomodoros !== 0 ||
                     workItem.statusWork !== "SOMEDAY") && (
                     <View style={styles.pomodoroContainer}>
                       <MaterialCommunityIcons
@@ -189,7 +199,6 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
                     </View>
                   )}
                   {renderDay()}
-                  
                 </View>
               </View>
               <View
@@ -200,7 +209,9 @@ const WorkCompleted = ({ workItem, reload, navigation }) => {
                 }}
               >
                 <TouchableOpacity style={styles.playButton}>
-                  <View style={{justifyContent:'center'}}>{renderDoneTime()}</View>
+                  <View style={{ justifyContent: "center" }}>
+                    {renderDoneTime()}
+                  </View>
                 </TouchableOpacity>
               </View>
             </View>

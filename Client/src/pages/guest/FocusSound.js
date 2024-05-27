@@ -7,7 +7,8 @@ import {
   Alert,
   FlatList,
   Modal,
-  ScrollView,SafeAreaView
+  ScrollView,
+  SafeAreaView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -27,6 +28,7 @@ import {
 import * as DocumentPicker from "expo-document-picker";
 import SoundDeletedItem from "../../components/SoundDeletedItem";
 import { UploadAvt } from "../../services/Guest/UploadFile";
+import DeleteAllFileByType from "../../services/PREMIUM/FilePremiumService";
 
 const FocusSound = ({ navigation }) => {
   const [selectedMode, setSelectedMode] = useState(0);
@@ -111,7 +113,7 @@ const FocusSound = ({ navigation }) => {
   };
 
   const handleOption = (sound) => {
-    if (sound.statusSound !== "PREMIUM") {
+    if (sound.statusSound !== "DEFAULT") {
       Alert.alert(
         "Confirm Action",
         "Do you want to change this sound?",
@@ -122,6 +124,8 @@ const FocusSound = ({ navigation }) => {
         ],
         { cancelable: false }
       );
+    } else {
+      Alert.alert("Warning!!", "You can not change default sounds");
     }
   };
 
@@ -135,6 +139,33 @@ const FocusSound = ({ navigation }) => {
       fetchDataDeleted();
     } else {
       Alert.alert("Error!!", response.message);
+    }
+  };
+
+  const handleDeleteAllSound = () => {
+    Alert.alert(
+      "Confirm action",
+      "Are you sure you want to delete all sound?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Ok", onPress: () => confirmDeleteAllSound() },
+      ]
+    );
+  };
+  const confirmDeleteAllSound = async () => {
+    setModalVisible(!modalVisible);
+    const response = await DeleteAllFileByType("SOUNDCONCENTRATION");
+    if (response.success) {
+      Alert.alert("Action success", "Delete all sound successfully");
+      if (soundObject) {
+        await soundObject.stopAsync();
+      }
+      if (selectedSound.statusSound === "OWNED") {
+        await AsyncStorage.setItem("focusSound", JSON.stringify(soundList[0]));
+      }
+      fetchData();
+    } else {
+      Alert.alert("Action fail", response.message);
     }
   };
 
@@ -311,7 +342,7 @@ const FocusSound = ({ navigation }) => {
           <View>
             {deletedSoundList?.map((item) => (
               <SoundItem
-                key={item.id} 
+                key={item.id}
                 sound={item}
                 selectedSound={deletedSoundList}
                 onSelect={handleRecoverSound}
@@ -323,14 +354,14 @@ const FocusSound = ({ navigation }) => {
         ) : (
           <View
             style={{
-              flex:1,
+              flex: 1,
               height: 800,
               justifyContent: "center",
               alignItems: "center",
             }}
           >
             <Text
-              style={{ fontSize: 20, paddingBottom: 100, color: "#565656", }}
+              style={{ fontSize: 20, paddingBottom: 100, color: "#565656" }}
             >
               There're no Sound deleted
             </Text>
@@ -362,6 +393,14 @@ const FocusSound = ({ navigation }) => {
             >
               <Text>Deleted Sounds</Text>
             </TouchableOpacity>
+            {checkRole && (
+              <TouchableOpacity
+                style={[styles.modeItem, selectedMode === 1 && styles.selected]}
+                onPress={() => handleDeleteAllSound()}
+              >
+                <Text>Deleted All Sounds</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </TouchableOpacity>
       </Modal>

@@ -101,14 +101,14 @@ const ProjectDone = ({ projectItem, reload, navigation }) => {
             key={item.id}
           />
         ))}
-        {projectItem.listWorkDeleted?.map((item) => (
+        {/* {projectItem.listWorkDeleted?.map((item) => (
           <WorkDeleted
             workItem={item}
             reload={reload}
             navigation={navigation}
             key={item.id} // Use a unique identifier here, such as item.id
           />
-        ))}
+        ))} */}
       </View>
     </View>
   );

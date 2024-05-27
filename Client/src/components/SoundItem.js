@@ -17,7 +17,7 @@ const SoundItem = ({ sound, selectedSound, onSelect, onDelete }) => {
   };
 
   const handlePress = () => {
-    onSelect(sound); // Xử lý sự kiện nhấn vào toàn bộ mục
+    onSelect(sound); 
   };
 
   return (

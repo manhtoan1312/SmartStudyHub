@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { UpdateEvent, getEventDetail } from "../../services/Guest/EventService";
 import {
   StyleSheet,
   TouchableOpacity,
@@ -18,101 +19,61 @@ import {
   Entypo,
   Octicons,
 } from "@expo/vector-icons";
-import DateTimePicker from "./DateTimePicker";
-import CalendarPicker from "./CalendarPicker";
+import ColorDropdown from "../../components/ColorDropDown";
+import CalendarPicker from "../../components/CalendarPicker";
+import DateTimePicker from "../../components/DateTimePicker";
 import { Dropdown } from "react-native-element-dropdown";
-import ColorDropdown from "./ColorDropDown";
-import { CreateEvent } from "../services/Guest/EventService";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import getRole from "../services/RoleService";
 
-const ModalAddEvent = ({ visible, onClose }) => {
-  const initialDate = new Date();
-  initialDate.setHours(0, 0, 0, 0);
-  const initEnd = new Date(initialDate);
-  initEnd.setHours(initEnd.getHours() + 2);
-  const [eventName, setEventName] = useState("");
-  const [startTime, setStartTime] = useState(initialDate.getTime());
-  const [endTime, setEndTime] = useState(initEnd.getTime());
-  const [isAllDay, setIsAllDay] = useState(false);
-  const [place, setPlace] = useState("");
-  const [reminder, setReminder] = useState({
-    time: 0,
-    type: null,
-  });
-  const [colorCode, setColorCode] = useState("#FFA500");
-  const [description, setDescription] = useState("");
-  const [isPresent, setIsPresent] = useState(false);
+const EventDetail = ({ route, navigation }) => {
+  const { id } = route.params;
+  const [event, setEvent] = useState(null);
   const [isStartTimeVisible, setStartTimeVisible] = useState(false);
   const [isEndTimeVisible, setEndTimeVisible] = useState(false);
-  const [labelSelected, setLabelSelected] = useState({
-    _index: 0,
-    label: "None",
-    value: 0,
-  });
-  const handleClickStartTime = () => {
-    setStartTimeVisible(true);
-  };
-  const handleClickEndTime = () => {
-    setEndTimeVisible(true);
+  const [notifyValue, setNotifyValue] = useState('')
+  const fetchData = async () => {
+    const response = await getEventDetail(id);
+    if (response.success) {
+      setEvent(response.data);
+    } else {
+      Alert.alert("error!", response.message);
+      navigation.goBack();
+    }
   };
 
-  const handleDone = async () => {
-    if (eventName !== "") {
-      let id = await AsyncStorage.getItem("id");
-      const role = await getRole();
-      if (role) {
-        id = role.id;
-      }
-      const response = await CreateEvent(
-        id,
-        eventName,
-        startTime,
-        endTime,
-        isAllDay,
-        place,
-        reminder.type,
-        reminder.type !== null ? reminder.time : null,
-        colorCode,
-        description,
-        isPresent
-      );
-      if (response.success) {
-        console.log(
-          "----------------------DATA AFTER CREATE EVENT----------------------"
-        );
-        console.log(response.data);
-        console.log(
-          "------------------------------------------------------------------"
-        );
-        onClose();
-      } else {
-        console.log(response.message);
-      }
-    } else {
-      Alert.alert("Warning!!", "You must enter event Name");
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(()=> {
+    if(event?.dateRemindered && event?.typeRemindered){
+      console.log(renderRepeat())
+      setNotifyValue(renderRepeat())
     }
+  },[event?.dateRemindered,event?.typeRemindered])
+
+  const changeData = (key, value) => {
+    setEvent((prevEvent) => ({ ...prevEvent, [key]: value }));
   };
 
   const handleSelectStartTime = (time) => {
     const sTime = new Date(time).getTime();
-    setStartTime(sTime);
-    if (sTime > endTime) {
+    changeData('startTime',sTime);
+    if (sTime > event.endTime) {
       if (isAllDay) {
         const newEndTime = new Date(time);
         newEndTime.setHours(23,59)
-        setEndTime(newEndTime.getTime());
+        changeData('endTime',newEndTime);
       } else {
         const newEndTime = new Date(time);
         newEndTime.setHours(newEndTime.getHours() + 2);
-        setEndTime(newEndTime.getTime());
+        changeData('endTime',newEndTime);
       }
     }
   };
 
   const handleSelectEndTime = (time) => {
     const eTime = new Date(time);
-    if (eTime.getTime() < startTime) {
+    if (eTime.getTime() < event.startTime) {
       Alert.alert(
         "Warning!!!",
         `The event's end time cannot occur before the event's start time`
@@ -121,23 +82,9 @@ const ModalAddEvent = ({ visible, onClose }) => {
       if (isAllDay) {
         eTime.setHours(23, 59);
       }
-      setEndTime(eTime.getTime());
+      changeData('endTime', eTime.getTime());
     }
   };
-
-  function formatDateTime(date) {
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-
-    if (isAllDay) {
-      return `${day}/${month}/${year}`;
-    } else {
-      return `${day}/${month}/${year}, ${hours}:${minutes}`;
-    }
-  }
 
   const listNotifyTime = [
     { label: "None", value: 0 },
@@ -149,86 +96,114 @@ const ModalAddEvent = ({ visible, onClose }) => {
     { label: "before 1 day in email", value: "emaild" },
     { label: "before 1 week in email", value: "emailw" },
   ];
+
   const comeList = [
     { label: "are present", value: true },
     { label: "absent", value: false },
   ];
 
-  const calculateReminderDate = (startTime, value) => {
-    if (value === "emaild") {
-      return new Date(startTime - 24 * 60 * 60 * 1000);
-    } else if (value === "emailw") {
-      return new Date(startTime - 7 * 24 * 60 * 60 * 1000);
+  const handleDone = async () => {
+    console.log(event)
+    const response = await UpdateEvent(
+      id,
+      event.eventName,
+      event.startTime,
+      event.endTime,
+      event.isAllDay,
+      event.place,
+      event.typeRemindered,
+      event.dateRemindered,
+      event.colorCode,
+      event.descriptions,
+      event.isPresent
+    );
+    if (response.success) {
+      console.log(
+        "----------------------DATA AFTER UPDATE EVENT----------------------"
+      );
+      console.log(response.data);
+      console.log(
+        "------------------------------------------------------------------"
+      );
+      navigation.goBack();
     } else {
-      return new Date(startTime - value);
+      Alert.alert("Error when update event!", response.message);
     }
   };
 
+  const renderRepeat = () => {
+    if (event.typeRemindered === null) {
+      return 0;
+    } else if (event.typeRemindered === "EMAIL") {
+      if (event.dateRemindered - event.startTime === 24 * 60 * 60 * 1000) {
+        return "emaild";
+      } else {
+        return "emailw";
+      }
+    } else {
+      return event.startTime -event.dateRemindered;
+    }
+  };
+
+  const handleClickStartTime = () => {
+    setStartTimeVisible(true);
+  };
+  const handleClickEndTime = () => {
+    setEndTimeVisible(true);
+  };
+
+  function formatDateTime(date) {
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+
+    if (event.isAllDay) {
+      return `${day}/${month}/${year}`;
+    } else {
+      return `${day}/${month}/${year}, ${hours}:${minutes}`;
+    }
+  }
+
   const handleSelectReminder = (item) => {
-    if (item._index === 0) {
-      setReminder({
-        time: 0,
-        type: null,
-      });
-      setLabelSelected("");
+    if (item.value === 0) {
+      changeData("typeRemindered", null);
+      changeData("dateRemindered", null);
     } else {
       let type = "SYSTEM";
       if (item.value === "emaild" || item.value === "emailw") {
         type = "EMAIL";
       }
-      const reminderDate = calculateReminderDate(startTime, item.value);
-      setReminder({ type, dateRemindered: reminderDate });
-      setLabelSelected(item);
+      const reminderDate = calculateReminderDate(event.startTime, item.value);
+      changeData("typeRemindered", type);
+      changeData("dateRemindered", reminderDate);
     }
   };
 
-  const handleSelectColor = (item) => {
-    setColorCode(item.value);
-  };
-
-  const handleSelectPresent = (item) => {
-    setIsPresent(item.value);
-  };
-
-  const handleSelectAllDay = () => {
-    setIsAllDay(!isAllDay);
-    const startOfDay = new Date(startTime);
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(startTime);
-    endOfDay.setHours(23, 59, 59);
-
-    if (!isAllDay) {
-      setStartTime(startOfDay.getTime());
-      setEndTime(endOfDay.getTime());
-    } else {
-      // When switching from all-day, revert to the previous specific times
-      const currentStartTime = new Date();
-      const currentEndTime = new Date();
-      currentEndTime.setHours(currentEndTime.getHours() + 2);
-
-      setStartTime(currentStartTime.getTime());
-      setEndTime(currentEndTime.getTime());
+  const calculateReminderDate = (startTime, reminderValue) => {
+    if (typeof reminderValue === "string") {
+      if (reminderValue === "emaild") {
+        return startTime - 24 * 60 * 60 * 1000;
+      } else if (reminderValue === "emailw") {
+        return startTime - 7 * 24 * 60 * 60 * 1000;
+      }
     }
+    return startTime - reminderValue;
   };
-
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalContainer}>
+    <View style={styles.modalContainer}>
+      {event?.eventName && (
         <View style={styles.modalContent}>
           <View style={styles.header}>
-            <TouchableOpacity onPress={onClose}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <Ionicons name="arrow-back-outline" size={24} color="#454545" />
             </TouchableOpacity>
             <View>
-              <Text style={styles.title}>Create A New Event</Text>
+              <Text style={styles.title}>Event Detail</Text>
             </View>
             <TouchableOpacity onPress={handleDone}>
-              <Text style={[eventName === "" && styles.grayText]}>Done</Text>
+              <Text style={[event.eventName === "" ? styles.grayText : {color:'black'}]}>Update</Text>
             </TouchableOpacity>
           </View>
           <ScrollView style={styles.body}>
@@ -237,8 +212,8 @@ const ModalAddEvent = ({ visible, onClose }) => {
                 <View style={{ paddingLeft: 25 }}>
                   <TextInput
                     style={{ fontSize: 20 }}
-                    value={eventName}
-                    onChangeText={(e) => setEventName(e)}
+                    value={event?.eventName}
+                    onChangeText={(e) => changeData("eventName", e)}
                     placeholder="Add Event Name"
                   />
                 </View>
@@ -255,8 +230,8 @@ const ModalAddEvent = ({ visible, onClose }) => {
                 <Switch
                   trackColor={{ false: "gray", true: "red" }}
                   thumbColor={"white"}
-                  value={isAllDay}
-                  onValueChange={() => handleSelectAllDay()}
+                  value={event?.isAllDay}
+                  onValueChange={() => changeData("isAllDay", !event.isAllDay)}
                 />
               </View>
               <TouchableOpacity
@@ -268,7 +243,7 @@ const ModalAddEvent = ({ visible, onClose }) => {
                 </Text>
                 <View style={styles.select}>
                   <Text style={styles.name}>
-                    {formatDateTime(new Date(startTime))}
+                    {formatDateTime(new Date(event.startTime))}
                   </Text>
                   <MaterialIcons
                     name="navigate-next"
@@ -284,7 +259,7 @@ const ModalAddEvent = ({ visible, onClose }) => {
                 <Text style={{ color: "gray", paddingLeft: 10 }}>End Time</Text>
                 <View style={styles.select}>
                   <Text style={styles.name}>
-                    {formatDateTime(new Date(endTime))}
+                    {formatDateTime(new Date(event.endTime))}
                   </Text>
                   <MaterialIcons
                     name="navigate-next"
@@ -304,8 +279,8 @@ const ModalAddEvent = ({ visible, onClose }) => {
                   />
                   <TextInput
                     style={{ paddingLeft: 10, fontSize: 16 }}
-                    value={place}
-                    onChangeText={(e) => setPlace(e)}
+                    value={event.place}
+                    onChangeText={(e) => changeData("place", e)}
                     placeholder="Add a place"
                   />
                 </View>
@@ -316,7 +291,7 @@ const ModalAddEvent = ({ visible, onClose }) => {
                 <View style={styles.dayText}>
                   <Entypo name="bell" size={24} color="gray" />
                   <Text style={{ color: "gray", paddingLeft: 10 }}>
-                    {reminder.type === null ? "Add Notification" : "Notify:"}
+                    {event.typeRemindered === null ? "Add Notification" : "Notify:"}
                   </Text>
                 </View>
                 <Dropdown
@@ -325,7 +300,7 @@ const ModalAddEvent = ({ visible, onClose }) => {
                   labelField="label"
                   valueField="value"
                   placeholder=""
-                  value={labelSelected.value}
+                  value={notifyValue}
                   onChange={(item) => handleSelectReminder(item)}
                 />
               </View>
@@ -334,14 +309,14 @@ const ModalAddEvent = ({ visible, onClose }) => {
               <View style={styles.rowOption}>
                 <View style={styles.dayText}>
                   <View
-                    style={[styles.block, { backgroundColor: colorCode }]}
+                    style={[styles.block, { backgroundColor: event.colorCode }]}
                   ></View>
                   <Text style={{ color: "gray", paddingLeft: 10 }}>Color:</Text>
                 </View>
                 <View style={styles.dayText}>
                   <ColorDropdown
-                    selectedColor={colorCode}
-                    onSelectColor={handleSelectColor}
+                    selectedColor={event.colorCode}
+                    onSelectColor={(e) => changeData("colorCode", e.value)}
                   />
                 </View>
               </View>
@@ -352,8 +327,8 @@ const ModalAddEvent = ({ visible, onClose }) => {
                   <Octicons name="three-bars" size={24} color="gray" />
                   <TextInput
                     style={{ paddingLeft: 10, fontSize: 16 }}
-                    value={description}
-                    onChangeText={(e) => setDescription(e)}
+                    value={event.descriptions}
+                    onChangeText={(e) => changeData("descriptions", e)}
                     placeholder="Add description"
                   />
                 </View>
@@ -373,54 +348,53 @@ const ModalAddEvent = ({ visible, onClose }) => {
                   data={comeList}
                   labelField="label"
                   valueField="value"
-                  value={isPresent}
-                  onChange={(item) => handleSelectPresent(item)}
+                  value={event.isPresent}
+                  onChange={(item) => changeData("isPresent", item.value)}
                 />
               </View>
             </View>
           </ScrollView>
-          {isAllDay ? (
+          {event.isAllDay ? (
             <CalendarPicker
+              inititalDate={event.startTime}
               isVisible={isStartTimeVisible}
-              onSelectDate={handleSelectStartTime}
+              onSelectDate={(e) => handleSelectStartTime(e)}
               onClose={() => setStartTimeVisible(false)}
             />
           ) : (
             <DateTimePicker
-              onSelectTime={handleSelectStartTime}
+              onSelectTime={(e) => handleSelectStartTime(e)}
               visible={isStartTimeVisible}
               onClose={() => setStartTimeVisible(false)}
-              defaultTime={new Date(startTime)}
+              defaultTime={new Date(event.startTime)}
             />
           )}
-          {isAllDay ? (
+          {event.isAllDay ? (
             <CalendarPicker
+              inititalDate={event.endTime}
               isVisible={isEndTimeVisible}
-              onSelectDate={handleSelectEndTime}
+              onSelectDate={(e) => handleSelectEndTime(e)}
               onClose={() => setEndTimeVisible(false)}
             />
           ) : (
             <DateTimePicker
-              onSelectTime={handleSelectEndTime}
+              onSelectTime={(e) => handleSelectEndTime(e)}
               visible={isEndTimeVisible}
               onClose={() => setEndTimeVisible(false)}
-              defaultTime={new Date(endTime)}
+              defaultTime={new Date(event.endTime)}
             />
           )}
         </View>
-      </View>
-    </Modal>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
   },
   modalContent: {
-    height: "95%",
     backgroundColor: "white",
     borderRadius: 10,
     paddingVertical: 20,
@@ -479,4 +453,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ModalAddEvent;
+export default EventDetail;

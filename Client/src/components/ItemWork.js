@@ -29,10 +29,13 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     alignItems: "center",
+    justifyContent:'center',
   },
   text: {
     fontSize: 12,
     color: "gray",
+    justifyContent:'center',
+    textAlign:'center'
   },
   countContainer:{
     alignItems: "center",

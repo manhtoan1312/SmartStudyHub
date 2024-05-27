@@ -9,7 +9,15 @@ const CreateWork = async (
   priority,
   dueDate,
   numberOfPomodoros,
-  timeOfPomodoro
+  timeOfPomodoro,
+  typeRepeat,
+  unitRepeat,
+  amountRepeat,
+  daysOfWeekRepeat,
+  isRemindered,
+  timeWillAnnounce,
+  note,
+  dateEndRepeat
 ) => {
   try {
     const response = await fetch(`${uri}/create`, {
@@ -26,11 +34,14 @@ const CreateWork = async (
         dueDate,
         numberOfPomodoros,
         timeOfPomodoro,
-        "typeRepeat": null,
-        "unitRepeat": null, 
-        "amountRepeat": null, 
-        "daysOfWeekRepeat": null, 
-    
+        typeRepeat: typeRepeat ? typeRepeat : null,
+        unitRepeat: unitRepeat ? unitRepeat : null,
+        amountRepeat: amountRepeat ? amountRepeat : null,
+        daysOfWeekRepeat: daysOfWeekRepeat ? daysOfWeekRepeat : null,
+        isRemindered: isRemindered ? isRemindered : null,
+        timeWillAnnounce: timeWillAnnounce ? timeWillAnnounce : null,
+        note: note ? note : null,
+        dateEndRepeat: dateEndRepeat ? dateEndRepeat : null,
       }),
     });
 
@@ -96,7 +107,7 @@ const UpdateWork = async (
         unitRepeat,
         amountRepeat,
         daysOfWeekRepeat,
-        dateEndRepeat
+        dateEndRepeat,
       }),
     });
 
@@ -153,6 +164,27 @@ const DeleteWorkComplete = async (id) => {
     return { success: false, message: "Client Error" };
   }
 };
+
+const DeleteAllWork = async (id) => {
+  try {
+    const response = await fetch(`${uri}/delete-completely-all/${id}`, {
+      method: "delete",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    if (response.status === 200) {
+      return { success: true, data: data.data };
+    } else {
+      return { success: false, message: data.meta.message };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+}
 
 const GetWorkByProjectAndStatus = async (status, userId) => {
   try {
@@ -420,4 +452,5 @@ export {
   GetWorkCompleted,
   GetWorkDeleted,
   SortWork,
+  DeleteAllWork
 };

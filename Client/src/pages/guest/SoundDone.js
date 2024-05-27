@@ -8,7 +8,8 @@ import {
   Alert,
   FlatList,
   Modal,
-  ScrollView,SafeAreaView
+  ScrollView,
+  SafeAreaView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -28,6 +29,7 @@ import { Audio } from "expo-av";
 import * as DocumentPicker from "expo-document-picker";
 import SoundDeletedItem from "../../components/SoundDeletedItem";
 import { UploadAvt } from "../../services/Guest/UploadFile";
+import DeleteAllFileByType from "../../services/PREMIUM/FilePremiumService";
 const SoundDone = ({ navigation }) => {
   const [selectedMode, setSelectedMode] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
@@ -39,8 +41,8 @@ const SoundDone = ({ navigation }) => {
     url: "https://res.cloudinary.com/dnj5purhu/video/upload/v1702956713/SmartStudyHub/SOUNDDONE/DEFAULT/DefaultBell_vh2hg0.mp3",
     statusSound: "DEFAULT",
     createdDate: 1701129600000,
-    status: "ACTIVE"
-});
+    status: "ACTIVE",
+  });
   const [soundObject, setSoundObject] = useState(null);
   const [checkRole, setCheckRole] = useState(false);
 
@@ -63,14 +65,12 @@ const SoundDone = ({ navigation }) => {
 
     if (response.success) {
       setSoundList(response.data);
-    }
-    else{
-      Alert.alert('Error!', response.message)
+    } else {
+      Alert.alert("Error!", response.message);
       // if(response.message==='Wrong token'){
       //   await ClearData()
       //   navigation.navigate('Login')
       // }
-
     }
   };
 
@@ -97,13 +97,12 @@ const SoundDone = ({ navigation }) => {
     setModalVisible(false);
   };
 
-
   const handleSelectSound = async (sound) => {
     if (soundObject) {
       await soundObject.stopAsync();
     }
 
-    setSelectedSound(sound)
+    setSelectedSound(sound);
     const newSoundObject = new Audio.Sound();
     try {
       await newSoundObject.loadAsync({ uri: sound.url });
@@ -116,7 +115,7 @@ const SoundDone = ({ navigation }) => {
   };
 
   const handleOption = (sound) => {
-    if (sound.statusSound !== "PREMIUM") {
+    if (sound.statusSound !== "DEFAULT") {
       Alert.alert(
         "Confirm Action",
         "Do you want to change this sound?",
@@ -127,15 +126,20 @@ const SoundDone = ({ navigation }) => {
         ],
         { cancelable: false }
       );
+    } else {
+      Alert.alert("Warning!!", "You can not change default themes");
     }
   };
 
   const confirmDelete = async (sound) => {
     const response = await markDeleteSoundDone(sound.id);
     if (response.success) {
-      if(sound.id === selectedSound.id){
-        const length = soundList.length
-        await AsyncStorage.setItem('soundDone', JSON.stringify(soundList[length-1]))
+      if (sound.id === selectedSound.id) {
+        const length = soundList.length;
+        await AsyncStorage.setItem(
+          "soundDone",
+          JSON.stringify(soundList[length - 1])
+        );
       }
       fetchData();
       fetchDataDeleted();
@@ -150,27 +154,26 @@ const SoundDone = ({ navigation }) => {
       null, // Đặt phần mô tả là null
       async (text) => {
         if (text !== null && text.trim().length > 0) {
-          confirmUpdateSound(sound, text)
+          confirmUpdateSound(sound, text);
         }
       },
-      "plain-text", 
-      sound.nameSound, 
-      "default" 
+      "plain-text",
+      sound.nameSound,
+      "default"
     );
-  }
+  };
 
   const confirmUpdateSound = async (sound, text) => {
-    const response = await updateSoundDone(sound.id, text, sound.url)
-    if(response.success) {
-      if(selectedSound.id === sound.id){
-        await AsyncStorage.setItem('focusSound', JSON.stringify(response.data))
+    const response = await updateSoundDone(sound.id, text, sound.url);
+    if (response.success) {
+      if (selectedSound.id === sound.id) {
+        await AsyncStorage.setItem("focusSound", JSON.stringify(response.data));
       }
-      fetchData()
+      fetchData();
+    } else {
+      Alert.alert("Error when update sound!", response.message);
     }
-    else{
-      Alert.alert("Error when update sound!", response.message)
-    }
-  }
+  };
 
   const handleAddSound = async () => {
     try {
@@ -185,7 +188,7 @@ const SoundDone = ({ navigation }) => {
           type: "audio/mp3",
         };
         const response = await UploadAvt(file, "SOUNDCONCENTRATION");
-        addSoundStep2(response.data );
+        addSoundStep2(response.data);
       }
     } catch (error) {
       console.error("Error picking sound:", error);
@@ -200,14 +203,13 @@ const SoundDone = ({ navigation }) => {
       async (text) => {
         if (text.trim().length > 0) {
           const response = await addSoundDone(text, uri);
-          if(response.success) {
-            fetchData()
-          }
-          else{
-            Alert.alert('Error!', response.message)
+          if (response.success) {
+            fetchData();
+          } else {
+            Alert.alert("Error!", response.message);
           }
         } else {
-           Alert.alert("Error", "Please enter a valid name for the sound!");
+          Alert.alert("Error", "Please enter a valid name for the sound!");
         }
       },
       "plain-text"
@@ -263,6 +265,36 @@ const SoundDone = ({ navigation }) => {
   };
   // Các hàm khác đã được định nghĩa trước đó
 
+  const handleDeleteAllSound = () => {
+    Alert.alert(
+      "Confirm action",
+      "Are you sure you want to delete all sound?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Ok", onPress: () => confirmDeleteAllSound() },
+      ]
+    );
+  };
+  const confirmDeleteAllSound = async () => {
+    setModalVisible(!modalVisible);
+    const response = await DeleteAllFileByType("SOUNDDONE");
+    if (response.success) {
+      Alert.alert("Action success", "Delete all sound successfully");
+      if (soundObject) {
+        await soundObject.stopAsync();
+      }
+      if (selectedSound.statusSound === "OWNED") {
+        const length = soundList.length;
+        await AsyncStorage.setItem(
+          "soundDone",
+          JSON.stringify(soundList[length - 1])
+        );
+      }
+      fetchData();
+    } else {
+      Alert.alert("Action fail", response.message);
+    }
+  };
   return (
     <View style={{ backgroundColor: "#eeeeee" }}>
       {/* Header */}
@@ -272,7 +304,11 @@ const SoundDone = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.headerText}>Sound Done</Text>
         <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <MaterialIcons name="more-vert" size={24} color={checkRole ? 'black' : "white"} />
+          <MaterialIcons
+            name="more-vert"
+            size={24}
+            color={checkRole ? "black" : "white"}
+          />
         </TouchableOpacity>
       </View>
 
@@ -307,7 +343,7 @@ const SoundDone = ({ navigation }) => {
           <View>
             {deletedSoundList?.map((item) => (
               <SoundItem
-                key={item.id} 
+                key={item.id}
                 sound={item}
                 selectedSound={deletedSoundList}
                 onSelect={handleRecoverSound}
@@ -319,14 +355,14 @@ const SoundDone = ({ navigation }) => {
         ) : (
           <View
             style={{
-              flex:1,
+              flex: 1,
               height: 800,
               justifyContent: "center",
               alignItems: "center",
             }}
           >
             <Text
-              style={{ fontSize: 20, paddingBottom: 100, color: "#565656", }}
+              style={{ fontSize: 20, paddingBottom: 100, color: "#565656" }}
             >
               There're no Sound deleted
             </Text>
@@ -358,6 +394,14 @@ const SoundDone = ({ navigation }) => {
             >
               <Text>Deleted Sounds</Text>
             </TouchableOpacity>
+            {checkRole && (
+              <TouchableOpacity
+                style={[styles.modeItem, selectedMode === 1 && styles.selected]}
+                onPress={() => handleDeleteAllSound()}
+              >
+                <Text>Deleted All Sounds</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </TouchableOpacity>
       </Modal>
@@ -406,8 +450,8 @@ const styles = StyleSheet.create({
     elevation: 5,
     marginHorizontal: 10,
     top: 120,
-    borderColor:"#f7c068",
-    borderWidth:1
+    borderColor: "#f7c068",
+    borderWidth: 1,
   },
   modeItem: {
     marginVertical: 10,

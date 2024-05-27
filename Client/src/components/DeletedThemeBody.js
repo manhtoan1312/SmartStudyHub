@@ -18,12 +18,18 @@ import {
 import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
 import getRole from "../services/RoleService";
 
-const DeletedThemeBody = () => {
+const DeletedThemeBody = ({ refreshKey }) => {
   const [themeList, setThemeList] = useState([]);
   const screenWidth = Dimensions.get("window").width;
   const imageWidth = screenWidth / 2 - 30;
   const imageHeight = imageWidth * 2;
 
+  useEffect(() => {
+    if (refreshKey !== 0) {
+      setThemeList([]);
+      fetchData();
+    }
+  }, [refreshKey]);
   useEffect(() => {
     fetchData();
   }, []);
@@ -128,8 +134,17 @@ const DeletedThemeBody = () => {
       />
     </View>
   ) : (
-    <View style={{height:"auto", flex:1, justifyContent:'center', alignItems:'center'}}>
-      <Text style={{fontSize:20, color:'#565656'}}>There're no Theme deleted</Text>
+    <View
+      style={{
+        height: "auto",
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Text style={{ fontSize: 20, color: "#565656" }}>
+        There're no Theme deleted
+      </Text>
     </View>
   );
 };

@@ -7,25 +7,30 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
+  Pressable,
+  Alert,
 } from "react-native";
 import {
   AntDesign,
   FontAwesome5,
-  MaterialIcons,
+  FontAwesome6,
   Octicons,
 } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
+  DeleteAllWork,
   GetWorkCompleted,
   GetWorkDeleted,
 } from "../../services/Guest/WorkService";
-import { GetPomodoro } from "../../services/Guest/PomodoroService";
-import { GetProjectByStatus } from "../../services/Guest/ProjectService";
-import WorkCompleted from "../../components/WorkCompleted";
-import PomodoroCompleted from "../../components/PomodoroCompleted";
-import ProjectDone from "../../components/ProjectDone";
+import {
+  DeleteAllProject,
+  GetProjectByStatus,
+} from "../../services/Guest/ProjectService";
 import ImageFocus from "../../components/Image_Focus";
-import { GetAllFolderDelete } from "../../services/Guest/FolderService";
+import {
+  DeleteAllFolder,
+  GetAllFolderDelete,
+} from "../../services/Guest/FolderService";
 import ProjectDeleted from "../../components/ProjectDeleted";
 import WorkDeleted from "../../components/WorkDeleted";
 import FolderDeleted from "../../components/FolderDeleted";
@@ -114,6 +119,38 @@ const DeletedDetail = ({ navigation }) => {
     toggleModal();
   };
 
+  const handleDeleteAll = () => {
+    Alert.alert(
+      "Confirm action!",
+      `Are you sure you wanna delete all ${selectedCategory}`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Ok", onPress: () => confirmDeleteAll() },
+      ]
+    );
+  };
+
+  const confirmDeleteAll = async () => {
+    let response;
+    let id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    if (role) {
+      id = role.id;
+    }
+    if (selectedCategory === "Work") {
+      response = await DeleteAllWork(id);
+    } else if (selectedCategory === "Folder") {
+      response = await DeleteAllFolder(id);
+    } else {
+      response = await DeleteAllProject(id);
+    }
+    if (response.success) {
+      Alert.alert("Action success");
+      navigation.goBack();
+    } else {
+      Alert.alert("Error delete all:", response.message);
+    }
+  };
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -124,13 +161,17 @@ const DeletedDetail = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Category */}
-        <TouchableOpacity onPress={toggleModal}>
-          <Text style={styles.categoryText}>{selectedCategory}</Text>
-        </TouchableOpacity>
+        <Pressable
+          style={{ flexDirection: "row", justifyContent: "center" }}
+          onPress={toggleModal}
+        >
+          <Text style={styles.categoryText}>{selectedCategory} </Text>
+          <AntDesign name="downcircleo" size={24} color="black" />
+        </Pressable>
 
         {/* Three dots button */}
-        <TouchableOpacity onPress={toggleModal}>
-          <MaterialIcons name="more-vert" size={24} color="black" />
+        <TouchableOpacity onPress={handleDeleteAll}>
+          <FontAwesome6 name="trash" size={24} color="#333" />
         </TouchableOpacity>
       </View>
 

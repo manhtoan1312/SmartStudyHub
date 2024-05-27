@@ -27,9 +27,10 @@ const ModalCustomRepeat = ({
     amountRepeat !==null ? amountRepeat : 1
   );
   const [selectedDaysOfWeekRepeat, setSelectedDaysOfWeekRepeat] = useState(
-    daysOfWeekRepeat.length > 0 ? daysOfWeekRepeat : [2]
+    daysOfWeekRepeat && daysOfWeekRepeat.length > 0 ? daysOfWeekRepeat : [2]
   );
-
+  
+console.log(daysOfWeekRepeat)
   const optionUnitRepeat = [
     {
       label: "Every day",

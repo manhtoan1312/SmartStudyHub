@@ -22,7 +22,7 @@ import getRole from "../services/RoleService";
 import AvtItem from "./AvatarItem";
 import { UploadAvt } from "../services/Guest/UploadFile";
 
-const AvatarList = ({ information, navigation }) => {
+const AvatarList = ({ information, navigation, refreshKey }) => {
   const [avtList, setAvtList] = useState([]);
   const [selectedAvt, setSelectedAvt] = useState(information.imageUrl);
   const infor = information;
@@ -103,7 +103,6 @@ const AvatarList = ({ information, navigation }) => {
   };
 
   const updateInfor = async (image) => {
-    const role = await getRole();
     const response = await updateInformation(
       infor.phoneNumber ? infor.phoneNumber : null,
       infor.firstName,

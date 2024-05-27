@@ -23,7 +23,7 @@ import {
   getUserInfor,
   updateInformation,
 } from "../../services/UserService";
-import { DeleteGuest } from "../../services/GuestService";
+import { DeleteGuest, UpdateTimeLastUse } from "../../services/GuestService";
 import { ResendOTP } from "../../services/AccountService";
 import { useIsFocused } from "@react-navigation/native";
 import PhoneInputModal from "../../components/PhoneInputModal";
@@ -51,7 +51,6 @@ const InforUser = ({ navigation }) => {
       setInfor(response.data);
       setNewFirstName(response.data.firstName);
       setNewLastName(response.data.lastName);
-      await AsyncStorage.setItem("img", response.data.imageUrl);
     } else {
       Alert.alert("Error", "Wrong or expired token, please log in again", [
         ,
@@ -183,6 +182,10 @@ const InforUser = ({ navigation }) => {
         text: "OK",
         onPress: async () => {
           await ClearData();
+          const response = await UpdateTimeLastUse();
+          if (!response.success) {
+            Alert.alert("Update time last use fail");
+          }
           navigation.navigate("Home");
         },
       },
@@ -298,7 +301,7 @@ const InforUser = ({ navigation }) => {
                         borderRadius: 20,
                         marginRight: 10,
                       }}
-                      source={{uri: infor?.imageUrl}}
+                      source={{ uri: infor?.imageUrl }}
                     />
                     <MaterialIcons
                       name="navigate-next"

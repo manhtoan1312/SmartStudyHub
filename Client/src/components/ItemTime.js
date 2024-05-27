@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   estimatedTimeText: {
     fontSize: 12,
     color: "gray",
-
+    textAlign:'center'
   },
 });
 

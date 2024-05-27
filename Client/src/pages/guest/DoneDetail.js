@@ -1,7 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GetWorkCompleted } from "../../services/Guest/WorkService";
 import { useEffect, useState } from "react";
-import { GetPomodoro } from "../../services/Guest/PomodoroService";
+import {
+  DeleteAllPomodoro,
+  GetPomodoro,
+} from "../../services/Guest/PomodoroService";
 import {
   GetProjectByStatus,
   GetProjectCompletedNewVision,
@@ -15,11 +18,13 @@ import {
   Alert,
   ScrollView,
   SafeAreaView,
+  Pressable,
 } from "react-native";
 import {
   AntDesign,
   FontAwesome,
   FontAwesome5,
+  FontAwesome6,
   MaterialCommunityIcons,
   MaterialIcons,
   Octicons,
@@ -170,19 +175,47 @@ const DoneDetail = ({ navigation }) => {
     );
   };
 
+  const handleDeleteAllPomodoro = () => {
+    Alert.alert(
+      "Confirm action",
+      "Are you sure you want to delete all pomodoro?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Ok", onPress: () => confirmDeleteAllPomodoro() },
+      ]
+    );
+  };
+  const confirmDeleteAllPomodoro = async () => {
+    let id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    if (role) {
+      id = role.id;
+    }
+    const response = await DeleteAllPomodoro(id);
+    if (response.success) {
+      Alert.alert("Action success", "Delete all pomodoro successfully");
+      setListPomodoro([]);
+      fetchPomodoro();
+    } else {
+      Alert.alert("Action fail", response.message);
+    }
+  };
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         {/* Back button */}
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Pressable onPress={() => navigation.goBack()}>
           <AntDesign name="arrowleft" size={24} color="black" />
-        </TouchableOpacity>
-
+        </Pressable>
         {/* Category */}
-        <TouchableOpacity onPress={toggleModal}>
-          <Text style={styles.categoryText}>{selectedCategory}</Text>
-        </TouchableOpacity>
+        <Pressable
+          style={{ flexDirection: "row", justifyContent: "center" }}
+          onPress={toggleModal}
+        >
+          <Text style={styles.categoryText}>{selectedCategory} </Text>
+          <AntDesign name="downcircleo" size={24} color="black" />
+        </Pressable>
 
         {/* Three dots button */}
         <View style={{ flexDirection: "row" }}>
@@ -196,9 +229,15 @@ const DoneDetail = ({ navigation }) => {
               color="black"
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={toggleModal}>
-            <MaterialIcons name="more-vert" size={24} color="black" />
-          </TouchableOpacity>
+          {selectedCategory === "Pomodoro" ? (
+            <Pressable onPress={() => handleDeleteAllPomodoro()}>
+              <FontAwesome6 name="trash" size={24} color="#333" />
+            </Pressable>
+          ) : (
+            <TouchableOpacity onPress={toggleModal}>
+              <MaterialIcons name="more-vert" size={24} color="black" />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 

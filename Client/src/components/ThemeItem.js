@@ -9,9 +9,9 @@ import {
   TouchableOpacity,
   Pressable,
 } from "react-native";
-import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
+import { AntDesign, FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 
-const ThemeItem = ({ theme, id, navigation , onSelect, onDelete }) => {
+const ThemeItem = ({ theme, id, navigation, onSelect, onDelete }) => {
   const screenWidth = Dimensions.get("window").width;
   const imageWidth = screenWidth / 2 - 30;
   const imageHeight = imageWidth * 2;
@@ -20,20 +20,32 @@ const ThemeItem = ({ theme, id, navigation , onSelect, onDelete }) => {
     if (theme.statusTheme === "PREMIUM") {
       return (
         <Text style={{ color: "#e27602" }}>
-          {theme.nameTheme}{" "}
+          {theme.nameTheme} {" "}
           <FontAwesome5 name="crown" size={16} color="#e27602" />
         </Text>
       );
     } else {
-      return <Text style={{ color: "#3b3f44" }}>{theme.nameTheme}</Text>;
+      return (
+        <View style={{ flexDirection: "row", alignItems:'center' }}>
+          <Text style={{ color: "#3b3f44" }}>{theme.nameTheme} {" "}</Text>
+          {theme.statusTheme === "OWNED" && (
+            <FontAwesome style name="user" size={16} color="#333" />
+          )}
+        </View>
+      );
     }
   };
+  
   const handleChoose = () => {
     onSelect(theme);
   };
-  
+
   return (
-    <Pressable onLongPress={() => onDelete(theme)} onPress={handleChoose} style={styles.container}>
+    <Pressable
+      onLongPress={() => onDelete(theme)}
+      onPress={handleChoose}
+      style={styles.container}
+    >
       <View style={[styles.imageContainer, theme.id === id && styles.selected]}>
         <ImageBackground
           source={{ uri: theme.url }}

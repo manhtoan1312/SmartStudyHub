@@ -303,7 +303,7 @@ const WorkDetail = ({ route, navigation }) => {
     });
   };
   const stringToNumberArray = (str) => {
-    return str.split(",").map(Number);
+    return String(str).split(",").map(Number);
   };
 
   const colorflag = () => {
@@ -582,10 +582,9 @@ const WorkDetail = ({ route, navigation }) => {
           ? String(work?.unitRepeat).toLowerCase()
           : "day"
       } ${
-        work?.unitRepeat === "WEEK" &&
-        arr.length > 1 &&
-        arr.length < 7 &&
-        renderAtTime(arr)
+        work?.unitRepeat === "WEEK" && arr.length > 1 && arr.length < 7
+          ? renderAtTime(arr)
+          : ""
       }`;
       return str;
     }

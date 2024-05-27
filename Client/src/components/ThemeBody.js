@@ -23,12 +23,25 @@ import getRole from "../services/RoleService";
 import { UploadAvt } from "../services/Guest/UploadFile";
 import ThemeItem from "./ThemeItem";
 
-const ThemeBody = ({ navigation }) => {
+const ThemeBody = ({ navigation, refreshKey }) => {
   const [themeList, setThemeList] = useState([]);
   const [selectedTheme, setSelectedTheme] = useState(null);
   const screenWidth = Dimensions.get("window").width;
   const imageWidth = screenWidth / 2 - 30;
   const imageHeight = imageWidth * 2;
+
+  useEffect(() => {
+    const checkTheme = async () => {
+      if (selectedTheme?.statusTheme === "OWNED") {
+        await AsyncStorage.setItem("theme", JSON.stringify(themeList[1]));
+      }
+    };
+    if (refreshKey !== 0) {
+      checkTheme();
+      setThemeList([]);
+      fetchData();
+    }
+  }, [refreshKey]);
 
   const fetchData = async () => {
     try {
@@ -40,7 +53,6 @@ const ThemeBody = ({ navigation }) => {
     } catch (error) {
       console.log("Error fetching theme from AsyncStorage:", error);
     }
-
     try {
       const role = await getRole();
       if (role && role.role === "PREMIUM") {
@@ -92,7 +104,7 @@ const ThemeBody = ({ navigation }) => {
     setSelectedTheme(theme);
   };
   const handleDeleteTheme = (theme) => {
-    if (theme.statusTheme !== "PREMIUM") {
+    if (theme.statusTheme === "OWNED") {
       Alert.alert(
         "Confirm Action",
         "Do you want to change this theme?",
@@ -103,35 +115,36 @@ const ThemeBody = ({ navigation }) => {
         ],
         { cancelable: false }
       );
+    } else {
+      Alert.alert("Warning!!", "You can not change default themes");
     }
   };
   const confirmUpdate = (theme) => {
     Alert.prompt(
       "Update Theme",
-      'Enter Theme name', // Đặt phần mô tả là null
+      "Enter Theme name", // Đặt phần mô tả là null
       async (text) => {
         if (text !== null && text.trim().length > 0) {
-          confirmUpdateTheme(theme, text)
+          confirmUpdateTheme(theme, text);
         }
       },
-      "plain-text", 
-      theme.nameTheme, 
-      "default" 
+      "plain-text",
+      theme.nameTheme,
+      "default"
     );
   };
-  
+
   const confirmUpdateTheme = async (theme, text) => {
-    const response = await updateTheme(theme.id, text, theme.url)
-    if(response.success) {
-      if(theme.id === selectedTheme.id) {
-        await AsyncStorage.setItem('theme', JSON.stringify(response.data))
+    const response = await updateTheme(theme.id, text, theme.url);
+    if (response.success) {
+      if (theme.id === selectedTheme.id) {
+        await AsyncStorage.setItem("theme", JSON.stringify(response.data));
       }
-      fetchData()
+      fetchData();
+    } else {
+      Alert.alert("Error when updating theme!!", response.message);
     }
-    else{
-      Alert.alert('Error when updating theme!!', response.message)
-    }
-  }
+  };
 
   const confirmDelete = async (theme) => {
     const response = await markDeleteTheme(theme?.id);

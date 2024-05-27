@@ -485,12 +485,14 @@ if(role) {
                 />
               </TouchableOpacity>
             )}
-            <AntDesign
-              name="barschart"
-              style={styles.itemRow}
-              size={20}
-              color="black"
-            />
+            <TouchableOpacity onPress={() => navigation.navigate('Statistical')}>
+              <AntDesign
+                name="barschart"
+                style={styles.itemRow}
+                size={20}
+                color="black"
+              />
+            </TouchableOpacity>
           </View>
         </View>
         <View style={styles.searchContainer}>

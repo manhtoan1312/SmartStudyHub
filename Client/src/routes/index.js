@@ -56,6 +56,9 @@ import ProjectDoneDetail from "../pages/guest/ProjectDoneDetail";
 import FullScreenMode from "../pages/guest/FullScreenMode";
 import Event from "../pages/guest/Event";
 import CreateWorkPage from "../pages/guest/CreateWork";
+import EventDetail from "../pages/guest/EventDetail";
+import WorkDueDate from "../pages/guest/WorkDueDate";
+import Statistical from "../pages/guest/Statistical";
 
 const Stack = createStackNavigator();
 
@@ -116,6 +119,9 @@ const Navigator = () => (
     <Stack.Screen name="FullScreen" component={FullScreenMode} />
     <Stack.Screen name="Event" component={Event} />
     <Stack.Screen name="CreateWork" component={CreateWorkPage} />
+    <Stack.Screen name="EventDetail" component={EventDetail} />
+    <Stack.Screen name="WorkDueDate" component={WorkDueDate} />
+    <Stack.Screen name="Statistical" component={Statistical} />
   </Stack.Navigator>
 );
 

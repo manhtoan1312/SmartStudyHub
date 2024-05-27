@@ -59,4 +59,41 @@ const UploadReportFile = async (file, id) => {
     return { success: false, message: "Client Error" };
   }
 };
-export { UploadAvt, UploadReportFile };
+
+const DeleteAllAvatar = async (type) => {
+  try {
+    const role = await getRole();
+
+    if (role && role.role === "PREMIUM") {
+      const { token } = role;
+
+      const response = await fetch(
+        `${uri}/delete-completely-all?type=${type}`,
+        {
+          method: "delete",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const data = await response.json();
+        return { success: true, data: data.data };
+      } else {
+        const data = await response.json();
+        return { success: false, message: data.meta.message };
+      }
+    } else {
+      return {
+        success: false,
+        message: "You don't have permission to access this function",
+      };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Wrong token" };
+  }
+};
+export { UploadAvt, UploadReportFile,DeleteAllAvatar };
