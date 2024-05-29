@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Alert, Platform, StyleSheet, View, Text } from 'react-native';
 import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import { Provider } from 'react-redux';
 import { registerRootComponent } from 'expo';

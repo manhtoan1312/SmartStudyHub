@@ -1,6 +1,6 @@
 const uri = 'https://api-smart-study-hub.onrender.com/mobile/v1/user/guest/report'
 
-const CreateReport = async (id, email, phoneNumber, title, content, typeReport, urlFile) => {
+const CreateReport = async (id, report) => {
     try {
       const response = await fetch(`${uri}/create?userId=${id}`, {
         method: "post",
@@ -8,7 +8,7 @@ const CreateReport = async (id, email, phoneNumber, title, content, typeReport, 
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            email, phoneNumber, title, content, typeReport, urlFile
+            report
         }),
       });
   

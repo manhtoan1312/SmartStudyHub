@@ -10,6 +10,7 @@ import {
   ScrollView,
   SafeAreaView,
   Switch,
+  Pressable,
 } from "react-native";
 import {
   MaterialIcons,
@@ -37,7 +38,6 @@ import CalendarPicker from "../../components/CalendarPicker";
 
 const CreateWorkPage = ({ navigation }) => {
   const initialDate = new Date();
-  initialDate.setHours(0, 0, 0, 0);
   const initEnd = new Date(initialDate);
   initEnd.setHours(initEnd.getHours() + 2);
   const [work, setWork] = useState({
@@ -94,8 +94,8 @@ const CreateWorkPage = ({ navigation }) => {
     }
   };
   useEffect(() => {
-    fetchData()
-  },[])
+    fetchData();
+  }, []);
 
   const handleBack = async () => {
     navigation.goBack();
@@ -200,7 +200,8 @@ const CreateWorkPage = ({ navigation }) => {
     hidePriorityModal();
   };
 
-  const handleChangeName = (text) => {
+  const  handleChangeName = (text) => {
+    console.log(text)
     const updateWork = { ...work };
     updateWork.workName = text;
     setWork(updateWork);
@@ -252,7 +253,7 @@ const CreateWorkPage = ({ navigation }) => {
   };
   const deleteDueDate = () => {
     const updateWork = { ...work };
-    updateWork.dueDate = new Date().getTime();
+    updateWork.dueDate = initEnd.getTime()
     setWork(updateWork);
   };
   const renderDay = () => {
@@ -314,7 +315,7 @@ const CreateWorkPage = ({ navigation }) => {
       </TouchableOpacity>
     );
   }
-  const AddWork = async () => {
+  const AddWorkFunc = async () => {
     if (work.workName && work.dueDate) {
       try {
         const updatedWorkdata = { ...work };
@@ -324,7 +325,7 @@ const CreateWorkPage = ({ navigation }) => {
         if (role) {
           id = role.id;
         }
-        console.log(updatedWorkdata)
+        console.log(work)
         const response = await CreateWork(
           id,
           updatedWorkdata.projectId ? updatedWorkdata.projectId : null,
@@ -357,7 +358,7 @@ const CreateWorkPage = ({ navigation }) => {
             "------------------------------------------------------------------"
           );
 
-          navigation.goBack()
+          navigation.goBack();
         } else {
           Alert.alert("Create Work Error", response.message);
         }
@@ -518,9 +519,9 @@ const CreateWorkPage = ({ navigation }) => {
             </Text>
             <AntDesign name="down" size={15} color="white" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => AddWork()}>
-            <Text style={{color:'white', fontSize:16}}>Create</Text>
-          </TouchableOpacity>
+          <Pressable onPress={() => AddWorkFunc()}>
+            <Text style={{ color: "white", fontSize: 16 }}>Create</Text>
+          </Pressable>
         </View>
         <Modal
           animationType="slide"
@@ -617,7 +618,7 @@ const CreateWorkPage = ({ navigation }) => {
                     }}
                     value={work.workName}
                     placeholder="enter Work name"
-                    onChange={(text) => handleChangeName(text)}
+                    onChangeText={(text) => handleChangeName(text)}
                   />
                   <View style={styles.tagsContainer}>
                     {listTagSelected?.map((tag) => (
@@ -670,7 +671,7 @@ const CreateWorkPage = ({ navigation }) => {
                       color="#ff3232"
                     />
                     <Text style={styles.pomodoroText}>
-                      {work.numberOfPomodorosDone}/
+                      0/
                     </Text>
                     <MaterialCommunityIcons
                       name="clock"
@@ -817,14 +818,13 @@ const CreateWorkPage = ({ navigation }) => {
         onClose={handleChangeRepeat}
       />
 
-  
-        <CalendarPicker
-          isVisible={isSelectEndDateVisible}
-          onSelectDate={handleSelectRepeatEndDate}
-          inititalDate={work?.dateEndRepeat}
-          onClose={() => setSelectEndDateVisible(false)}
-        />
-      
+      <CalendarPicker
+        isVisible={isSelectEndDateVisible}
+        onSelectDate={handleSelectRepeatEndDate}
+        inititalDate={work?.dateEndRepeat}
+        onClose={() => setSelectEndDateVisible(false)}
+      />
+
       <ImageFocus />
     </View>
   );

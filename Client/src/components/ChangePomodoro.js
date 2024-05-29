@@ -73,6 +73,7 @@ const ChangePomodoro = ({ visible, initPomo, initTime, onClose, onSubmit }) => {
                 style={{
                   height: 40,
                   width: 150,
+                  backgroundColor:'white'
                 }}
                 selectedValue={pomoCount}
                 onValueChange={handlePomoCountChange}
@@ -86,6 +87,7 @@ const ChangePomodoro = ({ visible, initPomo, initTime, onClose, onSubmit }) => {
                 style={{
                   height: 40,
                   width: 150,
+                  backgroundColor:'white'
                 }}
                 selectedValue={pomoTime}
                 onValueChange={handlePomoTimeChange}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Image,
   Alert,
-  ScrollView,SafeAreaView
+  ScrollView,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -15,15 +15,44 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UploadReportFile } from "../../services/Guest/UploadFile";
 import PickerSelect from "react-native-picker-select";
 import { CreateReport } from "../../services/Guest/ReportService";
+import getRole from "../../services/RoleService";
 
-const Report = ({ navigation }) => {
+const Report = ({ route, navigation }) => {
+  const type = route.params?.reportType || "HELP";
+
+  const [report, setReport] = useState({
+    userWasReportedId: null,
+    email: "",
+    phoneNumber: "",
+    title: "",
+    whereProblemOccur: "",
+    descriptionDetail: "",
+    whatHelp: "",
+    howProblemAffect: "",
+    thingMostSatisfy: "",
+    thingToImprove: "",
+    typeReport: type,
+    urlFile: null,
+  });
+
   const [selectedImage, setSelectedImage] = useState(null);
+  const [titleText, setTitleText] = useState("What do you need assistance?");
   const [file, setFile] = useState(null);
-  const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [typeReport, setTypeReport] = useState("REPORTPROBLEM");
+
+  useEffect(() => {
+    let text;
+    if (report.typeReport === "HELP") {
+      text = "What do you need assistance?*";
+    } else if (report.typeReport === "REPORTPROBLEM") {
+      text = "What is the problem you encountered?*";
+    } else {
+      text = "Tilte*";
+    }
+    setTitleText(text);
+  }, [report.typeReport]);
+  const handleInputChange = (field, value) => {
+    setReport({ ...report, [field]: value });
+  };
 
   const handleChooseImage = async () => {
     try {
@@ -40,12 +69,16 @@ const Report = ({ navigation }) => {
         });
 
         if (!result.canceled) {
-          setSelectedImage(result.assets[0].uri);
-          setFile({
-            uri: result.assets[0].uri,
-            name: `${result.assets[0].fileName}`,
-            type: "image/png",
-          });
+          if (result.assets[0].fileSize > 10485760) {
+            Alert.alert("Warning!", "file size too large");
+          } else {
+            setSelectedImage(result.assets[0].uri);
+            setFile({
+              uri: result.assets[0].uri,
+              name: `${result.assets[0].fileName}`,
+              type: "image/jpeg",
+            });
+          }
         }
       }
     } catch (error) {
@@ -53,53 +86,88 @@ const Report = ({ navigation }) => {
     }
   };
 
+  const handleDeleteImage = () => {
+    setSelectedImage(null);
+  };
+
+  const validateForm = () => {
+    const { email, phoneNumber, title, descriptionDetail, typeReport } = report;
+
+    if (!email || !phoneNumber || !title || !descriptionDetail) {
+      return false;
+    }
+
+    if (typeReport === "HELP" && !report.whatHelp) {
+      return false;
+    }
+
+    if (typeReport === "REPORTPROBLEM" && !report.whereProblemOccur) {
+      return false;
+    }
+
+    if (
+      typeReport === "FEEDBACK" &&
+      (!report.thingMostSatisfy || !report.thingToImprove)
+    ) {
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmitReport = async () => {
-    if (!email || !phoneNumber || !title || !content || !typeReport) {
+    if (!validateForm()) {
       Alert.alert("Incomplete Form", "Please fill in all required fields.");
       return;
     }
 
-    const id = await AsyncStorage.getItem("id");
+    let id = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    if (role) {
+      id = role.id;
+    }
     if (file) {
       const response = await UploadReportFile(file, id);
       if (response.success) {
-        const rs = await CreateReport(
-          id,
-          email,
-          phoneNumber,
-          title,
-          content,
-          typeReport,
-          response.data
-        );
+        const rs = await CreateReport(id, {
+          ...report,
+          urlFile: response.data,
+        });
         if (rs.success) {
-          Alert.alert("Success", "send report successfully!!");
+          Alert.alert("Success", "Send report successfully!");
         } else {
-          Alert.alert("Error", "send report Fail!!");
+          Alert.alert("Error", "Send report failed!");
+          console.log(rs.message);
         }
+      } else {
+        Alert.alert("Error", "Update image failed!");
+        console.log(response.message);
       }
     } else {
-      const rs = await CreateReport(
-        id,
-        email,
-        phoneNumber,
-        title,
-        content,
-        typeReport,
-        null
-      );
+      const rs = await CreateReport(id, report);
       if (rs.success) {
-        Alert.alert("Success", "send report successfully!!");
+        Alert.alert("Success", "Send report successfully!");
       } else {
-        Alert.alert("Error", "send report Fail!!");
+        Alert.alert("Error", "Send report failed!");
+        console.log(rs.message);
       }
     }
+
     setSelectedImage(null);
-    setEmail("");
-    setPhoneNumber("");
-    setTitle("");
-    setContent("");
-    setTypeReport("REPORTPROBLEM");
+    setReport({
+      userWasReportedId: null,
+      email: "",
+      phoneNumber: "",
+      title: "",
+      whereProblemOccur: "",
+      descriptionDetail: "",
+      whatHelp: "",
+      howProblemAffect: "",
+      thingMostSatisfy: "",
+      thingToImprove: "",
+      typeReport: "HELP",
+      urlFile: null,
+    });
   };
 
   return (
@@ -112,75 +180,171 @@ const Report = ({ navigation }) => {
       </TouchableOpacity>
       <View style={styles.content}>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Feed Back And Report</Text>
+          <Text style={styles.title}>Feedback And Report</Text>
         </View>
-        <Text style={styles.subTitle}>Submit Report</Text>
 
-        <TextInput
-          placeholder="Title"
-          value={title}
-          onChangeText={(text) => setTitle(text)}
-          style={styles.additionalInput}
-        />
-        <View style={styles.inputContainer}>
+        <ScrollView style={{ height: 300 }}>
           <TextInput
-            placeholder="Content"
-            multiline
-            numberOfLines={6}
-            value={content}
-            onChangeText={(text) => setContent(text)}
-            style={styles.input}
+            placeholder="Email*"
+            value={report.email}
+            onChangeText={(text) => handleInputChange("email", text)}
+            style={styles.additionalInput}
+            keyboardType="email-address"
           />
-        </View>
-        <TextInput
-          placeholder="Email"
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-          style={styles.additionalInput}
-          keyboardType="email-address"
-        />
-        <TextInput
-          placeholder="Phone Number"
-          value={phoneNumber}
-          onChangeText={(text) => setPhoneNumber(text)}
-          style={styles.additionalInput}
-          keyboardType="numeric"
-        />
+          <TextInput
+            placeholder="Phone Number*"
+            value={report.phoneNumber}
+            onChangeText={(text) => handleInputChange("phoneNumber", text)}
+            style={styles.additionalInput}
+            keyboardType="numeric"
+          />
+          <TextInput
+            placeholder={titleText}
+            value={report.title}
+            onChangeText={(text) => handleInputChange("title", text)}
+            style={styles.additionalInput}
+          />
+          <View style={styles.inputContainer}>
+            {report.typeReport === "HELP" && (
+              <View>
+                <TextInput
+                  placeholder="problem details*"
+                  multiline
+                  numberOfLines={6}
+                  value={report.descriptionDetail}
+                  onChangeText={(text) =>
+                    handleInputChange("descriptionDetail", text)
+                  }
+                  style={styles.input}
+                />
+                <TextInput
+                  placeholder="What help do you need?"
+                  value={report.whatHelp}
+                  onChangeText={(text) => handleInputChange("whatHelp", text)}
+                  style={styles.input}
+                />
+              </View>
+            )}
+            {report.typeReport === "REPORTPROBLEM" && (
+              <View>
+                <TextInput
+                  placeholder="Where did the problem occur?*"
+                  value={report.whereProblemOccur}
+                  onChangeText={(text) =>
+                    handleInputChange("whereProblemOccur", text)
+                  }
+                  style={styles.input}
+                />
+                <TextInput
+                  placeholder="Process error occurred*"
+                  multiline
+                  numberOfLines={6}
+                  value={report.descriptionDetail}
+                  onChangeText={(text) =>
+                    handleInputChange("descriptionDetail", text)
+                  }
+                  style={styles.input}
+                />
+                <TextInput
+                  placeholder="How did the problem affect you?"
+                  value={report.howProblemAffect}
+                  onChangeText={(text) =>
+                    handleInputChange("howProblemAffect", text)
+                  }
+                  style={styles.input}
+                />
+              </View>
+            )}
+
+            {report.typeReport === "FEEDBACK" && (
+              <View>
+                <TextInput
+                  placeholder="What thing most satisfies you?*"
+                  value={report.thingMostSatisfy}
+                  onChangeText={(text) =>
+                    handleInputChange("thingMostSatisfy", text)
+                  }
+                  style={styles.input}
+                />
+                <TextInput
+                  placeholder="What thing needs improvement?*"
+                  value={report.thingToImprove}
+                  onChangeText={(text) =>
+                    handleInputChange("thingToImprove", text)
+                  }
+                  style={styles.input}
+                />
+                <TextInput
+                  placeholder="Describe your feelings"
+                  multiline
+                  numberOfLines={6}
+                  value={report.descriptionDetail}
+                  onChangeText={(text) =>
+                    handleInputChange("descriptionDetail", text)
+                  }
+                  style={styles.input}
+                />
+              </View>
+            )}
+          </View>
 
           <View style={styles.pickerContainer}>
             <Text style={styles.pickerLabel}>Select Type of Report: </Text>
             <PickerSelect
-              value={typeReport}
-              onValueChange={(value) => setTypeReport(value)}
+              value={report.typeReport}
+              onValueChange={(value) => handleInputChange("typeReport", value)}
               items={[
                 { label: "Help", value: "HELP" },
                 { label: "Report Problem", value: "REPORTPROBLEM" },
-                { label: "Report User", value: "REPORTUSER" },
                 { label: "Feedback", value: "FEEDBACK" },
               ]}
               style={styles.picker}
             />
           </View>
-          {selectedImage && (
-            <Image source={{ uri: selectedImage }} style={styles.selectedImage} />
+          {!selectedImage ? (
+            <View>
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={handleChooseImage}
+              >
+                <Text style={styles.buttonText}>Choose Image</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View>
+              <Image
+                source={{ uri: selectedImage }}
+                style={styles.selectedImage}
+              />
+              <View style={styles.optionButtons}>
+                <TouchableOpacity
+                  style={styles.changeButton}
+                  onPress={handleChooseImage}
+                >
+                  <Text style={styles.buttonText}>Change Image</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={handleDeleteImage}
+                >
+                  <Text style={styles.buttonText}>Delete Image</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           )}
-          <TouchableOpacity
-            style={styles.imageButton}
-            onPress={handleChooseImage}
-          >
-            <Text style={styles.buttonText}>Choose Image</Text>
-          </TouchableOpacity>
-  
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={handleSubmitReport}
-          >
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
+        </ScrollView>
+
+        <TouchableOpacity
+          style={styles.submitButton}
+          onPress={handleSubmitReport}
+        >
+          <Text style={styles.buttonText}>Submit</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -192,9 +356,11 @@ const styles = StyleSheet.create({
     top: 20,
     left: 20,
     zIndex: 1,
+    width: 25,
+    height: 25,
   },
   content: {
-    paddingHorizontal: 60,
+    padding: 60,
     justifyContent: "center",
     height: "100%",
   },
@@ -214,28 +380,42 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   inputContainer: {
-    borderWidth: 2,
-    paddingBottom: 10,
     marginBottom: 20,
-    borderColor: "#ccc",
-    borderRadius: 15,
+  },
+
+  optionButtons: {
+    justifyContent: "space-between",
+    flexDirection: "row",
   },
   input: {
     fontSize: 16,
-    height: 80,
+    height: 50,
     padding: 10,
+    borderBottomWidth: 2,
+    borderColor: "#ccc",
+    marginBottom: 20,
   },
-  imageButton: {
+  changeButton: {
     backgroundColor: "#FFA500",
     marginTop: 20,
     padding: 15,
     borderRadius: 25,
-    width: 300,
+    width: 140,
     alignItems: "center",
+    opacity: 0.8,
+  },
+  deleteButton: {
+    backgroundColor: "red",
+    marginTop: 20,
+    padding: 15,
+    borderRadius: 25,
+    width: 140,
+    alignItems: "center",
+    opacity: 0.8,
   },
   selectedImage: {
-    width: 200,
-    height: 200,
+    width: 280,
+    height: 280,
     resizeMode: "cover",
     borderRadius: 10,
     marginVertical: 20,
@@ -245,7 +425,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 15,
     borderRadius: 25,
-    width: 300,
+    width: 280,
     alignItems: "center",
     opacity: 0.8,
   },
@@ -254,20 +434,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   additionalInput: {
-    borderWidth: 2,
-    paddingBottom: 10,
-    marginBottom: 20,
-    borderColor: "#ccc",
-    borderRadius: 15,
     fontSize: 16,
     height: 50,
     padding: 10,
+    borderBottomWidth: 2,
+    borderColor: "#ccc",
+    marginBottom: 20,
   },
   pickerContainer: {
     marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
   },
   pickerLabel: {
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 5,
   },
   picker: {

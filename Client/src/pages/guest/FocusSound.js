@@ -26,7 +26,6 @@ import {
   updateSound,
 } from "../../services/PREMIUM/SoundService";
 import * as DocumentPicker from "expo-document-picker";
-import SoundDeletedItem from "../../components/SoundDeletedItem";
 import { UploadAvt } from "../../services/Guest/UploadFile";
 import DeleteAllFileByType from "../../services/PREMIUM/FilePremiumService";
 
@@ -40,6 +39,7 @@ const FocusSound = ({ navigation }) => {
   const [noneSelected, setNoneSelected] = useState(false);
   const [checkRole, setCheckRole] = useState(false);
   const fetchData = async () => {
+    setSoundList([]);
     const sound = await AsyncStorage.getItem("focusSound");
     if (sound) {
       setSelectedSound(JSON.parse(sound));
@@ -89,17 +89,34 @@ const FocusSound = ({ navigation }) => {
     if (soundObject) {
       await soundObject.stopAsync();
     }
-
-    setSelectedSound(sound);
-    setNoneSelected(false);
-    const newSoundObject = new Audio.Sound();
-    try {
-      await newSoundObject.loadAsync({ uri: sound.url });
-      await newSoundObject.playAsync();
-      setSoundObject(newSoundObject);
-      await AsyncStorage.setItem("focusSound", JSON.stringify(sound));
-    } catch (error) {
-      console.error("Error playing sound:", error);
+    if (sound.statusSound === "PREMIUM") {
+      if (checkRole) {
+        setSelectedSound(sound);
+        setNoneSelected(false);
+        const newSoundObject = new Audio.Sound();
+        try {
+          await newSoundObject.loadAsync({ uri: sound.url });
+          await newSoundObject.playAsync();
+          setSoundObject(newSoundObject);
+          await AsyncStorage.setItem("focusSound", JSON.stringify(sound));
+        } catch (error) {
+          console.error("Error playing sound:", error);
+        }
+      } else {
+        navigation.navigate("PREMIUM");
+      }
+    } else {
+      setSelectedSound(sound);
+      setNoneSelected(false);
+      const newSoundObject = new Audio.Sound();
+      try {
+        await newSoundObject.loadAsync({ uri: sound.url });
+        await newSoundObject.playAsync();
+        setSoundObject(newSoundObject);
+        await AsyncStorage.setItem("focusSound", JSON.stringify(sound));
+      } catch (error) {
+        console.error("Error playing sound:", error);
+      }
     }
   };
 
@@ -142,7 +159,10 @@ const FocusSound = ({ navigation }) => {
     }
   };
 
-  const handleDeleteAllSound = () => {
+  const handleDeleteAllSound = async() => {
+    if (soundObject) {
+      await soundObject.stopAsync();
+    }
     Alert.alert(
       "Confirm action",
       "Are you sure you want to delete all sound?",
@@ -163,7 +183,7 @@ const FocusSound = ({ navigation }) => {
       if (selectedSound.statusSound === "OWNED") {
         await AsyncStorage.setItem("focusSound", JSON.stringify(soundList[0]));
       }
-      fetchData();
+      navigation.goBack()
     } else {
       Alert.alert("Action fail", response.message);
     }
@@ -395,7 +415,7 @@ const FocusSound = ({ navigation }) => {
             </TouchableOpacity>
             {checkRole && (
               <TouchableOpacity
-                style={[styles.modeItem, selectedMode === 1 && styles.selected]}
+                style={[styles.modeItem]}
                 onPress={() => handleDeleteAllSound()}
               >
                 <Text>Deleted All Sounds</Text>

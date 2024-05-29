@@ -102,15 +102,32 @@ const SoundDone = ({ navigation }) => {
       await soundObject.stopAsync();
     }
 
-    setSelectedSound(sound);
-    const newSoundObject = new Audio.Sound();
-    try {
-      await newSoundObject.loadAsync({ uri: sound.url });
-      await newSoundObject.playAsync();
-      setSoundObject(newSoundObject);
-      await AsyncStorage.setItem("soundDone", JSON.stringify(sound));
-    } catch (error) {
-      console.error("Error playing sound:", error);
+    if (sound.statusSound === "PREMIUM") {
+      if (checkRole) {
+        setSelectedSound(sound);
+        const newSoundObject = new Audio.Sound();
+        try {
+          await newSoundObject.loadAsync({ uri: sound.url });
+          await newSoundObject.playAsync();
+          setSoundObject(newSoundObject);
+          await AsyncStorage.setItem("soundDone", JSON.stringify(sound));
+        } catch (error) {
+          console.error("Error playing sound:", error);
+        }
+      } else {
+        navigation.navigate("PREMIUM");
+      }
+    } else {
+      setSelectedSound(sound);
+      const newSoundObject = new Audio.Sound();
+      try {
+        await newSoundObject.loadAsync({ uri: sound.url });
+        await newSoundObject.playAsync();
+        setSoundObject(newSoundObject);
+        await AsyncStorage.setItem("soundDone", JSON.stringify(sound));
+      } catch (error) {
+        console.error("Error playing sound:", error);
+      }
     }
   };
 
@@ -265,7 +282,10 @@ const SoundDone = ({ navigation }) => {
   };
   // Các hàm khác đã được định nghĩa trước đó
 
-  const handleDeleteAllSound = () => {
+  const handleDeleteAllSound =async () => {
+    if (soundObject) {
+      await soundObject.stopAsync();
+    }
     Alert.alert(
       "Confirm action",
       "Are you sure you want to delete all sound?",
@@ -290,7 +310,7 @@ const SoundDone = ({ navigation }) => {
           JSON.stringify(soundList[length - 1])
         );
       }
-      fetchData();
+      navigation.goBack()
     } else {
       Alert.alert("Action fail", response.message);
     }
@@ -396,7 +416,7 @@ const SoundDone = ({ navigation }) => {
             </TouchableOpacity>
             {checkRole && (
               <TouchableOpacity
-                style={[styles.modeItem, selectedMode === 1 && styles.selected]}
+                style={[styles.modeItem]}
                 onPress={() => handleDeleteAllSound()}
               >
                 <Text>Deleted All Sounds</Text>

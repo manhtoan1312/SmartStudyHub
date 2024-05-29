@@ -12,7 +12,17 @@ import {
 } from "react-native";
 import WorkItem from "./WorkFocus";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import {
+  Feather,
+  FontAwesome5,
+  MaterialCommunityIcons,
+  EvilIcons,
+  AntDesign,
+  Fontisto,
+  FontAwesome,
+  MaterialIcons,
+  FontAwesome6,
+} from "@expo/vector-icons";
 import {
   GetWorkByPriority,
   GetWorkByType,
@@ -26,24 +36,119 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
   const [selectedType, setSelectedType] = useState("Today");
   const [chooseTypeVisible, setChooseTypeVisible] = useState(false);
   const [typeOptions] = useState([
-    "Today",
-    "OutOfDate",
-    "Tomorrow",
-    "ThisWeek",
-    "Next7Day",
-    "SomeDay",
-    "All",
-    "TaskDefault",
-    "Planned",
-    "LowPriority",
-    "NORMALPriority",
-    "HighPriority",
+    { name: "Today", icon: <Feather name="sun" size={20} color="#21D375" /> },
+    {
+      name: "Out Of Date",
+      icon: (
+        <MaterialIcons
+          style={styles.itemRow}
+          name="assignment-late"
+          size={20}
+          color="red"
+        />
+      ),
+    },
+    {
+      name: "Tomorrow",
+      icon: (
+        <MaterialCommunityIcons
+          name="weather-sunset"
+          style={styles.itemRow}
+          size={20}
+          color="orange"
+        />
+      ),
+    },
+    {
+      name: "This Week",
+      icon: (
+        <MaterialCommunityIcons
+          name="calendar-range-outline"
+          style={styles.itemRow}
+          size={20}
+          color="purple"
+        />
+      ),
+    },
+    {
+      name: "Next 7 Days",
+      icon: (
+        <MaterialCommunityIcons
+          name="calendar-arrow-right"
+          style={styles.itemRow}
+          size={20}
+          color="#32CD32"
+        />
+      ),
+    },
+    {
+      name: "Some Day",
+      icon: (
+        <MaterialCommunityIcons
+          name="calendar-text-outline"
+          style={styles.itemRow}
+          size={20}
+          color="purple"
+        />
+      ),
+    },
+    {
+      name: "All",
+      icon: (
+        <MaterialCommunityIcons
+          name="select-all"
+          style={styles.itemRow}
+          size={20}
+          color="orange"
+        />
+      ),
+    },
+    {
+      name: "Task Default",
+      icon: <AntDesign name="profile" size={20} color="#ff5722" />,
+    },
+    {
+      name: "Planned",
+      icon: (
+        <MaterialCommunityIcons
+          name="calendar-check-outline"
+          style={styles.itemRow}
+          size={20}
+          color="#87CEFA"
+        />
+      ),
+    },
+    {
+      name: "Low Priority",
+      icon: (
+        <Fontisto
+          name="flag"
+          style={styles.itemRow}
+          size={20}
+          color="#00FF7F"
+        />
+      ),
+    },
+    {
+      name: "Normal Priority",
+      icon: (
+        <Fontisto name="flag" style={styles.itemRow} size={20} color="orange" />
+      ),
+    },
+    {
+      name: "High Priority",
+      icon: (
+        <Fontisto name="flag" style={styles.itemRow} size={20} color="red" />
+      ),
+    },
   ]);
   const [data, setData] = useState([]);
   const { defaultTimePomodoro } = useSelector((state) => state.focus);
+
   useEffect(() => {
     fetchDataFPT(selectedType);
   }, [selectedType, isVisible]);
+
   const fetchDataFPT = async (type) => {
     const role = await getRole();
     let id;
@@ -64,41 +169,42 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
         case "Tomorrow":
           result = await GetWorkByType("TOMORROW", id);
           break;
-        case "ThisWeek":
+        case "This Week":
           result = await GetWorkByType("THISWEEK", id);
           break;
-        case "Next7Day":
+        case "Next 7 Day":
           result = await GetWorkByType("NEXT7DAY", id);
           break;
-        case "SomeDay":
+        case "Some Day":
           result = await GetWorkByType("SOMEDAY", id);
           break;
         case "All":
           result = await GetWorkByType("ALL", id);
           break;
-        case "TaskDefault":
+        case "Task Default":
           result = await GetWorkByType("TASK_DEFAULT", id);
           break;
         case "Planned":
           result = await GetWorkByType("PLANNED", id);
           break;
-        case "LowPriority":
+        case "Low Priority":
           result = await GetWorkByPriority("LOW", id);
           break;
-        case "NORMALPriority":
+        case "Normal Priority":
           result = await GetWorkByPriority("NORMAL", id);
           break;
-        case "HighPriority":
+        case "High Priority":
           result = await GetWorkByPriority("HIGH", id);
           break;
         default:
+          result = await GetWorkByPriority("ALL", id);
           break;
       }
 
       if (result && result.success) {
         setData(result.data.listWorkActive);
       } else {
-        Alert.alert("Error fetching data", result.message || "Unknown error");
+        Alert.alert("Error fetching data", result?.message || "Unknown error");
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -135,20 +241,24 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
             secondsLeft: defaultTimePomodoro * 60,
             extraWorkId: workItem?.extraWorkId,
             extraWorkName: workItem?.extraWorkName,
-            extraWorkId:workItem?.id
+            extraWorkId: workItem?.id,
           })
         );
       }
-      if(play) {
-        dispatch(setFocus({isPause:false,
-          isStop:false
-        }))
+      if (play) {
+        dispatch(
+          setFocus({
+            isPause: false,
+            isStop: false,
+          })
+        );
       }
       onClose();
     } catch (e) {
       Alert.alert("Error when save work", e);
     }
   };
+
   const renderWorkItems = () => {
     if (data.length > 0) {
       return data?.map((workItem) => (
@@ -165,7 +275,7 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
           paddingTop: 80,
         }}
       >
-        <Text style={{ fontSize: 20, fontWeight: 400, color: "red" }}>
+        <Text style={{ fontSize: 20, fontWeight: "400", color: "red" }}>
           No Work active
         </Text>
       </View>
@@ -181,7 +291,7 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
         onRequestClose={() => setChooseTypeVisible(false)}
       >
         <View style={styles.modalContainer}>
-          <TouchableWithoutFeedback onPress={onClose}>
+          <TouchableWithoutFeedback onPress={() => setChooseTypeVisible(false)}>
             <View style={styles.overlay} />
           </TouchableWithoutFeedback>
           <View style={styles.modalContent}>
@@ -189,15 +299,18 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
             <ScrollView>
               {typeOptions.map((type) => (
                 <TouchableOpacity
-                  key={type}
+                  key={type.name}
                   style={styles.chooseTypeItem}
                   onPress={() => {
-                    setSelectedType(type);
-                    fetchDataFPT(type);
+                    setSelectedType(type.name);
+                    fetchDataFPT(type.name);
                     setChooseTypeVisible(false);
                   }}
                 >
-                  <Text>{type}</Text>
+                  <View style={styles.typeOption}>
+                    {type.icon}
+                    <Text style={styles.typeOptionText}>{type.name}</Text>
+                  </View>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -281,6 +394,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
+  },
+  typeOption: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  typeOptionText: {
+    marginLeft: 10,
   },
 });
 

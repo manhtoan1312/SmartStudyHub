@@ -197,24 +197,28 @@ const ThemeBody = ({ navigation, refreshKey }) => {
                 null,
                 async (text) => {
                   if (text.trim().length > 0) {
-                    const file = {
-                      uri: result.assets[0].uri,
-                      name: `${result.assets[0].fileName}`,
-                      type: "image/jpeg",
-                    };
-                    const response = await UploadAvt(file, "THEME");
-                    if (response.success) {
-                      const res = await addTheme(text, response.data);
-                      if (res.success) {
-                        fetchData();
-                      } else {
-                        Alert.alert("Error!", res.message);
-                      }
+                    if (result.assets[0].fileSize > 10485760) {
+                      Alert.alert("Warning!", "file size too large");
                     } else {
-                      Alert.alert("Error!", response.message);
-                      if (response.message === "Wrong token") {
-                        await AsyncStorage.removeItem("token");
-                        navigation.navigate("Login");
+                      const file = {
+                        uri: result.assets[0].uri,
+                        name: `${result.assets[0].fileName}`,
+                        type: "image/jpeg",
+                      };
+                      const response = await UploadAvt(file, "THEME");
+                      if (response.success) {
+                        const res = await addTheme(text, response.data);
+                        if (res.success) {
+                          fetchData();
+                        } else {
+                          Alert.alert("Error!", res.message);
+                        }
+                      } else {
+                        Alert.alert("Error!", response.message);
+                        if (response.message === "Wrong token") {
+                          await AsyncStorage.removeItem("token");
+                          navigation.navigate("Login");
+                        }
                       }
                     }
                   } else {

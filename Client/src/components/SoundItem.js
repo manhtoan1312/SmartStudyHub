@@ -7,7 +7,7 @@ import {
   TouchableWithoutFeedback,
   Pressable,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5, FontAwesome6, MaterialIcons } from "@expo/vector-icons";
 
 const SoundItem = ({ sound, selectedSound, onSelect, onDelete }) => {
   const isSelected = sound.url === selectedSound.url;
@@ -17,9 +17,20 @@ const SoundItem = ({ sound, selectedSound, onSelect, onDelete }) => {
   };
 
   const handlePress = () => {
-    onSelect(sound); 
+    onSelect(sound);
   };
 
+  const renderIcon = () => {
+    if(sound.statusSound==='PREMIUM') {
+      return <FontAwesome6 name="crown" size={16} color="#e27602" />
+    }
+    else if(sound.statusSound==='OWNED'){
+      return <FontAwesome style name="user" size={16} color="#333" />
+    }
+    else{
+      return
+    }
+  }
   return (
     <Pressable
       onPress={handlePress}
@@ -33,12 +44,15 @@ const SoundItem = ({ sound, selectedSound, onSelect, onDelete }) => {
       ]}
     >
       <View style={styles.container}>
-        <Text style={styles.bodyText}>{sound.nameSound}</Text>
+        <View style={{flexDirection:'row'}}>
+          <Text style={styles.bodyText}>{sound.nameSound} {" "}</Text>
+          {renderIcon()}
+        </View>
         {isSelected && <MaterialIcons name="check" size={24} color="orange" />}
       </View>
     </Pressable>
   );
-}
+};
 const styles = StyleSheet.create({
   addItem: {
     height: 50,
@@ -61,4 +75,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SoundItem
+export default SoundItem;
