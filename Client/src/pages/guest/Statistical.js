@@ -11,6 +11,7 @@ import {
   Pressable,
 } from "react-native";
 import StatisticalPomodoro from "../../components/StatisticalPomodoro";
+import StatisticalWork from "../../components/StatisticalWork";
 
 const Statistical = ({ navigation }) => {
   const [headerDate, setHeaderData] = useState({});
@@ -69,7 +70,7 @@ const Statistical = ({ navigation }) => {
           ]}
         />
       </View>
-      <View style={{paddingTop:20}}>{mode === 1 && <StatisticalPomodoro />}</View>
+      <View style={{paddingTop:20}}>{mode === 1 ? <StatisticalPomodoro /> : <StatisticalWork />}</View>
     </View>
   );
 };

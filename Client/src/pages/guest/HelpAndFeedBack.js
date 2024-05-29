@@ -104,7 +104,20 @@ const HelpAndFeedBack = ({ navigation }) => {
                   style={styles.infoItem}
                   onPress={() => navigation.navigate('Report')}
                 >
-                  <Text style={styles.infoLabel}>Feed back & Report</Text>
+                  <Text style={styles.infoLabel}>Send New Feed back Or Report</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <MaterialIcons
+                      name="navigate-next"
+                      size={24}
+                      color="black"
+                    />
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.infoItem}
+                  onPress={() => navigation.navigate('ReportHistory')}
+                >
+                  <Text style={styles.infoLabel}>View Feed back & Report History</Text>
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <MaterialIcons
                       name="navigate-next"

@@ -59,6 +59,8 @@ import CreateWorkPage from "../pages/guest/CreateWork";
 import EventDetail from "../pages/guest/EventDetail";
 import WorkDueDate from "../pages/guest/WorkDueDate";
 import Statistical from "../pages/guest/Statistical";
+import ReportHistory from "../pages/guest/ReportHistory";
+import ReportDetail from "../pages/guest/ReportDetail";
 
 const Stack = createStackNavigator();
 
@@ -122,6 +124,8 @@ const Navigator = () => (
     <Stack.Screen name="EventDetail" component={EventDetail} />
     <Stack.Screen name="WorkDueDate" component={WorkDueDate} />
     <Stack.Screen name="Statistical" component={Statistical} />
+    <Stack.Screen name="ReportHistory" component={ReportHistory} />
+    <Stack.Screen name="ReportDetail" component={ReportDetail} />
   </Stack.Navigator>
 );
 
