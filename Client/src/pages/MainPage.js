@@ -29,18 +29,25 @@ const MainPage = () => {
     workId,
     extraWorkId,
     countWork,
-    defaultTimePomodoro
+    defaultTimePomodoro,
+    numberOfPomodoro,
+    numberOfPomodorosDone,
   } = useSelector((state) => state.focus);
 
-  const soundObjectRef = useRef(null); 
+  const soundObjectRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
   const playSound = async (uri) => {
+    if (isPlaying) return;
+
     try {
-      stopSound(); 
+      setIsPlaying(true);
+      await stopSound();
       const newSoundObject = new Audio.Sound();
       await newSoundObject.loadAsync({ uri: uri });
       await newSoundObject.playAsync();
       newSoundObject.setIsLoopingAsync(true);
-      soundObjectRef.current = newSoundObject; 
+      soundObjectRef.current = newSoundObject;
     } catch (error) {
       console.log("Error playing sound: ", error);
     }
@@ -48,13 +55,15 @@ const MainPage = () => {
 
   const playSoundWithLimit = async (uri, limit) => {
     try {
-      stopSound();
+      await stopSound();
+      setIsPlaying(true);
       const newSoundObject = new Audio.Sound();
       await newSoundObject.loadAsync({ uri: uri });
       await newSoundObject.playAsync();
       setTimeout(async () => {
         await newSoundObject.stopAsync();
-        soundObjectRef.current = null; 
+        soundObjectRef.current = null;
+        setIsPlaying(false);
       }, limit * 1000);
     } catch (error) {
       console.log("Error playing sound: ", error);
@@ -65,7 +74,9 @@ const MainPage = () => {
     try {
       if (soundObjectRef.current) {
         await soundObjectRef.current.stopAsync();
-        soundObjectRef.current = null; 
+        await soundObjectRef.current.unloadAsync();
+        soundObjectRef.current = null;
+        setIsPlaying(false);
       }
     } catch (error) {
       console.log("Error stopping sound: ", error);
@@ -85,8 +96,6 @@ const MainPage = () => {
               secondsLeft: parsedSettings.pomodoroTime * 60,
             })
           );
-
-         
         }
       } catch (error) {
         console.log(error);
@@ -107,10 +116,25 @@ const MainPage = () => {
           await playWorkingSound();
           if (mode === "+") {
             dispatch(setFocus({ secondsLeft: secondsLeft + 1 }));
+            if (secondsLeft === (workId ? pomodoroTime * 60 : defaultTimePomodoro * 60)) {
+              postPomodoro();
+              dispatch(
+                setFocus({ numberOfPomodorosDone: numberOfPomodorosDone + 1 })
+              );
+              if (!workId && extraWorkId) {
+                dispatch(setFocus({ numberOfPomodoro: numberOfPomodoro + 1 }));
+              }
+            }
           } else {
             if (secondsLeft === 1) {
               postPomodoro();
               switchMode();
+              dispatch(
+                setFocus({ numberOfPomodorosDone: numberOfPomodorosDone + 1 })
+              );
+              if (!workId && extraWorkId) {
+                dispatch(setFocus({ numberOfPomodoro: numberOfPomodoro + 1 }));
+              }
             } else {
               dispatch(setFocus({ secondsLeft: secondsLeft - 1 }));
             }
@@ -130,8 +154,8 @@ const MainPage = () => {
     return () => clearInterval(interval);
   }, [isPause, isStop, secondsLeft, mode, dispatch]);
 
-  const playWorkingSound = async () => {   
-    if (!soundObjectRef.current) {
+  const playWorkingSound = async () => {
+    if (!soundObjectRef.current && !isPlaying) {
       const sound = await AsyncStorage.getItem("focusSound");
       if (sound) {
         const parse = JSON.parse(sound);
@@ -139,6 +163,7 @@ const MainPage = () => {
       }
     }
   };
+
   const postPomodoro = async () => {
     const endTime = new Date().getTime();
     const role = await getRole();
@@ -160,17 +185,18 @@ const MainPage = () => {
       const sound = await AsyncStorage.getItem("soundDone");
       if (sound) {
         const parse = JSON.parse(sound);
-        playSoundWithLimit(parse.url, 5);
+        playSoundWithLimit(parse.url, 3);
       } else {
         playSoundWithLimit(
           "https://res.cloudinary.com/dnj5purhu/video/upload/v1702956713/SmartStudyHub/SOUNDDONE/DEFAULT/DefaultBell_vh2hg0.mp3",
-          5
+          3
         );
       }
     } else {
       Alert.alert("Create Pomodoro fail!", response.message);
     }
   };
+
   const switchMode = () => {
     let newSecondsLeft = null;
     let newMode = null;
@@ -192,11 +218,9 @@ const MainPage = () => {
         } else {
           newSecondsLeft = longBreakTime * 60;
           newMode = "longBreak";
-
         }
         newCountWork++;
       }
-      
     } else {
       if (autoStartPo) {
         newStop = false;
@@ -211,23 +235,22 @@ const MainPage = () => {
       workMode: newMode,
       countWork: newCountWork,
     };
-    console.log(newMode)
     dispatch(setFocus(focusPayload));
   };
 
   useEffect(() => {
     const updateTime = async () => {
-      const role = await getRole()
-      const id = await AsyncStorage.getItem('id')
-      if(!role && id) {
-        const response = await UpdateTimeLastUse() 
-        if(!response.success) {
-          console.log("Error update time last use, message:", response.message)
+      const role = await getRole();
+      const id = await AsyncStorage.getItem("id");
+      if (!role && id) {
+        const response = await UpdateTimeLastUse();
+        if (!response.success) {
+          console.log("Error update time last use, message:", response.message);
         }
       }
-    }
-    updateTime()
-  }, [])
+    };
+    updateTime();
+  }, []);
 
   return (
     <NavigationContainer>
@@ -245,3 +268,4 @@ const styles = StyleSheet.create({
 });
 
 export default MainPage;
+

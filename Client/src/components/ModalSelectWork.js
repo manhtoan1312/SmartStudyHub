@@ -35,6 +35,7 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
   const dispatch = useDispatch();
   const [selectedType, setSelectedType] = useState("Today");
   const [chooseTypeVisible, setChooseTypeVisible] = useState(false);
+  const { mode } = useSelector((state) => state.focus);
   const [typeOptions] = useState([
     { name: "Today", icon: <Feather name="sun" size={20} color="#21D375" /> },
     {
@@ -219,12 +220,12 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
             workId: workItem.id,
             workName: workItem.workName,
             startTime: workItem?.startTime,
-            numberOfPomodoro: workItem.numberOfPomodoro,
+            numberOfPomodoro: workItem.numberOfPomodoros,
             numberOfPomodorosDone: workItem.numberOfPomodorosDone,
             pomodoroTime: workItem.timeOfPomodoro,
             isPause: true,
             isStop: true,
-            secondsLeft: workItem.timeOfPomodoro * 60,
+            secondsLeft: mode === "-" ? workItem.timeOfPomodoro * 60 : 0,
           })
         );
       } else {
@@ -238,7 +239,7 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
             pomodoroTime: defaultTimePomodoro,
             isPause: true,
             isStop: true,
-            secondsLeft: defaultTimePomodoro * 60,
+            secondsLeft: mode === "-" ? defaultTimePomodoro * 60 * 60 : 0,
             extraWorkId: workItem?.extraWorkId,
             extraWorkName: workItem?.extraWorkName,
             extraWorkId: workItem?.id,

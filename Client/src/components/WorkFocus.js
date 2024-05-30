@@ -24,7 +24,7 @@ const WorkItem = ({ workItem, onSelect }) => {
       >
         <View style={styles.itemContent}>
           <Text style={styles.itemName}>{workItem.workName}</Text>
-          {workItem.numberOfPomodoros !== 0 && (
+          {(workItem.numberOfPomodoros !== 0 || workItem.numberOfPomodorosDone !==0) && (
             <View style={styles.pomodoroContainer}>
               <MaterialCommunityIcons
                 name="clock-check"

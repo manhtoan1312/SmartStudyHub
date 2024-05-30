@@ -346,5 +346,5 @@ export {
   DeleteCompletelyProject,
   RecoverProject,
   GetProjectCompletedNewVision,
-  DeleteAllProject
+  DeleteAllProject,
 };

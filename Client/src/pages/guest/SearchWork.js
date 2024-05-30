@@ -9,7 +9,7 @@ import {
   Alert,
   FlatList,SafeAreaView
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { SearchByWorkName } from "../../services/Guest/WorkService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import WorkActive from "../../components/WorkActive";
@@ -106,7 +106,7 @@ const SearchWork = ({ navigation }) => {
       <View style={styles.searchContainer}>
         <View style={styles.inputContainer}>
           <TouchableOpacity style={styles.searchIcon}>
-            <Ionicons name="md-search" size={20} color="black" />
+          <AntDesign name="search1" size={20} color="black" />
           </TouchableOpacity>
           <TextInput
             ref={inputRef}
@@ -123,7 +123,7 @@ const SearchWork = ({ navigation }) => {
               onPress={() => handleClearText()}
               style={styles.clearIcon}
             >
-              <Ionicons name="md-close" size={20} color="black" />
+              <AntDesign name="close" size={20} color="black" />
             </TouchableOpacity>
           )}
         </View>

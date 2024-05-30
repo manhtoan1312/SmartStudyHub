@@ -37,7 +37,7 @@ const Focus = () => {
   const [choose, setChoose] = useState(false);
   const [percentage, setPercentage] = useState(100);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [isSoundVisible, setSoundVisible] = useState(false)
+  const [isSoundVisible, setSoundVisible] = useState(false);
   const dispatch = useDispatch();
   const {
     isStop,
@@ -108,6 +108,7 @@ const Focus = () => {
         numberOfPomodorosDone: null,
         secondsLeft: defaultTimePomodoro * 60,
         pomodoroTime: defaultTimePomodoro,
+        workMode: "work",
       })
     );
   };
@@ -144,7 +145,8 @@ const Focus = () => {
       setFocus({
         isPause: true,
         isStop: true,
-        secondsLeft: mode==='+' ? 0 :(workId ? pomodoroTime : defaultTimePomodoro) * 60,
+        secondsLeft:
+          mode === "+" ? 0 : (workId ? pomodoroTime : defaultTimePomodoro) * 60,
       })
     );
   };
@@ -223,13 +225,12 @@ const Focus = () => {
     dispatch(setFocus({ mode: selectedMode, secondsLeft: second }));
   };
   const handleOpenSound = () => {
-    if(!isPause) {
-      Alert.alert('Waring!!', 'You must pause pomodoro before change sound')
+    if (!isPause) {
+      Alert.alert("Waring!!", "You must pause pomodoro before change sound");
+    } else {
+      setSoundVisible(true);
     }
-    else{
-      setSoundVisible(true)
-    }
-  }
+  };
   return (
     <View style={styles.container}>
       <Image
@@ -258,9 +259,12 @@ const Focus = () => {
             <View
               style={{ width: 280, flexDirection: "row", alignItems: "center" }}
             >
-              <TouchableOpacity style={styles.selectedTask} onPress={() => setChoose(true)}>
+              <TouchableOpacity
+                style={styles.selectedTask}
+                onPress={() => setChoose(true)}
+              >
                 <TouchableOpacity
-                  style={{flexDirection: "row"}}
+                  style={{ flexDirection: "row" }}
                   onPress={() => handleDoneWork()}
                 >
                   <TouchableOpacity
@@ -271,7 +275,7 @@ const Focus = () => {
                     <View style={styles.taskDetails}>
                       <Text style={styles.workName}>{workName}</Text>
                       <View style={styles.timerIcons}>
-                        {numberOfPomodoro !== 0 && (
+                        {(numberOfPomodoro !== 0 || numberOfPomodorosDone!==0) && (
                           <View style={styles.pomodoroContainer}>
                             <MaterialCommunityIcons
                               name="clock-check"
@@ -387,13 +391,19 @@ const Focus = () => {
               <Text style={{ color: "white", fontSize: 10 }}>Timer Mode</Text>
             </View>
           </View>
-          <TouchableOpacity onPress={() => navigation.navigate('FullScreen')} style={styles.settingsIcon}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("FullScreen")}
+            style={styles.settingsIcon}
+          >
             <Octicons name="screen-full" size={20} color="white" />
             <View style={styles.textMode}>
               <Text style={{ color: "white", fontSize: 10 }}>Full Screen</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleOpenSound} style={styles.settingsIcon}>
+          <TouchableOpacity
+            onPress={handleOpenSound}
+            style={styles.settingsIcon}
+          >
             <FontAwesome5 name="itunes-note" size={20} color="white" />
             <View style={{ marginTop: 5 }}>
               <Text style={{ color: "white", fontSize: 10 }}>Sound</Text>
@@ -466,9 +476,9 @@ const Focus = () => {
           handleClose();
         }}
       />
-      <ModalSelectSound 
-      visible={isSoundVisible}
-      onClose={() => setSoundVisible(false)}
+      <ModalSelectSound
+        visible={isSoundVisible}
+        onClose={() => setSoundVisible(false)}
       />
     </View>
   );

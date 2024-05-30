@@ -7,7 +7,11 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useIsFocused,
+  useNavigation,
+} from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 const { width: screenWidth } = Dimensions.get("window");
@@ -15,20 +19,29 @@ const ImageFocus = () => {
   const navigation = useNavigation();
   const { secondsLeft } = useSelector((state) => state.focus);
   const [theme, setTheme] = useState(null);
+  const isFocused = useIsFocused();
   const toPomodoro = () => {
     navigation.navigate("Focus");
   };
+  const fetchTheme = async () => {
+    const theme = await AsyncStorage.getItem("theme");
+    if (theme) {
+      const parse = JSON.parse(theme);
+      setTheme(parse);
+    }
+  };
   useEffect(() => {
-    const fetchTheme = async () => {
-      const theme = await AsyncStorage.getItem("theme");
-      if (theme) {
-        const parse = JSON.parse(theme);
-        setTheme(parse);
-      }
-    };
     fetchTheme();
   }, []);
 
+  useEffect(() => {
+    const fetchDataOnFocus = async () => {
+      if (isFocused) {
+        await fetchTheme();
+      }
+    };
+    fetchDataOnFocus();
+  }, [isFocused]);
   return (
     <View style={styles.container}>
       <TouchableOpacity
