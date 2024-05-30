@@ -1,13 +1,16 @@
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import WorkStatisticalHeader from "./WorkStatisticalHeader";
 import StatisticalWorkByType from "./StatisticalWorkByType";
+import StatisticalWorkByProject from "./StatisticalWorkByProject";
 
 const StatisticalWork = () => {
   return (
-    <View>
-      <WorkStatisticalHeader />
-      <StatisticalWorkByType />
-    </View>
+    <ScrollView>
+        <WorkStatisticalHeader />
+        <StatisticalWorkByType />
+        <StatisticalWorkByProject />
+        <View style={{height:200}}></View>
+    </ScrollView>
   );
 };
 

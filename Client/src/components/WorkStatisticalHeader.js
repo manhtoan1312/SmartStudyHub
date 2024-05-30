@@ -39,8 +39,8 @@ const WorkStatisticalHeader = () => {
       <View style={styles.container}>
         <View style={styles.countContainer}>
           <Text style={styles.work}>
-            {data?.totalWorksToday
-              ? data?.totalWorksToday
+            {data?.totalWorksWeekly
+              ? data?.totalWorksWeekly
               : "0"}
           </Text>
         </View>
@@ -51,7 +51,7 @@ const WorkStatisticalHeader = () => {
       <View style={styles.container}>
         <View style={styles.countContainer}>
           <Text style={styles.work}>
-            {data?.totalWorksWeekly ? data?.totalWorksWeekly : "0"}
+            {data?.totalWorksToday ? data?.totalWorksToday : "0"}
           </Text>
         </View>
         <View style={styles.textContainer}>

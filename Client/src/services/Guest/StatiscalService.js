@@ -68,8 +68,8 @@ const statisticalWorksByUnit = async (startDate, endDate, userId, unit) => {
 
     const data = await response.json();
     if (response.status === 200) {
-      if (data.metacode === "15_2_f") {
-        return { success: true, data: [] };
+      if (data.meta.code === "15_2_f") {
+        return { success: true, data: null };
       }
       return { success: true, data: data.data };
     } else {

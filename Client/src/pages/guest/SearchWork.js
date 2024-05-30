@@ -114,9 +114,6 @@ const SearchWork = ({ navigation }) => {
             placeholder="Search..."
             value={searchText}
             onChangeText={(text) => handleTyping(text)}
-            // onSubmitEditing={() => handleSearch(searchText)}
-            // returnKeyType="search"
-            // returnKeyLabel="Search"
           />
           {searchText !== "" && (
             <TouchableOpacity

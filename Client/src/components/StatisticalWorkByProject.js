@@ -1,17 +1,14 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  Modal,
   TouchableOpacity,
-  FlatList,
   Pressable,
-  Animated,
   ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import getRole from "../services/RoleService";
 import { statisticalWorksByUnit } from "../services/Guest/StatiscalService";
 import {
@@ -23,32 +20,15 @@ import {
   addMonths,
   subMonths,
 } from "date-fns";
-import {} from "react-native-gifted-charts";
-const options = [
-  { key: "Show Work", value: "WORK" },
-  { key: "Show Project", value: "PROJECT" },
-  { key: "Show Tag", value: "TAG" },
-];
+import { PieChart } from "react-native-gifted-charts";
 
-const Dropdown = ({ visible, onSelect, onClose }) => (
-  <Modal visible={visible} transparent animationType="slide">
-    <TouchableOpacity style={styles.overlay} onPress={onClose}>
-      <View style={styles.dropdownContainer}>
-        {options.map((item) => (
-          <Pressable style={styles.option} onPress={() => onSelect(item.value)}>
-            <Text style={styles.optionText}>{item.key}</Text>
-          </Pressable>
-        ))}
-      </View>
-    </TouchableOpacity>
-  </Modal>
-);
-
-const StatisticalWorkByType = () => {
+const StatisticalWorkByProject = () => {
   const [data, setData] = useState({});
+  const [chartData, setChartData] = useState([]);
   const now = new Date();
   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const [typeDay, setTypeDay] = useState("Every Month");
 
   const setEndOfDay = (date) => {
     const newDate = new Date(date);
@@ -58,9 +38,6 @@ const StatisticalWorkByType = () => {
 
   const [startDate, setStartDate] = useState(firstDayOfMonth.getTime());
   const [endDate, setEndDate] = useState(setEndOfDay(lastDayOfMonth).getTime());
-  const [type, setType] = useState("PROJECT");
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [typeDay, setTypeDay] = useState("Every Month");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,9 +51,10 @@ const StatisticalWorkByType = () => {
           startDate,
           endDate,
           id,
-          type
+          "PROJECT"
         );
         if (response.success) {
+          console.log(response.data);
           setData(response.data);
         } else {
           console.log("Error fetch data in app:", response.message);
@@ -86,25 +64,51 @@ const StatisticalWorkByType = () => {
       }
     };
     fetchData();
-  }, [startDate, endDate, type]);
+  }, [startDate, endDate]);
 
-  const renderTime = (time) => {
-    if (!time) {
-      return "0m";
+  useEffect(() => {
+    if (data && data.listDataStatisticalByUnit) {
+      const listData = data.listDataStatisticalByUnit.map((item) => ({
+        value: item.totalTimeFocusInUnit,
+        color:
+          item?.unitId === 0
+            ? "#006DFF"
+            : item.unitColor == "None"
+            ? "#e27602"
+            : item.unitColor,
+        name: item.unitName,
+      }));
+      setChartData(listData);
     }
-    const min = time % 60;
-    if (time > 60) {
-      const hours = Math.floor(time / 60);
-      return `${hours}h ${min}m`;
-    } else {
-      return `${min}m`;
-    }
-  };
+  }, [data]);
 
-  const handleSelect = (value) => {
-    setType(value);
-    setDropdownVisible(false);
-  };
+  const renderDot = (color) => (
+    <View style={[styles.dot, { backgroundColor: color }]} />
+  );
+
+  const renderLegendComponent = () => (
+    <View
+      style={{
+        paddingTop: 20,
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "space-between",
+      }}
+    >
+      {chartData.map((item, index) => (
+        <View key={index} style={styles.legendRow}>
+          {renderDot(item.color)}
+          <View>
+            <Text style={styles.legendText}>{item.name}:</Text>
+            <Text style={{ color: "#aaa" }}>
+              {renderTime(item.value)}-
+              {Math.floor((item.value / data.totalValue) * 100)}%
+            </Text>
+          </View>
+        </View>
+      ))}
+    </View>
+  );
 
   const handleDayTypeChange = (text) => {
     setTypeDay(text);
@@ -160,28 +164,21 @@ const StatisticalWorkByType = () => {
 
   const formatDate = (date, formatStr) => format(new Date(date), formatStr);
 
+  const renderTime = (time) => {
+    if (!time) {
+      return "0m";
+    }
+    const min = time % 60;
+    if (time > 60) {
+      const hours = Math.floor(time / 60);
+      return `${hours}h ${min}m`;
+    } else {
+      return `${min}m`;
+    }
+  };
+
   return (
     <View style={styles.mainContainer}>
-      <View style={styles.headerContainer}>
-        <View>
-          <Text style={{ color: "#333" }}>Time focus</Text>
-          <Text style={styles.text}>
-            Total Time focus: {renderTime(data?.totalValue)}
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={styles.typeButton}
-          onPress={() => setDropdownVisible(true)}
-        >
-          <AntDesign
-            name="swap"
-            size={24}
-            color="red"
-            style={styles.rotatedIcon}
-          />
-          <Text style={{ color: "red" }}>Show {type.toLowerCase()}</Text>
-        </TouchableOpacity>
-      </View>
       <View style={styles.navigationContainer}>
         <TouchableOpacity onPress={handlePrev}>
           <Ionicons name="chevron-back" size={24} color="black" />
@@ -230,96 +227,39 @@ const StatisticalWorkByType = () => {
         </Pressable>
       </View>
       <View style={styles.charts}>
-        {data && data?.listDataStatisticalByUnit ? (
-          <ScrollView>
-            <View style={{ paddingTop: 20 }}>
-              {data.listDataStatisticalByUnit.map((item, index) => (
-                <View key={index} style={styles.line}>
-                  <Text
-                    style={{ color: item?.unitId === -1 ? "#ccc" : "#333" }}
-                  >
-                    {item?.unitName}
-                  </Text>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <View
-                      style={[
-                        {
-                          backgroundColor:
-                            item?.unitId === 0
-                              ? "#006DFF"
-                              : item.unitColor == "None"
-                              ? "#e27602"
-                              : item.unitColor,
-                          width: item.totalTimeFocusInUnit,
-                          maxWidth: 300,
-                          minWidth: 20,
-                          height: 5,
-                          borderRadius: 5,
-                          marginRight: 10,
-                        },
-                      ]}
-                    ></View>
-                    <Text style={{ color: "#ccc" }}>
-                      {renderTime(item?.totalTimeFocusInUnit)}
+        {data && chartData.length > 0 ? (
+          <View>
+            <View style={styles.chartContainer}>
+              <PieChart
+                data={chartData}
+                donut
+                showGradient
+                sectionAutoFocus
+                radius={90}
+                innerRadius={60}
+                focusOnPress
+                strokeWidth={2}
+                strokeColor="white"
+                innerCircleColor={"#232B5D"}
+                centerLabelComponent={() => (
+                  <View style={styles.centerLabel}>
+                    <Text style={styles.centerLabelSubText}>Total</Text>
+                    <Text style={styles.centerLabelText}>
+                      {renderTime(data?.totalValue)}
                     </Text>
                   </View>
-                </View>
-              ))}
+                )}
+              />
             </View>
-            {/* <FlatList
-              data={data?.listDataStatisticalByUnit}
-              renderItem={({ item }) => (
-                <View style={styles.line}>
-                  <Text
-                    style={{ color: item?.unitId === -1 ? "#ccc" : "#333" }}
-                  >
-                    {item?.unitName}
-                  </Text>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <View
-                      style={[
-                        {
-                          backgroundColor:
-                            item?.unitColor === "None" || !item?.unitColor
-                              ? "#e27602"
-                              : item.unitColor,
-                          width: item.totalTimeFocusInUnit,
-                          maxWidth: 300,
-                          minWidth: 20,
-                          height: 5,
-                          borderRadius: 5,
-                          marginRight: 10,
-                        },
-                      ]}
-                    ></View>
-                    <Text style={{ color: "#ccc" }}>
-                      {renderTime(item?.totalTimeFocusInUnit)}
-                    </Text>
-                  </View>
-                </View>
-              )}
-              keyExtractor={(item) => item.unitId}
-            /> */}
-          </ScrollView>
+            {renderLegendComponent()}
+          </View>
         ) : (
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <View style={styles.noDataContainer}>
             <Ionicons name="document-outline" size={24} color="black" />
-            <Text> No data here</Text>
+            <Text>No data here</Text>
           </View>
         )}
       </View>
-
-      <Dropdown
-        visible={dropdownVisible}
-        onSelect={handleSelect}
-        onClose={() => setDropdownVisible(false)}
-      />
     </View>
   );
 };
@@ -331,52 +271,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginTop: 20,
     borderRadius: 5,
-    flex: 1,
-  },
-  headerContainer: {
-    padding: 20,
-    justifyContent: "space-between",
-    flexDirection: "row",
-    alignItems: "center",
-    borderBottomWidth: 2,
-    borderColor: "#ccc",
-  },
-  text: {
-    fontSize: 12,
-    color: "gray",
-  },
-  typeButton: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#eee",
-    borderRadius: 20,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    width: 150,
-  },
-  rotatedIcon: {
-    transform: [{ rotate: "90deg" }],
-    marginRight: 5,
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "flex-end",
-  },
-  dropdownContainer: {
-    width: 150,
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 10,
-    marginRight: 40,
-  },
-  option: {
-    padding: 10,
-  },
-  optionText: {
-    fontSize: 16,
   },
   navigationContainer: {
     flexDirection: "row",
@@ -420,11 +314,43 @@ const styles = StyleSheet.create({
     minHeight: 150,
     justifyContent: "center",
     marginBottom: 50,
-    maxHeight: 300,
   },
-  line: {
-    marginVertical: 10,
+  chartContainer: {
+    alignItems: "center",
+  },
+  centerLabel: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  centerLabelText: {
+    fontSize: 22,
+    color: "white",
+    fontWeight: "bold",
+  },
+  centerLabelSubText: {
+    fontSize: 14,
+    color: "white",
+  },
+  noDataContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dot: {
+    height: 10,
+    width: 10,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  legendRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    width: "48%",
+  },
+  legendText: {
+    color: "black",
   },
 });
 
-export default StatisticalWorkByType;
+export default StatisticalWorkByProject;
