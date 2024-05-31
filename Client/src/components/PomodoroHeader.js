@@ -55,7 +55,7 @@ const PomodoroHeader = () => {
           </Text>
         </View>
         <View style={styles.textContainer}>
-          <Text style={styles.text}>Total time focus today</Text>
+          <Text style={styles.text}>Total time focus today (hours)</Text>
         </View>
       </View>
     </View>

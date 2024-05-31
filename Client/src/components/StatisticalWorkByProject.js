@@ -54,7 +54,6 @@ const StatisticalWorkByProject = () => {
           "PROJECT"
         );
         if (response.success) {
-          console.log(response.data);
           setData(response.data);
         } else {
           console.log("Error fetch data in app:", response.message);

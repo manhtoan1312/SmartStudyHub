@@ -61,6 +61,7 @@ import WorkDueDate from "../pages/guest/WorkDueDate";
 import Statistical from "../pages/guest/Statistical";
 import ReportHistory from "../pages/guest/ReportHistory";
 import ReportDetail from "../pages/guest/ReportDetail";
+import HistoryDaily from "../pages/guest/HistoryDaily";
 
 const Stack = createStackNavigator();
 
@@ -126,6 +127,7 @@ const Navigator = () => (
     <Stack.Screen name="Statistical" component={Statistical} />
     <Stack.Screen name="ReportHistory" component={ReportHistory} />
     <Stack.Screen name="ReportDetail" component={ReportDetail} />
+    <Stack.Screen name="HistoryDaily" component={HistoryDaily} />
   </Stack.Navigator>
 );
 

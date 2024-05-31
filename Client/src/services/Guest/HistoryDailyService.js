@@ -10,7 +10,12 @@ const getHistoryDaily = async (userId, page, size) => {
     
         const data = await response.json();
         if (response.status === 200) {
-          return { success: true, data: data.data };
+          if(data.meta.code==="14_1_f"){
+            return { success: false, message: data.meta.message };
+          }
+          else{
+            return {success:true, data:data.data}
+          }
         } else {
           return { success: false, message: data.meta.message };
         }

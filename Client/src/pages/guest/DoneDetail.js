@@ -293,8 +293,8 @@ const DoneDetail = ({ navigation }) => {
       {/* Content based on selected category */}
       {selectedCategory === "Work" && (
         <ScrollView>
-          {listwork?.map((item) => (
-            <View>
+          {listwork?.map((item,index) => (
+            <View key={index}>
               <View
                 style={{
                   flex: 1,

@@ -34,8 +34,8 @@ const Dropdown = ({ visible, onSelect, onClose }) => (
   <Modal visible={visible} transparent animationType="slide">
     <TouchableOpacity style={styles.overlay} onPress={onClose}>
       <View style={styles.dropdownContainer}>
-        {options.map((item) => (
-          <Pressable style={styles.option} onPress={() => onSelect(item.value)}>
+        {options.map((item,index) => (
+          <Pressable style={styles.option} key={index} onPress={() => onSelect(item.value)}>
             <Text style={styles.optionText}>{item.key}</Text>
           </Pressable>
         ))}
@@ -247,9 +247,9 @@ const StatisticalWorkByType = () => {
                           backgroundColor:
                             item?.unitId === 0
                               ? "#006DFF"
-                              : item.unitColor == "None"
+                              : item?.unitColor ? (item?.unitColor == "None"
                               ? "#e27602"
-                              : item.unitColor,
+                              : item.unitColor) : '#e27602',
                           width: item.totalTimeFocusInUnit,
                           maxWidth: 300,
                           minWidth: 20,
@@ -266,40 +266,6 @@ const StatisticalWorkByType = () => {
                 </View>
               ))}
             </View>
-            {/* <FlatList
-              data={data?.listDataStatisticalByUnit}
-              renderItem={({ item }) => (
-                <View style={styles.line}>
-                  <Text
-                    style={{ color: item?.unitId === -1 ? "#ccc" : "#333" }}
-                  >
-                    {item?.unitName}
-                  </Text>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <View
-                      style={[
-                        {
-                          backgroundColor:
-                            item?.unitColor === "None" || !item?.unitColor
-                              ? "#e27602"
-                              : item.unitColor,
-                          width: item.totalTimeFocusInUnit,
-                          maxWidth: 300,
-                          minWidth: 20,
-                          height: 5,
-                          borderRadius: 5,
-                          marginRight: 10,
-                        },
-                      ]}
-                    ></View>
-                    <Text style={{ color: "#ccc" }}>
-                      {renderTime(item?.totalTimeFocusInUnit)}
-                    </Text>
-                  </View>
-                </View>
-              )}
-              keyExtractor={(item) => item.unitId}
-            /> */}
           </ScrollView>
         ) : (
           <View

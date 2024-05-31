@@ -208,6 +208,7 @@ const MainPage = () => {
         if (autoStartPo) {
           newStop = false;
         }
+        newMode='work'
       } else {
         if (autoStartBreak) {
           newStop = false;

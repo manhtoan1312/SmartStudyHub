@@ -83,7 +83,7 @@ const PomodoroCompleted = ({ pomoItem, reload, navigation }) => {
           }}
         ></View>
       </View>
-      {pomoItem?.pomodoros.map((item) => (
+      {pomoItem?.pomodoros && pomoItem?.pomodoros.map((item) => (
         <Swipeable
           renderRightActions={renderRightActions(item.id)}
           key={item.id}

@@ -38,11 +38,13 @@ const Statistical = ({ navigation }) => {
           <AntDesign name="left" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Statistical</Text>
-        <MaterialCommunityIcons
-          name="clipboard-text-outline"
-          size={24}
-          color="#333"
-        />
+        <Pressable onPress={() => navigation.navigate('HistoryDaily')}>
+          <MaterialCommunityIcons
+            name="clipboard-text-outline"
+            size={24}
+            color="#333"
+          />
+        </Pressable>
       </View>
       <View style={styles.bar}>
         <Pressable
