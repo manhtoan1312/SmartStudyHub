@@ -249,6 +249,11 @@ const InforUser = ({ navigation }) => {
       infor: infor,
     });
   };
+  const handleSelectCoverImage = async () => {
+    navigation.navigate("CoverImageUpload", {
+      infor: infor,
+    });
+  };
 
   const handle2FAChange = (value) => {
     setInfor({ ...infor, isTwoFactor: value });
@@ -303,6 +308,34 @@ const InforUser = ({ navigation }) => {
                       }}
                       source={{ uri: infor?.imageUrl }}
                     />
+                    <MaterialIcons
+                      name="navigate-next"
+                      size={24}
+                      color="black"
+                    />
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleSelectCoverImage}
+                  style={styles.infoItem}
+                >
+                  <Text style={styles.infoLabel}>Cover Image</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    {infor.coverImage ? (
+                      <Image
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 20,
+                          marginRight: 10,
+                        }}
+                        source={{ uri: infor?.coverImage }}
+                      />
+                    ) : (
+                      <Text style={styles.infoValue}>
+                        None
+                      </Text>
+                    )}
                     <MaterialIcons
                       name="navigate-next"
                       size={24}

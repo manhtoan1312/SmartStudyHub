@@ -62,6 +62,9 @@ import Statistical from "../pages/guest/Statistical";
 import ReportHistory from "../pages/guest/ReportHistory";
 import ReportDetail from "../pages/guest/ReportDetail";
 import HistoryDaily from "../pages/guest/HistoryDaily";
+import PersonalUser from "../pages/guest/PersonalUser";
+import CoverImageUpload from "../pages/user/CoverImageUpload";
+import ViewPersonalUser from "../pages/guest/ViewPersonalUser";
 
 const Stack = createStackNavigator();
 
@@ -128,6 +131,9 @@ const Navigator = () => (
     <Stack.Screen name="ReportHistory" component={ReportHistory} />
     <Stack.Screen name="ReportDetail" component={ReportDetail} />
     <Stack.Screen name="HistoryDaily" component={HistoryDaily} />
+    <Stack.Screen name="PersonalUser" component={PersonalUser} />
+    <Stack.Screen name="CoverImageUpload" component={CoverImageUpload} />
+    <Stack.Screen name="ViewUser" component={ViewPersonalUser} />
   </Stack.Navigator>
 );
 

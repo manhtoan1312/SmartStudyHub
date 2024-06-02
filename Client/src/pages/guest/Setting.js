@@ -25,6 +25,7 @@ import { DeleteGuest, UpdateTimeLastUse } from "../../services/GuestService";
 import ClearData from "../../services/ClearData";
 import { useDispatch, useSelector } from "react-redux";
 import { setFocus } from "../../slices/focusSlice";
+import { getUserInfor } from "../../services/UserService";
 export default function Setting({ navigation }) {
   const [preTime, setPreTime] = useState(0);
   const [workSound, setWorkSound] = useState("None");
@@ -45,6 +46,7 @@ export default function Setting({ navigation }) {
   const [email, setEmail] = useState("");
   const [img, setImg] = useState(null);
   const [name, setName] = useState("");
+  const [infor, setInfor] = useState({});
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const { isStop } = useSelector((state) => state.focus);
@@ -84,10 +86,15 @@ export default function Setting({ navigation }) {
         const parse = JSON.parse(breakSound);
         setBreakSound(parse?.nameSound);
       }
+      if (role) {
+        const response = await getUserInfor();
+        if (response.success) {
+          setPreTime(response.data.dueDatePremium);
+        }
+      }
       const storedSettings = await AsyncStorage.getItem("settings");
       if (storedSettings) {
         const parsedSettings = JSON.parse(storedSettings);
-        setPreTime(parsedSettings.preTime);
         setFocusSound(parsedSettings.focusSound);
         setVibrate(parsedSettings.vibrate);
         setPomodoroTime(parsedSettings.pomodoroTime);
@@ -198,8 +205,27 @@ export default function Setting({ navigation }) {
   const toSignIn = () => {
     navigate("Login");
   };
-  const toInfor = () => {
-    navigate("Infor");
+  const toInfor = async () => {
+    try {
+      await updateData();
+    } catch (e) {
+      console.log(e);
+      Alert.alert(
+        "Smart Study Hub Announcement",
+        "An error occurred while saving the settings",
+        [
+          {
+            text: "Cancel",
+          },
+          {
+            text: "OK",
+          },
+        ],
+        { cancelable: false }
+      );
+    }
+    const role = await getRole();
+    navigation.navigate("PersonalUser");
   };
   const toPREMIUM = () => {
     navigate("PREMIUM");
@@ -452,8 +478,8 @@ export default function Setting({ navigation }) {
         </View>
 
         <View style={s`flex flex-row`}>
-          <Text style={s`text-red-500 text-lg`}>{preTime} Days</Text>
-          <AntDesign style={s`text-lg`} name="right" color="red" />
+          <Text style={s`text-yellow-400 text-lg`}>{preTime} Days</Text>
+          <AntDesign style={s`text-lg`} name="right" color="#E6D800" />
         </View>
       </View>
 

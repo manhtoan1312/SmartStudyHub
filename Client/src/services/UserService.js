@@ -152,7 +152,7 @@ const updateInformation = async (
 ) => {
   try {
     const role = await getRole();
-    
+
     if (role) {
       const { token } = role;
       const response = await fetch(`${uri}/update-info`, {
@@ -408,6 +408,75 @@ const deleteAvtUploaded = async (publicId) => {
   }
 };
 
+const PayVNPay = async (vnpOrderInfor, vnpAmount, packagePremium) => {
+  try {
+    const role = await getRole();
+
+    if (role) {
+      const { token } = role;
+      const response = await fetch(`${uri}/payment/vnpay`, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          vnpOrderInfor,
+          vnpAmount,
+          packagePremium,
+        }),
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        return { success: true, data: data.data.stringType };
+      } else {
+        const data = await response.json();
+        return { success: false, message: data.meta.message };
+      }
+    } else {
+      return { success: false, message: "Token not found" };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
+const PayPaypal = async (paypalOrderInfo, paypalAmount, packagePremium) => {
+  try {
+    const role = await getRole();
+
+    if (role) {
+      const { token } = role;
+      const response = await fetch(`${uri}/payment/paypal`, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          paypalOrderInfo,
+          paypalAmount,
+          packagePremium,
+        }),
+      });
+      const data = await response.json();
+      console.log(data);
+      if (response.status === 200) {
+        return { success: true, data: data.data.stringType };
+      } else {
+        return { success: false, message: data.meta.message };
+      }
+    } else {
+      return { success: false, message: "Token not found" };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
 export {
   SendOTPChangePassword,
   changePassword,
@@ -421,4 +490,6 @@ export {
   getAvtUploaded,
   deleteCompletelyAvt,
   deleteAvtUploaded,
+  PayVNPay,
+  PayPaypal,
 };

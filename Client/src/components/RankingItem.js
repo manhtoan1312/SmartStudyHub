@@ -1,7 +1,9 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Entypo } from "@expo/vector-icons";
+import getRole from "../services/RoleService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const RankingItem = ({ user }) => {
+const RankingItem = ({ navigation, user }) => {
   const renderRank = () => {
     if (user.rank === 1) {
       return <Entypo name="trophy" size={24} color="#FFD700" />;
@@ -17,8 +19,20 @@ const RankingItem = ({ user }) => {
       );
     }
   };
+  const handlePressUser = async () => {
+    const role = await getRole();
+    let id = await AsyncStorage.getItem("id");
+    if (role) {
+      id = role.id;
+    }
+    if (id == user.id) {
+      navigation.navigate("PersonalUser");
+    } else {
+      navigation.navigate("ViewUser", { id: user.id });
+    }
+  };
   return (
-    <View style={styles.container}>
+    <Pressable onPress={handlePressUser} style={styles.container}>
       <View style={styles.body}>
         <View style={{ flexDirection: "row" }}>
           <View style={styles.rank}>{renderRank()}</View>
@@ -26,12 +40,10 @@ const RankingItem = ({ user }) => {
           <Text>{`${user.firstName} ${user.lastName}`}</Text>
         </View>
         <View>
-          <Text style={styles.time}>
-            {user?.totalTimeFocus || "0"} Minute
-          </Text>
+          <Text style={styles.time}>{user?.totalTimeFocus || "0"} Minute</Text>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

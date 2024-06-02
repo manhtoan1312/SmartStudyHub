@@ -148,10 +148,10 @@ function RankingUser({ navigation }) {
       </View>
       {mode === 1 ? (
         <View>
-          <RankingBody listUser={list30Days.allUsers} onEndList={loadMoreData} />
+          <RankingBody navigation={navigation} listUser={list30Days.allUsers} onEndList={loadMoreData} />
         </View>
       ) : (
-        <RankingBody listUser={listAll.allUsers} onEndList={loadMoreData} />
+        <RankingBody navigation={navigation} listUser={listAll.allUsers} onEndList={loadMoreData} />
       )}
       <View style={styles.user}>
         <RankingUserItem
