@@ -67,8 +67,8 @@ const ViewPersonalUser = ({ route, navigation }) => {
         </Text>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <PomodoroHeader />
-        <WorkStatisticalHeader />
+        <PomodoroHeader id={id}/>
+        <WorkStatisticalHeader id={id}/>
         {infor?.role !== "GUEST" && (
           <View style={styles.userInfoContainer}>
             <View style={styles.userInfoRow}>
@@ -118,8 +118,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 20,
     backgroundColor: "#fff",
-    elevation: 3, // Adds shadow for Android
-    shadowColor: "#000", // Shadow for iOS
+    elevation: 3,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 2,

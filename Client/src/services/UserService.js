@@ -462,7 +462,6 @@ const PayPaypal = async (paypalOrderInfo, paypalAmount, packagePremium) => {
         }),
       });
       const data = await response.json();
-      console.log(data);
       if (response.status === 200) {
         return { success: true, data: data.data.stringType };
       } else {

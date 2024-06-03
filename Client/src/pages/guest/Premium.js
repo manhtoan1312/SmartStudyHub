@@ -19,36 +19,46 @@ import {
 import { s } from "react-native-wind";
 import getRole from "../../services/RoleService";
 import { PayVNPay, getUserInfor, PayPaypal } from "../../services/UserService";
+import { useIsFocused } from "@react-navigation/native";
 
 function PREMIUM({ navigation }) {
   const [infor, setInfor] = useState({});
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const role = await getRole();
-      if (role) {
-        const response = await getUserInfor();
-        if (response.success) {
-          setInfor(response.data);
-        }
+  const isFocused = useIsFocused();
+  const fetchData = async () => {
+    const role = await getRole();
+    if (role) {
+      const response = await getUserInfor();
+      if (response.success) {
+        setInfor(response.data);
       }
-    };
+    }
+  };
+  useEffect(() => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const fetchDataOnFocus = async () => {
+      if (isFocused) {
+        await fetchData();
+      }
+    };
+    fetchDataOnFocus();
+  }, [isFocused]);
+
   const packages = {
-    'THREEMONTHS': {
-      name: 'Three Months',
+    THREEMONTHS: {
+      name: "Three Months",
       price: 1.99,
-      description: 'Pay the 3-month Premium account registration bill on',
+      description: "Pay the 3-month Premium account registration bill on",
     },
-    'FOREVER': {
-      name: 'Forever',
+    FOREVER: {
+      name: "Forever",
       price: 4.99,
-      description: 'Pay the Lifetime Premium account registration bill on',
-    }
+      description: "Pay the Lifetime Premium account registration bill on",
+    },
   };
 
   const openModal = (packageType) => {
@@ -65,20 +75,18 @@ function PREMIUM({ navigation }) {
     const packageDetails = packages[selectedPackage];
     const orderDate = new Date().toLocaleDateString();
     const orderInfor = `${packageDetails.description} ${orderDate}`;
-    const payAmount = parseInt(packageDetails.price*25000);
+    const payAmount = parseInt(packageDetails.price * 25000);
     const packageType = selectedPackage;
-    let response
-    console.log(orderInfor, payAmount, packageType)
-    if (option === 'PayPal') {
+    let response;
+    if (option === "PayPal") {
       response = await PayPaypal(orderInfor, payAmount, packageType);
     } else {
-      response = await PayVNPay(orderInfor, payAmount, packageType)
+      response = await PayVNPay(orderInfor, payAmount, packageType);
     }
-    if(response.success){
-      Linking.openURL(response.data)
-    }
-    else{
-      Alert.alert('Payment fail!', response.message)
+    if (response.success) {
+      Linking.openURL(response.data);
+    } else {
+      Alert.alert("Payment fail!", response.message);
     }
 
     console.log(
@@ -93,13 +101,12 @@ function PREMIUM({ navigation }) {
         <View
           style={s`bg-white justify-center items-center py-4 border-b-2 border-b-gray-200`}
         >
-          <FontAwesome
-            style={s`absolute left-6`}
-            name="angle-left"
-            size={30}
-            color="#000000"
+          <Pressable
             onPress={() => navigation.goBack()}
-          />
+            style={s`absolute left-6`}
+          >
+            <FontAwesome name="angle-left" size={30} color="#000000" />
+          </Pressable>
           <Text style={s`font-medium text-2xl text-yellow-400`}>
             Upgrade to Premium
           </Text>
@@ -208,11 +215,7 @@ function PREMIUM({ navigation }) {
 
           <View style={s`flex flex-row justify-between py-2 mt-2`}>
             <View style={s`flex flex-row`}>
-              <MaterialCommunityIcons
-                name="timer"
-                size={24}
-                color="#6633FF"
-              />
+              <MaterialCommunityIcons name="timer" size={24} color="#6633FF" />
               <Text style={s`h-full flex items-center pl-2`}>
                 Customize Pomodoro timer duration for tasks.
               </Text>
@@ -237,17 +240,24 @@ function PREMIUM({ navigation }) {
         <View style={styles.dueDate}>
           {infor?.dueDatePremium && (
             <Text style={styles.dueDateText}>
-              Remaining time to use the premium version: {infor?.dueDatePremium} Day
+              Remaining time to use the premium version: {infor?.dueDatePremium}{" "}
+              Day
             </Text>
           )}
         </View>
         <View>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={() => openModal('THREEMONTHS')}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => openModal("THREEMONTHS")}
+            >
               <Text style={styles.buttonText}>Three Months</Text>
               <Text style={styles.buttonText}>1.99 USD</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => openModal('FOREVER')}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => openModal("FOREVER")}
+            >
               <Text style={styles.buttonText}>Forever</Text>
               <View style={{ flexDirection: "row", justifyContent: "center" }}>
                 <Text style={styles.buttonText}>4.99 USD </Text>
@@ -270,13 +280,22 @@ function PREMIUM({ navigation }) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Select Payment Method</Text>
-            <Pressable style={styles.modalButton} onPress={() => handlePaymentOption('PayPal')}>
+            <Pressable
+              style={styles.modalButton}
+              onPress={() => handlePaymentOption("PayPal")}
+            >
               <Text style={styles.modalButtonText}>PayPal</Text>
             </Pressable>
-            <Pressable style={styles.modalButton} onPress={() => handlePaymentOption('VNPay')}>
+            <Pressable
+              style={styles.modalButton}
+              onPress={() => handlePaymentOption("VNPay")}
+            >
               <Text style={styles.modalButtonText}>VNPay</Text>
             </Pressable>
-            <Pressable style={[styles.modalButton, styles.cancelButton]} onPress={closeModal}>
+            <Pressable
+              style={[styles.modalButton, styles.cancelButton]}
+              onPress={closeModal}
+            >
               <Text style={styles.modalButtonText}>Cancel</Text>
             </Pressable>
           </View>
@@ -328,47 +347,47 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     marginTop: 5,
     borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   textDiscount: {
-    color: 'white',
+    color: "white",
     fontSize: 12,
     borderWidth: 1,
-    borderColor: 'white',
+    borderColor: "white",
     borderRadius: 5,
   },
   modalOverlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
     width: 300,
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 18,
     marginBottom: 20,
   },
   modalButton: {
-    width: '100%',
+    width: "100%",
     padding: 15,
-    backgroundColor: '#FA6408',
+    backgroundColor: "#FA6408",
     borderRadius: 5,
     marginVertical: 5,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
   },
   cancelButton: {
-    backgroundColor: 'gray',
+    backgroundColor: "gray",
   },
 });
 

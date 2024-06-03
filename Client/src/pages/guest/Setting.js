@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Pressable,
 } from "react-native";
 import { s } from "react-native-wind";
 import {
@@ -408,23 +409,23 @@ export default function Setting({ navigation }) {
   };
   return (
     <ScrollView style={s`flex-1 bg-gray`}>
-      <View style={s` flex-1 bg-white justify-center items-center mb-4 py-4`}>
-        <Feather
-          style={s`absolute left-4`}
-          size={24}
-          name="x"
-          onPress={() => handleSaveSettings()}
-        />
+      <Pressable
+        onPress={() => handleSaveSettings()}
+        style={s` flex-1 bg-white justify-center items-center mb-4 py-4`}
+      >
+        <Feather style={s`absolute left-4`} size={24} name="x" />
         <Text style={s`font-medium text-2xl`}>Setting</Text>
-      </View>
-      <TouchableOpacity onPress={() => handleHeader()}>
-        <View style={s`flex flex-row h-auto py-4 pl-4 bg-white`}>
-          <View>
-            <Image
-              source={img ? { uri: img } : require("../../images/avt.jpg")}
-              style={s`w-12 h-12 rounded-3xl`}
-            />
-          </View>
+      </Pressable>
+      <View>
+        <Pressable onPress={() => handleHeader()} style={s`flex flex-row h-auto py-4 pl-4 bg-white`}>
+          <Pressable onPress={() => navigate("PersonalUser")}>
+            <View>
+              <Image
+                source={img ? { uri: img } : require("../../images/avt.jpg")}
+                style={s`w-12 h-12 rounded-3xl`}
+              />
+            </View>
+          </Pressable>
           <TouchableOpacity style={s`flex px-2`}>
             <TouchableOpacity style={s`flex flex-row`}>
               <View style={s`mr-2`}>
@@ -460,8 +461,8 @@ export default function Setting({ navigation }) {
               </View>
             </TouchableOpacity>
           </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
+        </Pressable>
+      </View>
 
       <View
         style={s`flex flex-row justify-between px-2 mt-6 bg-white py-4`}

@@ -9,7 +9,9 @@ import {
   Alert,
   Animated,
   TouchableOpacity,
-  Linking,SafeAreaView
+  Linking,
+  SafeAreaView,
+  Pressable,
 } from "react-native";
 import { s } from "react-native-wind";
 import {
@@ -118,7 +120,7 @@ export default function Home({ navigation }) {
     try {
       const storedData = await AsyncStorage.getItem("projectData");
       const settings = await AsyncStorage.getItem("settings");
-      const role = await getRole()
+      const role = await getRole();
       const avatar = await AsyncStorage.getItem("img");
       const name = await AsyncStorage.getItem("accountName");
       let id;
@@ -148,12 +150,10 @@ export default function Home({ navigation }) {
         setDone(parsedData.done);
         setDeleted(parsedData.deleted);
       }
-      if(role) {
-        id = role.id
-      }
-      else{
-        id = await AsyncStorage.getItem('id')
-        
+      if (role) {
+        id = role.id;
+      } else {
+        id = await AsyncStorage.getItem("id");
       }
       if (name) {
         setEmail(name);
@@ -165,9 +165,8 @@ export default function Home({ navigation }) {
               await AsyncStorage.setItem("accountName", role.name);
             };
             setName();
-          }
-          else{
-            setEmail('')
+          } else {
+            setEmail("");
           }
         });
       }
@@ -180,7 +179,7 @@ export default function Home({ navigation }) {
         };
         fetchDataId();
       } else {
-        console.log('user id:',id);
+        console.log("user id:", id);
       }
     } catch (error) {
       console.log(error);
@@ -213,13 +212,12 @@ export default function Home({ navigation }) {
 
   const fetchDataFPT = async () => {
     const role = await getRole();
-let id;
-if(role) {
-        id = role.id
-      }
-      else{
-        id = await AsyncStorage.getItem('id')
-      }
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     if (id) {
       try {
         const [
@@ -360,9 +358,8 @@ if(role) {
           }
           if (rsTag?.success) {
             setTag(rsTag.data);
-          }
-          else{
-            setTag(null)
+          } else {
+            setTag(null);
           }
         }
       } catch (error) {
@@ -377,13 +374,12 @@ if(role) {
 
   const handleAddProject = async () => {
     const role = await getRole();
-let id;
-if(role) {
-        id = role.id
-      }
-      else{
-        id = await AsyncStorage.getItem('id')
-      }
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const rs = await CheckMaxProject(id);
     if (rs?.success) {
       if (rs.isMax) {
@@ -398,13 +394,12 @@ if(role) {
 
   const handleAddFolder = async () => {
     const role = await getRole();
-let id;
-if(role) {
-        id = role.id
-      }
-      else{
-        id = await AsyncStorage.getItem('id')
-      }
+    let id;
+    if (role) {
+      id = role.id;
+    } else {
+      id = await AsyncStorage.getItem("id");
+    }
     const rs = await CheckMaxFolder(id);
     if (rs?.success) {
       if (rs.isMax) {
@@ -443,23 +438,28 @@ if(role) {
       >
         <View>
           <View style={styles.headers}>
-            <TouchableOpacity onPress={() => navigation.navigate("Setting")}>
+            <Pressable onPress={() => navigation.navigate("PersonalUser")}>
               <ImageBackground
                 style={styles.avt}
                 resizeMode="cover"
                 source={{ uri: avt }}
               ></ImageBackground>
-            </TouchableOpacity>
-            <Text
-              style={{
-                fontSize: 20,
-                color: email ? "black" : "red",
+            </Pressable>
+            <Pressable onPress={() => navigation.navigate("Setting")}>
+              <Text
+                style={{
+                  fontSize: 20,
+                  color: email ? "black" : "red",
+                }}
+              >
+                {email ? email : "Login"}
+              </Text>
+            </Pressable>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("PREMIUM");
               }}
-              onPress={() => navigation.navigate("Setting")}
             >
-              {email ? email : "Login"}
-            </Text>
-            <TouchableOpacity onPress={() => {navigation.navigate('PREMIUM')}}>
               <FontAwesome6
                 name="crown"
                 style={styles.itemRow}
@@ -485,7 +485,9 @@ if(role) {
                 />
               </TouchableOpacity>
             )}
-            <TouchableOpacity onPress={() => navigation.navigate('Statistical')}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Statistical")}
+            >
               <AntDesign
                 name="barschart"
                 style={styles.itemRow}
@@ -743,11 +745,14 @@ if(role) {
             </View>
           </TouchableOpacity>
           {event && (
-            <TouchableOpacity onPress={()=> navigation.navigate('Event')} style={styles.headers}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Event")}
+              style={styles.headers}
+            >
               <View style={styles.row}>
                 <MaterialIcons
                   name="event"
-                  style={styles.itemRow} 
+                  style={styles.itemRow}
                   size={20}
                   color="#32CD32"
                 />
@@ -814,7 +819,10 @@ if(role) {
                 reload={reload}
               />
             ))}
-          <TouchableOpacity onPress={() => handleAddProject()} style={styles.headers}>
+          <TouchableOpacity
+            onPress={() => handleAddProject()}
+            style={styles.headers}
+          >
             <View style={styles.row}>
               <AntDesign
                 name="plus"
@@ -829,7 +837,7 @@ if(role) {
             </View>
             <View style={styles.row}>
               <TouchableOpacity
-                style={{ paddingHorizontal: 10, }}
+                style={{ paddingHorizontal: 10 }}
                 onPress={() => navigation.navigate("AddTag")}
               >
                 <MaterialCommunityIcons
@@ -839,7 +847,7 @@ if(role) {
                 />
               </TouchableOpacity>
               <TouchableOpacity
-                style={{ paddingHorizontal: 10,  }}
+                style={{ paddingHorizontal: 10 }}
                 onPress={() => handleAddFolder()}
               >
                 <AntDesign name="addfolder" size={24} color="red" />

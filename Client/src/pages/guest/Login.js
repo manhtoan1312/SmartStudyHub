@@ -6,13 +6,17 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  Linking,SafeAreaView
+  Linking,
+  SafeAreaView,
+  Pressable,
 } from "react-native";
 import {
   FontAwesome,
   MaterialCommunityIcons,
   Feather,
   EvilIcons,
+  AntDesign,
+  Entypo,
 } from "@expo/vector-icons";
 import { ResendOTP, login } from "../../services/AccountService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -23,7 +27,6 @@ function Login({ navigation }) {
   const [password, setPassword] = useState("");
   const [hide, setHide] = useState(true);
   const unsubscribeRef = useRef(null);
-
 
   useEffect(() => {
     const handleUrlChange = async ({ url }) => {
@@ -65,17 +68,17 @@ function Login({ navigation }) {
       if (response.success) {
         if (response.data.isTwoFactor) {
           const res = await ResendOTP(email);
-        
-      if (res.success) {
-        navigation.navigate("2FA", {
-          otpCode: res.data.otpCode,
-          time: res.data.otpTimeExpiration,
-          email: email,
-          token:response.token
-        });
-      } else {
-        Alert.alert("Register failed", response.message);
-      }
+
+          if (res.success) {
+            navigation.navigate("2FA", {
+              otpCode: res.data.otpCode,
+              time: res.data.otpTimeExpiration,
+              email: email,
+              token: response.token,
+            });
+          } else {
+            Alert.alert("Register failed", response.message);
+          }
         } else {
           await AsyncStorage.setItem("token", response.token);
           navigation.navigate("Home");
@@ -90,7 +93,10 @@ function Login({ navigation }) {
                 text: "No",
                 style: "cancel",
               },
-              { text: "Yes", onPress: () => navigation.navigate("Recover",{email:email}) },
+              {
+                text: "Yes",
+                onPress: () => navigation.navigate("Recover", { email: email }),
+              },
             ]
           );
         } else if (response.status === "2_3_f") {
@@ -134,14 +140,9 @@ function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <FontAwesome
-          style={styles.backIcon}
-          name="angle-left"
-          size={24}
-          onPress={() => navigation.goBack()}
-        />
-      </View>
+      <Pressable style={styles.header} onPress={() => navigation.goBack()}>
+        <FontAwesome style={styles.backIcon} name="angle-left" size={24} />
+      </Pressable>
       <View style={styles.content}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>SMART STUDY HUB</Text>
@@ -208,9 +209,9 @@ function Login({ navigation }) {
             <AntDesign name="google" size={24} color="white" />
             <Text style={styles.buttonTextSecondary}>Login With Google</Text>
           </TouchableOpacity>
-        </View> */}
+        </View>
 
-        {/* <View style={styles.buttonContainer}>
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.githubButton}
             onPress={handleGitHubLogin}

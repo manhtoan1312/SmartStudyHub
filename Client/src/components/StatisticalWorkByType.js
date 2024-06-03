@@ -34,8 +34,12 @@ const Dropdown = ({ visible, onSelect, onClose }) => (
   <Modal visible={visible} transparent animationType="slide">
     <TouchableOpacity style={styles.overlay} onPress={onClose}>
       <View style={styles.dropdownContainer}>
-        {options.map((item,index) => (
-          <Pressable style={styles.option} key={index} onPress={() => onSelect(item.value)}>
+        {options.map((item, index) => (
+          <Pressable
+            style={styles.option}
+            key={index}
+            onPress={() => onSelect(item.value)}
+          >
             <Text style={styles.optionText}>{item.key}</Text>
           </Pressable>
         ))}
@@ -130,11 +134,13 @@ const StatisticalWorkByType = () => {
     } else if (typeDay === "Every Week") {
       const newStartDate = subWeeks(startDate, 1).getTime();
       const newEndDate = subWeeks(endDate, 1).getTime();
+
       setStartDate(newStartDate);
       setEndDate(setEndOfDay(newEndDate).getTime());
     } else if (typeDay === "Every Month") {
       const newStartDate = subMonths(startDate, 1).getTime();
       const newEndDate = subMonths(endDate, 1).getTime();
+      console.log(newStartDate, newEndDate);
       setStartDate(newStartDate);
       setEndDate(setEndOfDay(newEndDate).getTime());
     }
@@ -247,9 +253,11 @@ const StatisticalWorkByType = () => {
                           backgroundColor:
                             item?.unitId === 0
                               ? "#006DFF"
-                              : item?.unitColor ? (item?.unitColor == "None"
-                              ? "#e27602"
-                              : item.unitColor) : '#e27602',
+                              : item?.unitColor
+                              ? item?.unitColor == "None"
+                                ? "#e27602"
+                                : item.unitColor
+                              : "#e27602",
                           width: item.totalTimeFocusInUnit,
                           maxWidth: 300,
                           minWidth: 20,

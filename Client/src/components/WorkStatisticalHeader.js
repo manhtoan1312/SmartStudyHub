@@ -4,21 +4,30 @@ import { getDataInApp } from "../services/Guest/getDataService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import getRole from "../services/RoleService";
 
-const WorkStatisticalHeader = () => {
+const WorkStatisticalHeader = ({id}) => {
   const [data, setData] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
-      let id = await AsyncStorage.getItem("id");
-      const role = await getRole();
-      if (role) {
-        id = role.id;
-      }
-      const response = await getDataInApp(id);
-      if (response.success) {
-        setData(response.data);
+      if (id) {
+        const response = await getDataInApp(id);
+        if (response.success) {
+          setData(response.data);
+        } else {
+          console.log("Error fetch data in app:", response.message);
+        }
       } else {
-        console.log("Error fetch data in app:", response.message);
+        let userId = await AsyncStorage.getItem("id");
+        const role = await getRole();
+        if (role) {
+          userId = role.id;
+        }
+        const response = await getDataInApp(userId);
+        if (response.success) {
+          setData(response.data);
+        } else {
+          console.log("Error fetch data in app:", response.message);
+        }
       }
     };
     fetchData();
