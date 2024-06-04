@@ -14,7 +14,7 @@ const statisticalTimeFocus = async (startDate, endDate, userId, type) => {
 
     const data = await response.json();
     if (response.status === 200) {
-      if (data.metacode === "15_1_f") {
+      if (data.meta.code === "15_1_f") {
         return { success: true, data: [] };
       }
       return { success: true, data: data.data };

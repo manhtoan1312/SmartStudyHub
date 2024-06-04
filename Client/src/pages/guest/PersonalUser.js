@@ -191,6 +191,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: -40,
+    marginBottom:10
   },
   avtBorder: {
     width: 90,

@@ -40,13 +40,16 @@ const UploadReportFile = async (file, id) => {
     formData.append("files", file);
     formData.append("type", "REPORT");
     formData.append("userId", String(id));
-    const response = await fetch(`https://api-smart-study-hub.onrender.com/mobile/v1/user/guest/files/upload`, {
-      method: "post",
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      body: formData,
-    });
+    const response = await fetch(
+      `https://api-smart-study-hub.onrender.com/mobile/v1/user/guest/files/upload`,
+      {
+        method: "post",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        body: formData,
+      }
+    );
     if (response.status === 200) {
       const data = await response.json();
       return { success: true, data: data.data.stringType };
@@ -96,4 +99,4 @@ const DeleteAllAvatar = async (type) => {
     return { success: false, message: "Wrong token" };
   }
 };
-export { UploadAvt, UploadReportFile,DeleteAllAvatar };
+export { UploadAvt, UploadReportFile, DeleteAllAvatar };

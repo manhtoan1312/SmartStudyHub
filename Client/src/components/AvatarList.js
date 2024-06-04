@@ -110,9 +110,9 @@ const AvatarList = ({ information, navigation, refreshKey }) => {
       infor.address ? infor.address : null,
       infor.dateOfBirth ? infor.dateOfBirth : null,
       infor.country ? infor.country : null,
-      image
-        ? image
-        : "https://res.cloudinary.com/dnj5purhu/image/upload/v1701175788/SmartStudyHub/USER/default-avatar_c2ruot.png"
+      image,
+      infor?.isTwoFactor ? infor?.isTwoFactor : false,
+      infor?.coverImage ? infor?.coverImage : null
     );
     if (!response.success) {
       Alert.alert("Change User Information fail", response.message);
@@ -138,21 +138,25 @@ const AvatarList = ({ information, navigation, refreshKey }) => {
           });
 
           if (!result.canceled) {
-            const file = {
-              uri: result.assets[0].uri,
-              name: `${result.assets[0].fileName}`,
-              type: "image/jpeg",
-            };
-            const response = await UploadAvt(file, "USER");
-            if (response.success) {
-              setSelectedAvt(response.data);
-              await updateInfor(response.data);
-              fetchData();
+            if (result.assets[0].fileSize > 10485760) {
+              Alert.alert("Warning!", "file size too large");
             } else {
-              Alert.alert("Error!", response.message);
-              if (response.message === "Wrong token") {
-                await AsyncStorage.removeItem("token");
-                navigation.navigate("Login");
+              const file = {
+                uri: result.assets[0].uri,
+                name: `${result.assets[0].fileName}`,
+                type: "image/jpeg",
+              };
+              const response = await UploadAvt(file, "USER");
+              if (response.success) {
+                setSelectedAvt(response.data);
+                await updateInfor(response.data);
+                fetchData();
+              } else {
+                Alert.alert("Error!", response.message);
+                if (response.message === "Wrong token") {
+                  await AsyncStorage.removeItem("token");
+                  navigation.navigate("Login");
+                }
               }
             }
           }

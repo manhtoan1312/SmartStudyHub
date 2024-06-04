@@ -468,12 +468,14 @@ export default function Home({ navigation }) {
               />
             </TouchableOpacity>
             {group && (
-              <MaterialCommunityIcons
-                name="account-group-outline"
-                style={styles.itemRow}
-                size={20}
-                color="black"
-              />
+              <Pressable onPress={() => navigation.navigate("GroupChat")}>
+                <MaterialCommunityIcons
+                  name="account-group-outline"
+                  style={styles.itemRow}
+                  size={20}
+                  color="black"
+                />
+              </Pressable>
             )}
             {rating && (
               <TouchableOpacity onPress={() => navigation.navigate("Ranking")}>

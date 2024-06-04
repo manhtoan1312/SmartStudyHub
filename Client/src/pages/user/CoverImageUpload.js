@@ -10,7 +10,7 @@ const CoverImageUpload = ({ route, navigation }) => {
   const handleDeleteAll = () => {
     Alert.alert(
       "Confirm action",
-      "Are you sure you want to delete all avatar?",
+      "Are you sure you want to delete all avatar and cover image?",
       [
         { text: "Cancel", style: "cancel" },
         { text: "Ok", onPress: () => confirmDelete() },
@@ -21,13 +21,8 @@ const CoverImageUpload = ({ route, navigation }) => {
   const confirmDelete = async () => {
     const response = await DeleteAllAvatar("USER");
     if (response.success) {
-      Alert.alert("Action success", "Delete all avatar successfully");
-      await AsyncStorage.setItem(
-        "img",
-        String(
-          "https://res.cloudinary.com/dnj5purhu/image/upload/v1701175788/SmartStudyHub/USER/default-avatar_c2ruot.png"
-        )
-      );
+      Alert.alert("Action success", "Delete all avatar and cover image successfully");
+      
       navigation.goBack();
     } else {
       Alert.alert("Action fail", response.message);
@@ -39,7 +34,7 @@ const CoverImageUpload = ({ route, navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <MaterialIcons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Avatar Uploaded</Text>
+        <Text style={styles.headerText}>Cover Image Uploaded</Text>
         <TouchableOpacity onPress={() => handleDeleteAll()}>
           <EvilIcons name="trash" size={24} color="#333" />
         </TouchableOpacity>

@@ -22,16 +22,18 @@ import getRole from "../services/RoleService";
 import AvtItem from "./AvatarItem";
 import { UploadAvt } from "../services/Guest/UploadFile";
 
-const CoverImageList = ({ information, navigation, refreshKey }) => {
+const CoverImageList = ({ information, navigation }) => {
   const [avtList, setAvtList] = useState([]);
   const infor = information;
-  const [selectedAvt, setSelectedAvt] = useState(infor.coverImage ? infor.coverImage : null);
+  const [selectedAvt, setSelectedAvt] = useState(
+    infor.coverImage ? infor.coverImage : null
+  );
   useEffect(() => {
-    getData()
+    getData();
   }, []);
 
   const getData = async () => {
-    const response = await getAvtUploaded("USER");
+    const response = await getAvtUploaded("COVERIMAGE");
     if (response.success) {
       const addAvtItem = {
         id: -1,
@@ -83,7 +85,7 @@ const CoverImageList = ({ information, navigation, refreshKey }) => {
   };
 
   const confirmDelete = async (image) => {
-    const response = await deleteCompletelyAvt(image.id);
+    const response = await deleteAvtUploaded(image.secureUrl);
     if (response.success) {
       getData();
     } else {
@@ -99,9 +101,9 @@ const CoverImageList = ({ information, navigation, refreshKey }) => {
       infor.address ? infor.address : null,
       infor.dateOfBirth ? infor.dateOfBirth : null,
       infor.country ? infor.country : null,
+      infor.imageUrl,
+      infor?.isTwoFactor ? infor?.isTwoFactor : false,
       image
-        ? image
-        : "https://res.cloudinary.com/dnj5purhu/image/upload/v1701175788/SmartStudyHub/USER/default-avatar_c2ruot.png"
     );
     if (!response.success) {
       Alert.alert("Change User Information fail", response.message);
@@ -127,21 +129,25 @@ const CoverImageList = ({ information, navigation, refreshKey }) => {
           });
 
           if (!result.canceled) {
-            const file = {
-              uri: result.assets[0].uri,
-              name: `${result.assets[0].fileName}`,
-              type: "image/jpeg",
-            };
-            const response = await UploadAvt(file, "USER");
-            if (response.success) {
-              setSelectedAvt(response.data);
-              await updateInfor(response.data);
-              fetchData();
+            if (result.assets[0].fileSize > 10485760) {
+              Alert.alert("Warning!", "file size too large");
             } else {
-              Alert.alert("Error!", response.message);
-              if (response.message === "Wrong token") {
-                await AsyncStorage.removeItem("token");
-                navigation.navigate("Login");
+              const file = {
+                uri: result.assets[0].uri,
+                name: `${result.assets[0].fileName}`,
+                type: "image/jpeg",
+              };
+              const response = await UploadAvt(file, "COVERIMAGE");
+              if (response.success) {
+                setSelectedAvt(response.data);
+                await updateInfor(response.data);
+                getData();
+              } else {
+                Alert.alert("Error!", response.message);
+                if (response.message === "Wrong token") {
+                  await AsyncStorage.removeItem("token");
+                  navigation.navigate("Login");
+                }
               }
             }
           }
@@ -166,7 +172,7 @@ const CoverImageList = ({ information, navigation, refreshKey }) => {
               onPress={() => handleAddAvt()}
             >
               <AntDesign name="pluscircle" size={24} color="#676767" />
-              <Text style={styles.addAvatarText}>Upload New Avatar</Text>
+              <Text style={styles.addAvatarText}>Upload New Cover Image</Text>
             </TouchableOpacity>
           ) : (
             <AvtItem

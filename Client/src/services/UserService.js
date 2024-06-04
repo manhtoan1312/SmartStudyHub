@@ -148,7 +148,8 @@ const updateInformation = async (
   dateOfBirth,
   country,
   imageUrl,
-  isTwoFactor
+  isTwoFactor,
+  coverImage
 ) => {
   try {
     const role = await getRole();
@@ -170,6 +171,7 @@ const updateInformation = async (
           country,
           imageUrl,
           isTwoFactor,
+          coverImage
         }),
       });
 

@@ -8,15 +8,23 @@ import {
   TouchableOpacity,
   Pressable,
   Image,
+  Alert,
 } from "react-native";
 import { AntDesign, Entypo } from "@expo/vector-icons";
 import PomodoroHeader from "../../components/PomodoroHeader";
 import WorkStatisticalHeader from "../../components/WorkStatisticalHeader";
+import ModalReportUser from "../../components/ModalReportUser";
+import ReportUserSubmit from "../../components/ReportUserSubmit";
+import { CreateReport } from "../../services/Guest/ReportService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import getRole from "../../services/RoleService";
 
 const ViewPersonalUser = ({ route, navigation }) => {
   const { id } = route.params;
   const [infor, setInfo] = useState({});
-
+  const [reportVisible, setReportVisible] = useState(false);
+  const [submitVisible, setSubmitVisible] = useState(false);
+  const [title, setTitle] = useState();
   const fetchData = async () => {
     const response = await getInforGuest(id);
     if (response.success) {
@@ -29,7 +37,35 @@ const ViewPersonalUser = ({ route, navigation }) => {
   useEffect(() => {
     fetchData();
   }, []);
-  const handlePressReport = () => {};
+  const handlePressReport = () => {
+    setReportVisible(true)
+  };
+
+  const handleSubmitTitle = (text) => {
+    setReportVisible(false);
+    setSubmitVisible(true);
+    setTitle(text);
+  };
+
+  const handleSubmitReport = async (desc) => {
+    setSubmitVisible(false);
+    let userId = await AsyncStorage.getItem("id");
+    const role = await getRole();
+    if (role) {
+      userId = role.id;
+    }
+    const response = await CreateReport(userId, {
+      userWasReportedId: id,
+      title: title,
+      descriptionDetail: desc,
+    });
+    if(response.success){
+      Alert.alert("Send Report successfully!")
+    }
+    else{
+      Alert.alert("Send Report fail!", response.message)
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -67,8 +103,8 @@ const ViewPersonalUser = ({ route, navigation }) => {
         </Text>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <PomodoroHeader id={id}/>
-        <WorkStatisticalHeader id={id}/>
+        <PomodoroHeader id={id} />
+        <WorkStatisticalHeader id={id} />
         {infor?.role !== "GUEST" && (
           <View style={styles.userInfoContainer}>
             <View style={styles.userInfoRow}>
@@ -102,6 +138,18 @@ const ViewPersonalUser = ({ route, navigation }) => {
           </View>
         )}
       </ScrollView>
+      <ModalReportUser
+        visible={reportVisible}
+        onClose={() => setReportVisible(false)}
+        id={id}
+        onSubmit={handleSubmitTitle}
+      />
+      <ReportUserSubmit
+        visible={submitVisible}
+        onClose={() => setSubmitVisible(false)}
+        title={title}
+        onSubmit={handleSubmitReport}
+      />
     </View>
   );
 };
@@ -139,6 +187,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: -40,
+    marginBottom:10
   },
   avtBorder: {
     width: 90,

@@ -79,7 +79,8 @@ const InforUser = ({ navigation }) => {
       infor.dateOfBirth ? infor.dateOfBirth : null,
       infor.country ? infor.country : null,
       infor.imageUrl,
-      infor?.isTwoFactor ? infor?.isTwoFactor : false
+      infor?.isTwoFactor ? infor?.isTwoFactor : false,
+      infor?.coverImage ? infor?.coverImage : null,
     );
     if (!response.success) {
       Alert.alert("Change User Information fail", response.message);
