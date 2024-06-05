@@ -10,7 +10,7 @@ const CoverImageUpload = ({ route, navigation }) => {
   const handleDeleteAll = () => {
     Alert.alert(
       "Confirm action",
-      "Are you sure you want to delete all avatar and cover image?",
+      "Are you sure you want to delete all cover image?",
       [
         { text: "Cancel", style: "cancel" },
         { text: "Ok", onPress: () => confirmDelete() },
@@ -19,10 +19,9 @@ const CoverImageUpload = ({ route, navigation }) => {
   };
 
   const confirmDelete = async () => {
-    const response = await DeleteAllAvatar("USER");
+    const response = await DeleteAllAvatar("COVERIMAGE");
     if (response.success) {
-      Alert.alert("Action success", "Delete all avatar and cover image successfully");
-      
+      Alert.alert("Action success", "Delete all cover image successfully");
       navigation.goBack();
     } else {
       Alert.alert("Action fail", response.message);

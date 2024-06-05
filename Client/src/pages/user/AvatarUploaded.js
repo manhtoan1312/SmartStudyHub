@@ -9,7 +9,7 @@ const AvatarUploaded = ({ route, navigation }) => {
   const handleDeleteAll = () => {
     Alert.alert(
       "Confirm action",
-      "Are you sure you want to delete all avatar and cover image?",
+      "Are you sure you want to delete all avatar?",
       [
         { text: "Cancel", style: "cancel" },
         { text: "Ok", onPress: () => confirmDelete() },
@@ -20,7 +20,7 @@ const AvatarUploaded = ({ route, navigation }) => {
   const confirmDelete = async () => {
     const response = await DeleteAllAvatar("USER");
     if (response.success) {
-      Alert.alert("Action success", "Delete all avatar and cover image successfully");
+      Alert.alert("Action success", "Delete all avatar successfully");
       await AsyncStorage.setItem(
         "img",
         String(
