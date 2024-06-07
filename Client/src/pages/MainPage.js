@@ -53,15 +53,20 @@ const MainPage = () => {
     }
   };
 
-  const playSoundWithLimit = async (uri, limit) => {
+  const playSoundWithLimit = async (uri, limit, isLocal = true) => {
     try {
       await stopSound();
       setIsPlaying(true);
       const newSoundObject = new Audio.Sound();
-      await newSoundObject.loadAsync({ uri: uri });
+      if (isLocal) {
+        await newSoundObject.loadAsync(require('../sound/Done.mp3'));
+      } else {
+        await newSoundObject.loadAsync({ uri: uri });
+      }
       await newSoundObject.playAsync();
       setTimeout(async () => {
         await newSoundObject.stopAsync();
+        await newSoundObject.unloadAsync();
         soundObjectRef.current = null;
         setIsPlaying(false);
       }, limit * 1000);
@@ -104,7 +109,7 @@ const MainPage = () => {
 
     fetchSettingsFromStorage();
     return () => {
-      stopSound(); // Dừng âm thanh khi component unmount
+      stopSound(); 
     };
   }, [dispatch]);
 
@@ -116,7 +121,10 @@ const MainPage = () => {
           await playWorkingSound();
           if (mode === "+") {
             dispatch(setFocus({ secondsLeft: secondsLeft + 1 }));
-            if (secondsLeft === (workId ? pomodoroTime * 60 : defaultTimePomodoro * 60)) {
+            if (
+              secondsLeft ===
+              (workId ? pomodoroTime * 60 : defaultTimePomodoro * 60)
+            ) {
               postPomodoro();
               dispatch(
                 setFocus({ numberOfPomodorosDone: numberOfPomodorosDone + 1 })
@@ -185,12 +193,9 @@ const MainPage = () => {
       const sound = await AsyncStorage.getItem("soundDone");
       if (sound) {
         const parse = JSON.parse(sound);
-        playSoundWithLimit(parse.url, 3);
+        playSoundWithLimit(parse.url, 2);
       } else {
-        playSoundWithLimit(
-          "https://res.cloudinary.com/dnj5purhu/video/upload/v1702956713/SmartStudyHub/SOUNDDONE/DEFAULT/DefaultBell_vh2hg0.mp3",
-          3
-        );
+        playSoundWithLimit(null,2, false);
       }
     } else {
       Alert.alert("Create Pomodoro fail!", response.message);
@@ -208,7 +213,7 @@ const MainPage = () => {
         if (autoStartPo) {
           newStop = false;
         }
-        newMode='work'
+        newMode = "work";
       } else {
         if (autoStartBreak) {
           newStop = false;
@@ -269,4 +274,3 @@ const styles = StyleSheet.create({
 });
 
 export default MainPage;
-

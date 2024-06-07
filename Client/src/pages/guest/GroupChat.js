@@ -1,3 +1,6 @@
+const TextEncodingPolyfill = require("text-encoding");
+const { TextDecoder, TextEncoder } = TextEncodingPolyfill;
+
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
@@ -13,9 +16,10 @@ import {
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import SockJS from "sockjs-client";
+import { Client } from "@stomp/stompjs";
 import { getChat } from "../../services/Guest/ChatSocket";
 import getRole from "../../services/RoleService";
-import SockJS from "sockjs-client";
 
 const PAGE_SIZE = 20;
 
@@ -29,8 +33,7 @@ const GroupChat = ({ navigation }) => {
   const [endList, setEndList] = useState(false);
   const [id, setId] = useState(null);
   const flatListRef = useRef(null);
-  const websocketRef = useRef(null);
-
+  const stompClientRef = useRef(null);
   useEffect(() => {
     const fetchData = async () => {
       let uId = await AsyncStorage.getItem("id");
@@ -47,34 +50,34 @@ const GroupChat = ({ navigation }) => {
     connect();
 
     return () => {
-      if (websocketRef.current) {
-        websocketRef.current.close();
+      if (stompClientRef.current) {
+        stompClientRef.current.deactivate();
       }
     };
   }, []);
 
   const connect = () => {
-    websocketRef.current = new WebSocket(
-      "wss://api-smart-study-hub.onrender.com/ws"
-    );
-    websocketRef.current.onopen = () => {
-      console.log("WebSocket connected");
-      websocketRef.current.send(JSON.stringify({ userId: id, type: "JOIN" }));
-    };
+    const socket = new SockJS("https://api-smart-study-hub.onrender.com/ws");
+    const stompClient = new Client({
+      webSocketFactory: () => socket,
+      onConnect: () => {
+        console.log("WebSocket connected");
+        stompClient.subscribe("/topic/public", onMessageReceived);
+        stompClient.publish({
+          destination: "/app/chat.addUser",
+          body: JSON.stringify({ userId: id, type: "JOIN" }),
+        });
+      },
+      onStompError: (error) => {
+        console.error("WebSocket error:", error);
+      },
+      onDisconnect: () => {
+        console.log("WebSocket disconnected");
+      },
+    });
 
-    websocketRef.current.onmessage = (event) => {
-      console.log(event);
-      const message = JSON.parse(event.data);
-      setMessages((prevMessages) => [message, ...prevMessages]);
-    };
-
-    websocketRef.current.onerror = (error) => {
-      console.log("WebSocket error:", error);
-    };
-
-    websocketRef.current.onclose = () => {
-      console.log("WebSocket disconnected");
-    };
+    stompClient.activate();
+    stompClientRef.current = stompClient;
   };
 
   const fetchMessages = async (page, initial = false) => {
@@ -104,19 +107,23 @@ const GroupChat = ({ navigation }) => {
     }
   };
 
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    setPage(0);
-    setEndList(false);
-    const result = await getChat(0, PAGE_SIZE);
-    setRefreshing(false);
+  // const handleRefresh = async () => {
+  //   setRefreshing(true);
+  //   setPage(0);
+  //   setEndList(false);
+  //   const result = await getChat(0, PAGE_SIZE);
+  //   setRefreshing(false);
 
-    if (result.success) {
-      setMessages(result.data);
-    } else {
-      console.error("Error refreshing chat data:", result.message);
-    }
-  };
+  //   if (result.success) {
+  //     if (result.data.length === 0) {
+  //       setEndList(true);
+  //     } else {
+  //       setMessages(result.data);
+  //     }
+  //   } else {
+  //     console.error("Error refreshing chat data:", result.message);
+  //   }
+  // };
 
   const handleLoadMore = () => {
     if (!loading && !initialLoading && !endList) {
@@ -127,16 +134,29 @@ const GroupChat = ({ navigation }) => {
   };
 
   const sendMessage = () => {
-    if (inputMessage !== "" && websocketRef.current) {
-      const chatMessage = {
-        id: id,
-        content: inputMessage,
-        type: "CHAT",
-      };
+    if (inputMessage !== "") {
+      if (stompClientRef.current && stompClientRef.current.connected) {
+        const chatMessage = {
+          userId: id,
+          content: inputMessage,
+          type: "CHAT",
+        };
 
-      websocketRef.current.send(JSON.stringify(chatMessage));
-      setInputMessage("");
+        stompClientRef.current.publish({
+          destination: "/app/chat.sendMessage",
+          body: JSON.stringify(chatMessage),
+        });
+        setInputMessage("");
+      } else {
+        console.error("WebSocket is not connected. Retrying in 1 second...");
+        setTimeout(sendMessage, 1000);
+      }
     }
+  };
+
+  const onMessageReceived = (message) => {
+    const receivedMessage = JSON.parse(message.body);
+    setMessages((prevMessages) => [...prevMessages, receivedMessage]);
   };
 
   const handleBack = () => {
@@ -277,25 +297,23 @@ const GroupChat = ({ navigation }) => {
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "white" }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={80}
+      keyboardVerticalOffset={90}
     >
       <View style={styles.header}>
-        <Pressable onPress={handleBack}>
+        <Pressable onPress={handleBack} style={styles.backButton}>
           <AntDesign name="left" size={24} color="black" />
         </Pressable>
-        <Text style={{ fontSize: 18, fontWeight: "bold" }}>Group Chat</Text>
-        <AntDesign name="left" size={24} color="white" />
+        <Text style={styles.title}>Group Chat</Text>
+        <View style={{ width: 40 }} />
       </View>
       <FlatList
         ref={flatListRef}
         data={messages}
         renderItem={renderChatItem}
-        keyExtractor={(item, index) => item.id || index.toString()}
-        onRefresh={handleRefresh}
-        refreshing={refreshing}
+        keyExtractor={(item, index) => index.toString()}
         onStartReached={handleLoadMore}
-        onStartReachedThreshold={0.1}
-        ListHeaderComponent={
+        onStartReachedThreshold={0.5}
+        ListHeaderComponent={() => (
           <View style={styles.headerContainer}>
             {loading && !endList && <ActivityIndicator size="large" />}
             {endList && (
@@ -314,29 +332,27 @@ const GroupChat = ({ navigation }) => {
               </View>
             )}
           </View>
-        }
+        )}
+        // refreshing={refreshing}
+        // onRefresh={handleRefresh}
       />
-      <View style={styles.buttonContainer}>
+      <View style={styles.inputContainer}>
         <TextInput
           value={inputMessage}
           onChangeText={setInputMessage}
-          placeholder="Type your message..."
-          style={{
-            borderBottomWidth: 1,
-            borderColor: "#ccc",
-            padding: 10,
-            margin: 10,
-            flex: 1,
-          }}
+          placeholder="Type a message"
+          style={styles.input}
         />
         <Pressable
-          style={[
-            styles.button,
-            inputMessage === "" ? styles.disableButton : styles.activeButton,
-          ]}
           onPress={sendMessage}
+          style={[
+            styles.sendButton,
+            inputMessage.length !== 0
+              ? styles.activeButton
+              : styles.disableButton,
+          ]}
         >
-          <Text style={{ color: "white" }}>Send</Text>
+          <AntDesign name="right" size={24} color="black" />
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -386,6 +402,28 @@ const styles = StyleSheet.create({
   },
   activeButton: {
     backgroundColor: "#FFA500",
+  },
+  inputContainer: {
+    flexDirection: "row",
+    padding: 10,
+    backgroundColor: "#f5f5f5",
+    borderTopWidth: 1,
+    borderTopColor: "#e5e5e5",
+  },
+  input: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 20,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#e5e5e5",
+  },
+  sendButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    marginLeft: 10,
+    borderRadius: 20,
   },
 });
 

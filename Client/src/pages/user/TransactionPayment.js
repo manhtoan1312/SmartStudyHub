@@ -7,9 +7,10 @@ import {
   StyleSheet,
   Alert,
   FlatList,
-  Pressable
+  Pressable,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons"; // Import FontAwesome for PayPal and VNPay icons
 
 const TransactionPayment = ({ navigation }) => {
   const [data, setData] = useState([]);
@@ -28,9 +29,22 @@ const TransactionPayment = ({ navigation }) => {
 
   const renderItem = ({ item }) => {
     const date = new Date(item.payDate);
-    const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    const formattedDate = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+    const backgroundColor = item.packagePremium === "FOREVER" ? "#fff8e1" : "#fff";
+    const getIcon = (method) => {
+      switch (method) {
+        case "PAYPAL":
+          return <FontAwesome name="paypal" size={24} color="#2790C3" style={styles.icon} />;
+        case "VNPAY":
+          return <FontAwesome name="credit-card" size={24} color="#2790C3" style={styles.icon} />;
+        default:
+          return null;
+      }
+    };
+
     return (
-      <View style={styles.itemContainer}>
+      <View style={[styles.itemContainer, { backgroundColor }]}>
+        {getIcon(item.methodPayment)}
         <Text style={styles.itemText}>Transaction No: {item.transactionNo}</Text>
         <Text style={styles.itemText}>Order ID: {item.orderId}</Text>
         <Text style={styles.itemText}>Method Payment: {item.methodPayment}</Text>
@@ -102,10 +116,16 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 1,
+    position: "relative", // Add this to position the icon
   },
   itemText: {
     fontSize: 16,
     marginBottom: 4,
+  },
+  icon: {
+    position: "absolute",
+    top: 8,
+    right: 8,
   },
 });
 
