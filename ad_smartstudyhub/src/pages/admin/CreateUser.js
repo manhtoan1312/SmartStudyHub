@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link, useNavigate } from "react-router-dom";
-import uploadFile from "~/services/FileService";
+import {uploadFile} from "~/services/FileService";
 import { createUser } from "~/services/UserService";
 import Alert from "@mui/material/Alert";
 const CreateUser = () => {

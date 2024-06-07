@@ -171,7 +171,7 @@ const updateInformation = async (
           country,
           imageUrl,
           isTwoFactor,
-          coverImage
+          coverImage,
         }),
       });
 
@@ -478,6 +478,62 @@ const PayPaypal = async (paypalOrderInfo, paypalAmount, packagePremium) => {
   }
 };
 
+const getAllTransactionPayment = async () => {
+  try {
+    const role = await getRole();
+
+    if (role) {
+      const { token } = role;
+      const response = await fetch(`https://api-smart-study-hub.onrender.com/mobile/v1/user/customer/transaction-payment/get`, {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (response.status === 200) {
+        return { success: true, data: data.data };
+      } else {
+        return { success: false, message: data.meta.message };
+      }
+    } else {
+      return { success: false, message: "Token not found" };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
+const getDetailTransation = async (id) => {
+  try {
+    const role = await getRole();
+
+    if (role) {
+      const { token } = role;
+      const response = await fetch(`${uri}/transaction-payment/get/${id}`, {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (response.status === 200) {
+        return { success: true, data: data.data };
+      } else {
+        return { success: false, message: data.meta.message };
+      }
+    } else {
+      return { success: false, message: "Token not found" };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
 export {
   SendOTPChangePassword,
   changePassword,
@@ -493,4 +549,6 @@ export {
   deleteAvtUploaded,
   PayVNPay,
   PayPaypal,
+  getAllTransactionPayment,
+  getDetailTransation,
 };

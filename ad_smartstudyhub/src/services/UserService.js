@@ -461,6 +461,40 @@ const getUserInfor = async () => {
   }
 };
 
+const StatisticalRole = async (type, year, month, day) => {
+  try {
+    const role = await getRole();
+
+    if (role) {
+      const { token } = role;
+
+      const response = await fetch(
+        `${uri}/statistical-register?type=${type}&year=${year}&month=${month}&day=${day}`,
+        {
+          method: "get",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const data = await response.json();
+        return { success: true, data: data.data };
+      } else {
+        const data = await response.json();
+        return { success: false, message: data.meta.message };
+      }
+    } else {
+      return { success: false, message: "Token not found" };
+    }
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: "Client Error" };
+  }
+};
+
 export {
   createUser,
   updateUser,
@@ -472,4 +506,5 @@ export {
   GetUserDetailById,
   getUserInfor,
   updateInformation,
+  StatisticalRole,
 };

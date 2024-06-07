@@ -11,7 +11,7 @@ const StatisticUserRegisterByDate = async (from, to) => {
       const { token } = role;
 
       const response = await fetch(
-        `${uri}//registered-by-date-range?dateFrom=${from}&dateTo=${to}`,
+        `${uri}/registered-by-date-range?dateFrom=${from}&dateTo=${to}`,
         {
           method: "get",
           headers: {

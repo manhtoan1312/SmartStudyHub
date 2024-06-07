@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBars,
-  faSearch,
-  faBell,
-  faComment,
-  faSun,
-  faMoon,
-} from "@fortawesome/free-solid-svg-icons";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import DropdownMessage from "./DropdownMessage";
 import DropdownNotification from "./DropdownNotification";

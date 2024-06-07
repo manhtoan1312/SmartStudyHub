@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import {
   FontAwesome,
+  Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
@@ -26,9 +27,11 @@ function PREMIUM({ navigation }) {
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const isFocused = useIsFocused();
+  const [checkRole, setCheckRole] = useState(false);
   const fetchData = async () => {
     const role = await getRole();
     if (role) {
+      setCheckRole(true);
       const response = await getUserInfor();
       if (response.success) {
         setInfor(response.data);
@@ -95,21 +98,27 @@ function PREMIUM({ navigation }) {
     closeModal();
   };
 
+  const handlePressPayment = () =>{
+  if(checkRole){
+  navigation.navigate('Transaction')
+  }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ position: "relative" }}>
         <View
-          style={s`bg-white justify-center items-center py-4 border-b-2 border-b-gray-200`}
+          style={s`bg-white flex-row justify-between items-center p-4 border-b-2 border-b-gray-200`}
         >
-          <Pressable
-            onPress={() => navigation.goBack()}
-            style={s`absolute left-6`}
-          >
-            <FontAwesome name="angle-left" size={30} color="#000000" />
+          <Pressable onPress={() => navigation.goBack()}>
+            <FontAwesome name="angle-left" size={30} color="#333" />
           </Pressable>
           <Text style={s`font-medium text-2xl text-yellow-400`}>
             Upgrade to Premium
           </Text>
+          <Pressable onPress={handlePressPayment}>
+            <Ionicons name="document-text-outline" size={24} color={checkRole ? "#333" :"white"} />
+          </Pressable>
         </View>
       </View>
       <ScrollView style={{ flex: 1 }}>

@@ -14,7 +14,7 @@ const Report = () => {
       const response = await GetAllReport(page, size);
       if (response.success) {
         setReportList(response.data.data);
-        setTotalReports(response.data.extendProp.totalReports); // Assuming the API returns the total number of reports
+        setTotalReports(response.data.extendProp.totalReports); 
       }
     };
     fetchData();

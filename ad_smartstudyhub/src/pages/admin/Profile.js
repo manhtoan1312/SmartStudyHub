@@ -1,6 +1,6 @@
 import { Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import uploadFile from "~/services/FileService";
+import {uploadFile} from "~/services/FileService";
 
 const { useState, useEffect } = require("react");
 const { getUserInfor, updateInformation } = require("~/services/UserService");

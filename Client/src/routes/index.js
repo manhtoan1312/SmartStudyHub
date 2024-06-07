@@ -68,6 +68,7 @@ import ViewPersonalUser from "../pages/guest/ViewPersonalUser";
 import ModalReportUser from "../components/ModalReportUser";
 import ReportUserSubmit from "../components/ReportUserSubmit";
 import GroupChat from "../pages/guest/GroupChat";
+import TransactionPayment from "../pages/user/TransactionPayment";
 
 const Stack = createStackNavigator();
 
@@ -138,6 +139,7 @@ const Navigator = () => (
     <Stack.Screen name="CoverImageUpload" component={CoverImageUpload} />
     <Stack.Screen name="ViewUser" component={ViewPersonalUser} />
     <Stack.Screen name="GroupChat" component={GroupChat} />
+    <Stack.Screen name="Transaction" component={TransactionPayment} />
   </Stack.Navigator>
 );
 

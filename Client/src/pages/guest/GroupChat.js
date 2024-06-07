@@ -3,22 +3,21 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   FlatList,
   ActivityIndicator,
   Image,
   Pressable,
   StyleSheet,
   KeyboardAvoidingView,
-  Platform
+  Platform,
 } from "react-native";
-import io from "socket.io-client";
-import { getChat } from "../../services/Guest/ChatSocket";
 import { AntDesign } from "@expo/vector-icons";
-import getRole from "../../services/RoleService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getChat } from "../../services/Guest/ChatSocket";
+import getRole from "../../services/RoleService";
+import SockJS from "sockjs-client";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 const GroupChat = ({ navigation }) => {
   const [messages, setMessages] = useState([]);
@@ -30,28 +29,53 @@ const GroupChat = ({ navigation }) => {
   const [endList, setEndList] = useState(false);
   const [id, setId] = useState(null);
   const flatListRef = useRef(null);
-  const socket = io("https://api-smart-study-hub.onrender.com");
+  const websocketRef = useRef(null);
 
   useEffect(() => {
-    const fetchID = async () => {
+    const fetchData = async () => {
       let uId = await AsyncStorage.getItem("id");
       const role = await getRole();
       if (role) {
         uId = role.id;
       }
       setId(uId);
+      await fetchMessages(0, true);
+      flatListRef.current.scrollToEnd({ animated: true });
     };
-    fetchID();
-    fetchMessages(0, true);
+    fetchData();
 
-    socket.on("receiveMessage", (message) => {
-      setMessages((prevMessages) => [message, ...prevMessages]);
-    });
+    connect();
 
     return () => {
-      socket.disconnect();
+      if (websocketRef.current) {
+        websocketRef.current.close();
+      }
     };
   }, []);
+
+  const connect = () => {
+    websocketRef.current = new WebSocket(
+      "wss://api-smart-study-hub.onrender.com/ws"
+    );
+    websocketRef.current.onopen = () => {
+      console.log("WebSocket connected");
+      websocketRef.current.send(JSON.stringify({ userId: id, type: "JOIN" }));
+    };
+
+    websocketRef.current.onmessage = (event) => {
+      console.log(event);
+      const message = JSON.parse(event.data);
+      setMessages((prevMessages) => [message, ...prevMessages]);
+    };
+
+    websocketRef.current.onerror = (error) => {
+      console.log("WebSocket error:", error);
+    };
+
+    websocketRef.current.onclose = () => {
+      console.log("WebSocket disconnected");
+    };
+  };
 
   const fetchMessages = async (page, initial = false) => {
     try {
@@ -60,13 +84,14 @@ const GroupChat = ({ navigation }) => {
       const result = await getChat(page, PAGE_SIZE);
       setLoading(false);
       setInitialLoading(false);
-
       if (result.success) {
         if (result.data.length === 0) {
           setEndList(true);
         } else {
           setMessages((prevMessages) =>
-            initial ? result.data : [...prevMessages, ...result.data]
+            initial
+              ? result.data.reverse()
+              : [...result.data.reverse(), ...prevMessages]
           );
         }
       } else {
@@ -87,9 +112,7 @@ const GroupChat = ({ navigation }) => {
     setRefreshing(false);
 
     if (result.success) {
-      setMessages(
-        result.data.reverse().sort((a, b) => a.dateSent - b.dateSent)
-      );
+      setMessages(result.data);
     } else {
       console.error("Error refreshing chat data:", result.message);
     }
@@ -103,65 +126,165 @@ const GroupChat = ({ navigation }) => {
     }
   };
 
-  const sendMessage = async () => {
-    if(inputMessage!==""){
-        let image = await AsyncStorage.getItem("img");
-    if (!image) {
-      image =
-        "https://res.cloudinary.com/dnj5purhu/image/upload/v1701175788/SmartStudyHub/USER/default-avatar_c2ruot.png";
-      await AsyncStorage.setItem(
-        "img",
-        "https://res.cloudinary.com/dnj5purhu/image/upload/v1701175788/SmartStudyHub/USER/default-avatar_c2ruot.png"
-      );
-    }
-    const message = {
-      content: inputMessage,
-      userId: id,
-      type: "CHAT",
-      sender: "Your Name",
-      imageUrl: image,
-      dateSent: new Date().getTime(),
-    };
+  const sendMessage = () => {
+    if (inputMessage !== "" && websocketRef.current) {
+      const chatMessage = {
+        id: id,
+        content: inputMessage,
+        type: "CHAT",
+      };
 
-    socket.emit("sendMessage", message);
-    setInputMessage("");
+      websocketRef.current.send(JSON.stringify(chatMessage));
+      setInputMessage("");
     }
-
   };
 
   const handleBack = () => {
-    socket.disconnect();
     navigation.goBack();
   };
 
-  const renderChatItem = ({ item }) => (
-    <View style={{ padding: 10, flexDirection: "row", alignItems: "center" }}>
-      <Image
-        source={{ uri: item.imageUrl }}
-        style={{ width: 50, height: 50, borderRadius: 25 }}
-      />
-      <View style={{ marginLeft: 10 }}>
-        <Text style={{ fontWeight: "bold" }}>{item.sender}</Text>
-        <Text>{item.content}</Text>
-        <Text style={{ fontSize: 10, color: "gray" }}>
-          {new Date(item.dateSent).toLocaleString()}
-        </Text>
+  const renderChatItem = ({ item }) => {
+    if (item.type === "JOIN" || item.type === "LEAVE") {
+      return (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            marginVertical: 10,
+          }}
+        >
+          <Text style={{ fontSize: 10, color: "gray" }}>
+            {new Date(item.dateSent).toLocaleString()}
+          </Text>
+          <Text style={{ padding: 2 }}>
+            {item.sender} {item.type === "JOIN" ? "joined" : "left"} group chat
+          </Text>
+        </View>
+      );
+    }
+    if (item.userId == id) {
+      return (
+        <View>
+          <View style={{ justifyContent: "center", alignItems: "center" }}>
+            <Text style={{ fontSize: 10, color: "gray" }}>
+              {new Date(item.dateSent).toLocaleString()}
+            </Text>
+          </View>
+          <View
+            style={{
+              paddingHorizontal: 10,
+              paddingBottom: 10,
+              justifyContent: "center",
+              alignItems: "flex-end",
+              width: "100%",
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "flex-end",
+              }}
+            >
+              <View
+                style={{
+                  marginLeft: 10,
+                  alignItems: "flex-end",
+                  justifyContent: "center",
+                  paddingRight: 10,
+                }}
+              >
+                <Text style={{ fontWeight: "bold", paddingRight: 5 }}>You</Text>
+                <View
+                  style={{
+                    marginTop: 10,
+                    padding: 10,
+                    backgroundColor: "#FFA500",
+                    borderRadius: 20,
+                    maxWidth: 250,
+                    minWidth: 20,
+                    justifyContent: "flex-start",
+                    flex: 1,
+                  }}
+                >
+                  <Text style={{ color: "white" }}>{String(item.content)}</Text>
+                </View>
+              </View>
+              <View style={{ justifyContent: "flex-end" }}>
+                <Image
+                  source={{ uri: item.imageUrl }}
+                  style={{ width: 50, height: 50, borderRadius: 25 }}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      );
+    }
+    return (
+      <View>
+        <View style={{ justifyContent: "center", alignItems: "center" }}>
+          <Text style={{ fontSize: 10, color: "gray" }}>
+            {new Date(item.dateSent).toLocaleString()}
+          </Text>
+        </View>
+        <View
+          style={{
+            padding: 10,
+            justifyContent: "center",
+            width: "100%",
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+            }}
+          >
+            <View style={{ justifyContent: "flex-end" }}>
+              <Image
+                source={{ uri: item.imageUrl }}
+                style={{ width: 50, height: 50, borderRadius: 25 }}
+              />
+            </View>
+            <View
+              style={{
+                marginLeft: 10,
+                justifyContent: "center",
+                paddingRight: 10,
+              }}
+            >
+              <Text style={{ fontWeight: "bold", paddingLeft: 5 }}>
+                {item.sender}
+              </Text>
+              <View
+                style={{
+                  marginTop: 10,
+                  padding: 10,
+                  backgroundColor: "#ccc",
+                  borderRadius: 20,
+                  maxWidth: 250,
+                }}
+              >
+                <Text>{String(item.content)}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "white" }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={80} // Adjust this value as needed
+      keyboardVerticalOffset={80}
     >
       <View style={styles.header}>
         <Pressable onPress={handleBack}>
-          <AntDesign name="left" size={24} color="gray" />
+          <AntDesign name="left" size={24} color="black" />
         </Pressable>
-        <Text style={{ fontSize: 18 }}>Group Chat</Text>
-        <AntDesign name="plus" size={24} color="white" />
+        <Text style={{ fontSize: 18, fontWeight: "bold" }}>Group Chat</Text>
+        <AntDesign name="left" size={24} color="white" />
       </View>
       <FlatList
         ref={flatListRef}
@@ -170,16 +293,25 @@ const GroupChat = ({ navigation }) => {
         keyExtractor={(item, index) => item.id || index.toString()}
         onRefresh={handleRefresh}
         refreshing={refreshing}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.1}
-        inverted
+        onStartReached={handleLoadMore}
+        onStartReachedThreshold={0.1}
         ListHeaderComponent={
           <View style={styles.headerContainer}>
             {loading && !endList && <ActivityIndicator size="large" />}
             {endList && (
-              <Text style={styles.headerText}>
-                This is the Beginning of Group Chat
-              </Text>
+              <View
+                style={
+                  messages.length === 0 && {
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: 700,
+                  }
+                }
+              >
+                <Text style={styles.headerText}>
+                  This is the Beginning of Group Chat
+                </Text>
+              </View>
             )}
           </View>
         }
@@ -194,10 +326,16 @@ const GroupChat = ({ navigation }) => {
             borderColor: "#ccc",
             padding: 10,
             margin: 10,
-            flex:1
+            flex: 1,
           }}
         />
-        <Pressable style={[styles.button, inputMessage==="" ? styles.disableButton : styles.activeButton]} onPress={sendMessage}>
+        <Pressable
+          style={[
+            styles.button,
+            inputMessage === "" ? styles.disableButton : styles.activeButton,
+          ]}
+          onPress={sendMessage}
+        >
           <Text style={{ color: "white" }}>Send</Text>
         </Pressable>
       </View>
@@ -232,8 +370,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 20,
     alignItems: "center",
-    justifyContent:"space-between",
-    paddingBottom: 20
+    justifyContent: "space-between",
+    paddingBottom: 20,
   },
   button: {
     height: 40,
@@ -246,9 +384,9 @@ const styles = StyleSheet.create({
   disableButton: {
     backgroundColor: "gray",
   },
-  activeButton:{
+  activeButton: {
     backgroundColor: "#FFA500",
-  }
+  },
 });
 
 export default GroupChat;
