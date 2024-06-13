@@ -208,7 +208,7 @@ const CreateUser = () => {
           </div>
           {/* Input để chọn ảnh */}
         </div>
-        <div>
+        <div className="mt-2">
           {userInfo.imageUrl && (
             <img
               src={userInfo.imageUrl}

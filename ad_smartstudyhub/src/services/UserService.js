@@ -16,18 +16,6 @@ const createUser = async (
   role
 ) => {
   try {
-    console.log(
-      userName,
-      firstName,
-      lastName,
-      email,
-      address,
-      phoneNumber,
-      dateOfBirth,
-      country,
-      imageUrl,
-      role
-    );
     const adRole = await getRole();
     if (adRole) {
       const { token } = adRole;

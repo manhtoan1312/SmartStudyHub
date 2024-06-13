@@ -95,7 +95,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                 </Link>
               </li>
               <li className="py-2 cursor-pointer">
-                <FontAwesomeIcon icon={faCalendarDays} /> Calendar
+                <Link to={'/files'}><FontAwesomeIcon icon={faCalendarDays} /> File</Link>
               </li>
               <li className="py-2 cursor-pointer">
                 <FontAwesomeIcon icon={faListCheck} /> Task

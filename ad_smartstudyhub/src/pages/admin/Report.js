@@ -140,7 +140,7 @@ const Report = () => {
           Previous
         </button>
         <span className="text-sm text-gray-700 dark:text-gray-300">
-          Page {page + 1} of {totalPages}
+          Page {Math.min(page + 1,totalPages)} of {totalPages}
         </span>
         <button
           className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"

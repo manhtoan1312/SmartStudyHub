@@ -1,3 +1,5 @@
+import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 export default function MessageBox({ message, submit, cancel }) {
   const [isVisible, setIsVisible] = useState(true);
@@ -14,35 +16,68 @@ export default function MessageBox({ message, submit, cancel }) {
   return (
     <>
       {isVisible && (
-        <div  className="absolute top-0 bottom-0 left-0 right-0 h-screen w-screen items-center justify-center">
-          <div className="absolute bg-gray-400 opacity-30 top-0 bottom-0 left-0 right-0" onClick={handleCancel}></div>
-          <div className=" bg-white rounded-xl justify-center flex flex-col items-center absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] ">
-            <div className=" flex items-center justify-center mt-[-20px] px-20">
-              <h2 className="text-white text-xl p-4 flex items-center justify-center bg-orange-500 w-[300px] rounded-2xl font-bold">
-                Smart Study Hub Announce
-              </h2>
+        <div
+        className="fixed z-10 inset-0 overflow-y-auto"
+        onClick={handleCancel}
+      >
+        <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+          <div
+            className="fixed inset-0 transition-opacity"
+            aria-hidden="true"
+          >
+            <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+          </div>
+          <span
+            className="hidden sm:inline-block sm:align-middle sm:h-screen"
+            aria-hidden="true"
+          >
+            &#8203;
+          </span>
+          <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div className="sm:flex sm:items-start">
+                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <FontAwesomeIcon
+                    icon={faExclamationCircle}
+                    className="h-6 w-6 text-red-600"
+                  />
+                </div>
+                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                  <h3
+                    className="text-lg font-medium leading-6 text-gray-900"
+                    id="modal-title"
+                  >
+                    Confirm Action
+                  </h3>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">
+                      {message}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <h2 className="mt-[30px] mb-[10px] text-[38px] mx-10 text-black font-extralight">
-              {message}
-            </h2>
-            <div className="flex justify-between pb-10 pt-4">
-              <button
-                type="button"
-                className="text-orange-400 w-32 py-2.5 mr-20 text-lg hover:text-white border border-orange-400 hover:bg-orange-500 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-center me-2 mb-2 dark:border-orange-300 dark:text-orange-300 dark:hover:text-white dark:hover:bg-orange-400 dark:focus:ring-orange-900"
-                onClick={handleSubmit}
-              >
-                OK
-              </button>
-              <button
-                type="button"
-                className="text-red-400 w-32 py-2.5 text-lg hover:text-white border border-red-400 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-center me-2 mb-2 dark:border-red-300 dark:text-red-300 dark:hover:text-white dark:hover:bg-red-400 dark:focus:ring-red-900"
-                onClick={handleCancel}
-              >
-                Cancel
-              </button>
+            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+
+             
+    
+                <button
+                  onClick={handleSubmit}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Submit
+                </button>
+                 <button
+                 onClick={handleCancel}
+                 className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+               >
+                 cancel
+               </button>
+              
             </div>
           </div>
         </div>
+      </div>
       )}
     </>
   );

@@ -34,6 +34,7 @@ const GroupChat = ({ navigation }) => {
   const [id, setId] = useState(null);
   const flatListRef = useRef(null);
   const stompClientRef = useRef(null);
+
   useEffect(() => {
     const fetchData = async () => {
       let uId = await AsyncStorage.getItem("id");
@@ -44,10 +45,9 @@ const GroupChat = ({ navigation }) => {
       setId(uId);
       await fetchMessages(0, true);
       flatListRef.current.scrollToEnd({ animated: true });
+      connect(uId);
     };
-    fetchData();
-
-    connect();
+    fetchData(0);
 
     return () => {
       if (stompClientRef.current) {
@@ -56,17 +56,14 @@ const GroupChat = ({ navigation }) => {
     };
   }, []);
 
-  const connect = () => {
+  const connect = (userId) => {
     const socket = new SockJS("https://api-smart-study-hub.onrender.com/ws");
     const stompClient = new Client({
       webSocketFactory: () => socket,
       onConnect: () => {
         console.log("WebSocket connected");
         stompClient.subscribe("/topic/public", onMessageReceived);
-        stompClient.publish({
-          destination: "/app/chat.addUser",
-          body: JSON.stringify({ userId: id, type: "JOIN" }),
-        });
+        sendJoinMessage(stompClient, userId);
       },
       onStompError: (error) => {
         console.error("WebSocket error:", error);
@@ -78,6 +75,18 @@ const GroupChat = ({ navigation }) => {
 
     stompClient.activate();
     stompClientRef.current = stompClient;
+  };
+
+  const sendJoinMessage = (stompClient, userId) => {
+    if (stompClient && stompClient.connected) {
+      stompClient.publish({
+        destination: "/app/chat.addUser",
+        body: JSON.stringify({ userId, type: "JOIN" }),
+      });
+    } else {
+      console.error("WebSocket is not connected. Retrying in 1 second...");
+      setTimeout(() => sendJoinMessage(stompClient, userId), 1000);
+    }
   };
 
   const fetchMessages = async (page, initial = false) => {
@@ -106,24 +115,6 @@ const GroupChat = ({ navigation }) => {
       console.log(e);
     }
   };
-
-  // const handleRefresh = async () => {
-  //   setRefreshing(true);
-  //   setPage(0);
-  //   setEndList(false);
-  //   const result = await getChat(0, PAGE_SIZE);
-  //   setRefreshing(false);
-
-  //   if (result.success) {
-  //     if (result.data.length === 0) {
-  //       setEndList(true);
-  //     } else {
-  //       setMessages(result.data);
-  //     }
-  //   } else {
-  //     console.error("Error refreshing chat data:", result.message);
-  //   }
-  // };
 
   const handleLoadMore = () => {
     if (!loading && !initialLoading && !endList) {

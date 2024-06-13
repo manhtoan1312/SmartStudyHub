@@ -87,7 +87,6 @@ const Revenue = () => {
   };
 
   const data = formatDataForChart();
-  console.log("Chart Data:", data);
 
   return (
     <div className="p-4">
