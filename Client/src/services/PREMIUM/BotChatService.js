@@ -1,3 +1,5 @@
+import getRole from "../RoleService";
+
 const uri =
   "https://api-smart-study-hub.onrender.com/mobile/v1/user/premium/bot";
 const SendMessage = async (message) => {
@@ -6,30 +8,30 @@ const SendMessage = async (message) => {
 
     if (role && role.role === "PREMIUM") {
       const { token } = role;
-      const body = {
-        role: "user",
-        content: message,
-      };
-      const response = await fetch(`${uri}/chat`, {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
+      const response = await fetch(
+        `https://api-smart-study-hub.onrender.com/mobile/v1/user/premium/bot/chat`,
+        {
+          method: "post",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(message),
+        }
+      );
 
       const data = await response.json();
+      console.log(data)
       if (response.status === 200) {
-        return { success: true, data: data };
+        return { success: true, data: data.data.choices };
       } else {
         if (response.status === 500) {
-            return {
-              success: false,
-              message: "Token has expired, please log in again",
-            };
-          }
-          return { success: false, message: data.meta.message };
+          return {
+            success: false,
+            message: "Token has expired, please log in again",
+          };
+        }
+        return { success: false, message: "Unexpected error occurred" };
       }
     } else {
       return {
@@ -49,22 +51,20 @@ const GetMessage = async () => {
 
     if (role && role.role === "PREMIUM") {
       const { token } = role;
-      const body = {
-        role: "user",
-        content: message,
-      };
-      const response = await fetch(`${uri}/get-messages`, {
-        method: "get",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-      });
+      const response = await fetch(
+        `https://api-smart-study-hub.onrender.com/mobile/v1/user/premium/bot/get-messages`,
+        {
+          method: "get",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       const data = await response.json();
       if (response.status === 200) {
-        return { success: true, data: data.data.choices[0].message, time:data.data.created };
+        return { success: true, data: data.data };
       } else {
         if (response.status === 500) {
           return {
@@ -72,7 +72,7 @@ const GetMessage = async () => {
             message: "Token has expired, please log in again",
           };
         }
-        return { success: false, message: data.meta.message };
+        return { success: false, message: "Unexpected error occurred" };
       }
     } else {
       return {
