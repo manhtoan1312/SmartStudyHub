@@ -427,6 +427,14 @@ export default function Home({ navigation }) {
     };
   }, [scrollY]);
 
+  const handleChatBot = async () => {
+    const role = await getRole();
+    if (role && role.role === "PREMIUM") {
+      navigation.navigate("ChatBot");
+    } else {
+      navigation.navigate("PREMIUM");
+    }
+  };
   return (
     <View style={s`h-full bg-white`}>
       <ScrollView
@@ -467,6 +475,9 @@ export default function Home({ navigation }) {
                 color="#FFD300"
               />
             </TouchableOpacity>
+            <Pressable onPress={handleChatBot}>
+              <AntDesign name="wechat" size={24} color="black" />
+            </Pressable>
             {group && (
               <Pressable onPress={() => navigation.navigate("GroupChat")}>
                 <MaterialCommunityIcons
