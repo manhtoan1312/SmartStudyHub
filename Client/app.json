@@ -5,6 +5,8 @@
     "privacy": "public",
     "version": "1.0.0",
     "orientation": "portrait",
+    "scheme": "http",
+    "host": "smartstudyhub",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {

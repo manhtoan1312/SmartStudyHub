@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import { registerRootComponent } from 'expo';
 import MainPage from './src/pages/MainPage';
 import store from './src/stores';
+import * as Linking from 'expo-linking';
 // Configure the notification handler
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -20,7 +21,8 @@ const App = () => {
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
-
+  const url = Linking.useURL();
+  console.log(url)
   useEffect(() => {
     registerForPushNotificationsAsync().then(token => {
       console.log('Expo Push Token:', token);
