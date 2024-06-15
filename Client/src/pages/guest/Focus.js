@@ -30,6 +30,9 @@ import { MarkCompleted } from "../../services/Guest/WorkService";
 import { useDispatch, useSelector } from "react-redux";
 import { setFocus } from "../../slices/focusSlice";
 import ModalSelectSound from "../../components/ModalSelectSound";
+import getRole from "../../services/RoleService";
+import MeditationModeModal from "../../components/MeditationModeModal";
+import FlipDetectionComponent from "../../components/FlipDetectionComponent";
 const { width, height } = Dimensions.get("screen");
 
 const Focus = () => {
@@ -38,6 +41,8 @@ const Focus = () => {
   const [percentage, setPercentage] = useState(100);
   const [isModalVisible, setModalVisible] = useState(false);
   const [isSoundVisible, setSoundVisible] = useState(false);
+  const [meditationVisible, setMeditationVisible] = useState(false);
+  const [isFlipPhone, setIsFlipPhone] = useState(false);
   const dispatch = useDispatch();
   const {
     isStop,
@@ -168,7 +173,11 @@ const Focus = () => {
   };
 
   const backtoHome = async () => {
-    navigation.goBack();
+    if(isFlipPhone && !isPause && workMode === "work"){
+      Alert.alert('Warning',"You are in strict work mode and cannot escape")
+    }else{
+      navigation.goBack();
+    }
   };
 
   const handleDoneExtra = async () => {
@@ -231,6 +240,23 @@ const Focus = () => {
       setSoundVisible(true);
     }
   };
+  const handleClickStrictMode = async () => {
+    if (isPause) {
+      setMeditationVisible(true);
+    } else {
+      Alert.alert("you must pause the timer before enabling this feature");
+    }
+  };
+  const handleSelectStrictMode = async (value) => {
+    const role = await getRole();
+    setIsFlipPhone(value);
+    if (role && role.role === "PREMIUM") {
+    } else {
+      if (value) {
+        Alert.alert("Only premium users can use this feature");
+      }
+    }
+  };
   return (
     <View style={styles.container}>
       <Image
@@ -275,7 +301,8 @@ const Focus = () => {
                     <View style={styles.taskDetails}>
                       <Text style={styles.workName}>{workName}</Text>
                       <View style={styles.timerIcons}>
-                        {(numberOfPomodoro !== 0 || numberOfPomodorosDone!==0) && (
+                        {(numberOfPomodoro !== 0 ||
+                          numberOfPomodorosDone !== 0) && (
                           <View style={styles.pomodoroContainer}>
                             <MaterialCommunityIcons
                               name="clock-check"
@@ -369,14 +396,17 @@ const Focus = () => {
 
         {/* Section 4: Options */}
         <View style={styles.settingsButtons}>
-          <View style={styles.settingsIcon}>
+          <Pressable
+            onPress={handleClickStrictMode}
+            style={styles.settingsIcon}
+          >
             <MaterialCommunityIcons name="meditation" size={20} color="white" />
             <View style={styles.textMode}>
               <Text style={{ color: "white", fontSize: 10 }}>
                 Strict Regime
               </Text>
             </View>
-          </View>
+          </Pressable>
           <View style={styles.settingsIcon} onTouchEnd={openTimerModeModal}>
             {mode === null && (
               <MaterialIcons name="timer" size={20} color="white" />
@@ -412,74 +442,96 @@ const Focus = () => {
         </View>
       </View>
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-        }}
-      >
-        <View style={styles.modalContainer}>
-          <Pressable
-            style={styles.modalBackground}
-            onPress={() => setModalVisible(false)}
-          >
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Select Timer Mode</Text>
-              {timerModeOptions.map((option) => (
-                <Pressable
-                  key={option.key}
-                  style={[
-                    styles.timerModeOption,
-                    option.key === selectedMode && {
-                      backgroundColor: "#FFC0CB",
-                    },
-                  ]}
-                  onPress={() => handleSelectMode(option.key)}
-                >
-                  <Text style={styles.timerModeText}>{option.label}</Text>
-                  {option.key === selectedMode && (
-                    <AntDesign
-                      name="checkcircle"
-                      size={20}
-                      color="red"
-                      style={styles.checkIcon}
-                    />
-                  )}
-                </Pressable>
-              ))}
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={[styles.button, styles.cancelButton]}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={styles.buttonText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.button, styles.okButton]}
-                  onPress={() => handleSubmitMode(false)}
-                >
-                  <Text style={styles.buttonText}>Ok</Text>
-                </TouchableOpacity>
+      {isModalVisible && (
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={() => {
+            setModalVisible(false);
+          }}
+        >
+          <View style={styles.modalContainer}>
+            <Pressable
+              style={styles.modalBackground}
+              onPress={() => setModalVisible(false)}
+            >
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Select Timer Mode</Text>
+                {timerModeOptions.map((option) => (
+                  <Pressable
+                    key={option.key}
+                    style={[
+                      styles.timerModeOption,
+                      option.key === selectedMode && {
+                        backgroundColor: "#FFC0CB",
+                      },
+                    ]}
+                    onPress={() => handleSelectMode(option.key)}
+                  >
+                    <Text style={styles.timerModeText}>{option.label}</Text>
+                    {option.key === selectedMode && (
+                      <AntDesign
+                        name="checkcircle"
+                        size={20}
+                        color="red"
+                        style={styles.checkIcon}
+                      />
+                    )}
+                  </Pressable>
+                ))}
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    style={[styles.button, styles.cancelButton]}
+                    onPress={() => setModalVisible(false)}
+                  >
+                    <Text style={styles.buttonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.button, styles.okButton]}
+                    onPress={() => handleSubmitMode(false)}
+                  >
+                    <Text style={styles.buttonText}>Ok</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          </Pressable>
-        </View>
-      </Modal>
-      <ModalSelectWork
-        isVisible={choose}
-        play={() => {
-          handleClose();
-        }}
-        onClose={() => {
-          handleClose();
-        }}
+            </Pressable>
+          </View>
+        </Modal>
+      )}
+      {choose && (
+        <ModalSelectWork
+          isVisible={choose}
+          play={() => {
+            handleClose();
+          }}
+          onClose={() => {
+            handleClose();
+          }}
+        />
+      )}
+      {isSoundVisible && (
+        <ModalSelectSound
+          visible={isSoundVisible}
+          onClose={() => setSoundVisible(false)}
+        />
+      )}
+      {meditationVisible && (
+        <MeditationModeModal
+          isVisible={meditationVisible}
+          initialOption={isFlipPhone}
+          onClose={() => setMeditationVisible(false)}
+          onSelectOption={handleSelectStrictMode}
+        />
+      )}
+      {/* {isFlipPhone && !isPause && ( */}
+      <FlipDetectionComponent
+        isFlipPhone={isFlipPhone}
+        isPause={isPause}
+        workMode={workMode}
+        stopPo={stopPo}
       />
-      <ModalSelectSound
-        visible={isSoundVisible}
-        onClose={() => setSoundVisible(false)}
-      />
+      {/* )} */}
     </View>
   );
 };

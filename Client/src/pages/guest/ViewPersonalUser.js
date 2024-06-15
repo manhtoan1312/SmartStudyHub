@@ -58,6 +58,7 @@ const ViewPersonalUser = ({ route, navigation }) => {
       userWasReportedId: id,
       title: title,
       descriptionDetail: desc,
+      typeReport:'REPORTUSER'
     });
     if(response.success){
       Alert.alert("Send Report successfully!")

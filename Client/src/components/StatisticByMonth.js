@@ -6,12 +6,13 @@ import getRole from "../services/RoleService";
 import { statisticalTimeFocus } from "../services/Guest/StatiscalService";
 import { format } from "date-fns";
 import { CircularProgress } from "react-native-circular-progress";
+import HourPicker from "./HourPicker";
 
 const StatisticByMonth = () => {
   const [data, setData] = useState({});
   const [goal, setGoal] = useState(2); // in hours
   const [selectedMonth, setSelectedMonth] = useState(new Date());
-
+  const [pickerVisible, setPickerVisible] = useState(false);
   const daysToCompleteGoal = useMemo(() => {
     if (!data?.listDate) return 0;
     return data.listDate.filter((d) => d.totalValue >= goal * 60).length;
@@ -77,6 +78,15 @@ const StatisticByMonth = () => {
     );
   };
 
+  const handleHourPicker = async () => {
+    const role = await getRole();
+    if (role && role.role === "PREMIUM") {
+      setPickerVisible(true);
+    } else {
+      Alert.alert("Only premium users can use this feature");
+    }
+  };
+
   return (
     <View style={styles.mainContainer}>
       <View style={styles.headerContainer}>
@@ -90,9 +100,7 @@ const StatisticByMonth = () => {
         </View>
         <TouchableOpacity
           style={styles.typeButton}
-          onPress={() =>
-            Alert.alert("Change Goal", "Goal changing functionality")
-          }
+          onPress={() => handleHourPicker()}
         >
           <Text style={{ color: "red" }}>Goal: {goal}H</Text>
         </TouchableOpacity>
@@ -106,6 +114,14 @@ const StatisticByMonth = () => {
           setSelectedMonth(new Date(month.year, month.month - 1, 1));
         }}
       />
+      {pickerVisible && (
+        <HourPicker
+          initTime={goal}
+          visible={pickerVisible}
+          onClose={() => setPickerVisible(false)}
+          onSelect={(value) => setGoal(value)}
+        />
+      )}
     </View>
   );
 };

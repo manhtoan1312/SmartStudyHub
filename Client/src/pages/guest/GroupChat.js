@@ -250,12 +250,17 @@ const GroupChat = ({ navigation }) => {
               flexDirection: "row",
             }}
           >
-            <View style={{ justifyContent: "flex-end" }}>
+            <Pressable
+              onPress={() =>
+                navigation.navigate("ViewUser", { id: item.userId })
+              }
+              style={{ justifyContent: "flex-end" }}
+            >
               <Image
                 source={{ uri: item.imageUrl }}
                 style={{ width: 50, height: 50, borderRadius: 25 }}
               />
-            </View>
+            </Pressable>
             <View
               style={{
                 marginLeft: 10,

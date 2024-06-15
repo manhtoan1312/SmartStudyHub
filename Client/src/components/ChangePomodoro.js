@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Modal, TouchableOpacity } from "react-native";
 import { Picker } from "react-native-wheel-pick";
 
 const ChangePomodoro = ({ visible, initPomo, initTime, onClose, onSubmit }) => {
-  const [pomoCount, setPomoCount] = useState(String(initPomo));
-  const [pomoTime, setPomoTime] = useState(String(initTime));
-
+  const [pomoCount, setPomoCount] = useState(initPomo|| 0);
+  const [pomoTime, setPomoTime] = useState(initTime || 0);
+  useEffect(()=> {
+    setPomoCount(initPomo)
+    setPomoTime(initTime)
+  },[visible, initPomo, initTime])
   const handlePomoCountChange = (value) => {
     setPomoCount(value);
   };
@@ -77,7 +80,7 @@ const ChangePomodoro = ({ visible, initPomo, initTime, onClose, onSubmit }) => {
                 }}
                 selectedValue={pomoCount}
                 onValueChange={handlePomoCountChange}
-                pickerData={generateNumberArray(1, 250)}
+                pickerData={generateNumberArray(0, 250)}
               />
             </View>
 

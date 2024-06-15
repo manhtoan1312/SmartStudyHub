@@ -7,6 +7,8 @@ import {
   Pressable,
   StyleSheet,
   Dimensions,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 
@@ -14,54 +16,67 @@ const { height, width } = Dimensions.get("window");
 
 const ReportUserSubmit = ({ title, visible, onClose, onSubmit }) => {
   const [description, setDescription] = useState("");
+
   return (
     <Modal visible={visible} transparent={true} animationType="slide">
-      <Pressable style={styles.modalBackground} onPress={onClose}>
-        <Pressable
-          style={styles.modalContainer}
-          onPress={(e) => e.stopPropagation()}
-        >
-          <View style={styles.header}>
-            <AntDesign name="checkcircle" size={24} color="green" />
-            <Text style={styles.headerText}>You chose</Text>
-            <Pressable onPress={onClose}>
-              <AntDesign name="close" size={24} color="#333" />
-            </Pressable>
-          </View>
-          <View style={{ alignItems: "center" }}>
-            <View style={styles.titleContainer}>
-              <Text style={styles.titleText}>{title}</Text>
-            </View>
-          </View>
-          <View style={styles.infoContainer}>
-            <Text style={styles.infoText}>
-              We will use your comments to prevent violations and make the
-              application environment more civilized.
-            </Text>
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>
-              Can you tell us more information?
-            </Text>
-            <TextInput
-              value={description}
-              placeholder="Description"
-              onChangeText={(e) => setDescription(e)}
-              multiline
-              style={styles.textInput}
-            />
-          </View>
+      <KeyboardAvoidingView
+        style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <Pressable style={styles.modalBackground} onPress={onClose}>
           <Pressable
-            style={styles.submitButton}
-            onPress={() => {
-              onSubmit(description);
-              setDescription("")
-            }}
+            style={styles.modalContainer}
+            onPress={(e) => e.stopPropagation()}
           >
-            <Text style={styles.submitButtonText}>Submit</Text>
+            <View style={styles.header}>
+              <AntDesign name="checkcircle" size={24} color="green" />
+              <Text style={styles.headerText}>You chose</Text>
+              <Pressable onPress={onClose}>
+                <AntDesign name="close" size={24} color="#333" />
+              </Pressable>
+            </View>
+            <View style={{ alignItems: "center" }}>
+              <View style={styles.titleContainer}>
+                <Text style={styles.titleText}>{title}</Text>
+              </View>
+            </View>
+            <View style={styles.infoContainer}>
+              <Text style={styles.infoText}>
+                We will use your comments to prevent violations and make the
+                application environment more civilized.
+              </Text>
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>
+                Can you tell us more information?
+              </Text>
+              <TextInput
+                value={description}
+                placeholder="Description"
+                onChangeText={(e) => setDescription(e)}
+                multiline
+                style={styles.textInput}
+              />
+            </View>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <Pressable
+                style={styles.submitButton}
+                onPress={() => {
+                  onSubmit(description);
+                  setDescription("");
+                }}
+              >
+                <Text style={styles.submitButtonText}>Submit</Text>
+              </Pressable>
+              <Pressable style={styles.cancelButton} onPress={onClose}>
+                <Text style={styles.submitButtonText}>Cancel</Text>
+              </Pressable>
+            </View>
           </Pressable>
         </Pressable>
-      </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -74,7 +89,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContainer: {
-    height: height * 0.67,
+    height: height * 0.5,
     backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
@@ -132,6 +147,14 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingVertical: 10,
     alignItems: "center",
+    width: 150,
+  },
+  cancelButton: {
+    backgroundColor: "red",
+    borderRadius: 5,
+    paddingVertical: 10,
+    alignItems: "center",
+    width: 150,
   },
   submitButtonText: {
     color: "white",
