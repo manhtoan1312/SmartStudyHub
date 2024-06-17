@@ -2,7 +2,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { faUser } from "@fortawesome/free-regular-svg-icons";
-import { faBraille, faListCheck, faCalendarDays, faGear } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBraille,
+  faListCheck,
+  faCalendarDays,
+  faGear,
+  faEnvelope,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const location = useLocation();
@@ -21,7 +27,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   useEffect(() => {
     const clickHandler = ({ target }) => {
       if (!sidebar.current || !trigger.current) return;
-      if (!sidebarOpen || sidebar.current.contains(target) || trigger.current.contains(target)) return;
+      if (
+        !sidebarOpen ||
+        sidebar.current.contains(target) ||
+        trigger.current.contains(target)
+      )
+        return;
       setSidebarOpen(false);
     };
     document.addEventListener("click", clickHandler);
@@ -90,23 +101,24 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
             <ul className="mb-6 flex flex-col gap-1 text-l text-gray-400 font-medium">
               <li className="py-2 cursor-pointer">
-                <Link to={'/dashboard'}>
+                <Link to={"/dashboard"}>
                   <FontAwesomeIcon icon={faBraille} /> Dashboard
                 </Link>
               </li>
               <li className="py-2 cursor-pointer">
-                <Link to={'/files'}><FontAwesomeIcon icon={faCalendarDays} /> File</Link>
-              </li>
-              <li className="py-2 cursor-pointer">
-                <FontAwesomeIcon icon={faListCheck} /> Task
-              </li>
-              <li className="py-2 cursor-pointer">
-                <Link to={'/profile'}>
-                  <FontAwesomeIcon icon={faUser} /> Profile
+                <Link to={"/files"}>
+                  <FontAwesomeIcon icon={faCalendarDays} /> File
                 </Link>
               </li>
               <li className="py-2 cursor-pointer">
-                <FontAwesomeIcon icon={faGear} /> Setting
+                <Link to={"/report"}>
+                  <FontAwesomeIcon icon={faEnvelope} /> Report
+                </Link>
+              </li>
+              <li className="py-2 cursor-pointer">
+                <Link to={"/profile"}>
+                  <FontAwesomeIcon icon={faUser} /> Profile
+                </Link>
               </li>
             </ul>
           </div>

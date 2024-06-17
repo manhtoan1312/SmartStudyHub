@@ -75,7 +75,8 @@ function PREMIUM({ navigation }) {
   };
 
   const handlePaymentOption = async (option) => {
-    const packageDetails = packages[selectedPackage];
+    if(checkRole){
+      const packageDetails = packages[selectedPackage];
     const orderDate = new Date().toLocaleDateString();
     const orderInfor = `${packageDetails.description} ${orderDate}`;
     const payAmount = parseInt(packageDetails.price * 25000);
@@ -95,6 +96,9 @@ function PREMIUM({ navigation }) {
     console.log(
       `Selected package: ${selectedPackage}, Payment option: ${option}`
     );
+    }else{
+      navigation.navigate('Login')
+    }
     closeModal();
   };
 

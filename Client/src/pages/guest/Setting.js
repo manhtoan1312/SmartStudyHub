@@ -227,7 +227,6 @@ export default function Setting({ navigation }) {
         { cancelable: false }
       );
     }
-    const role = await getRole();
     navigation.navigate("PersonalUser");
   };
   const toPREMIUM = () => {
@@ -244,7 +243,7 @@ export default function Setting({ navigation }) {
       if (role && role.role === "PREMIUM") {
         setPomodoroTime(index);
       } else {
-        navigation.navigate("PREMIUM");
+        navigate("PREMIUM");
       }
     });
   };
@@ -255,7 +254,7 @@ export default function Setting({ navigation }) {
       if (role && role.role === "PREMIUM") {
         setShortBreakTime(index);
       } else {
-        navigation.navigate("PREMIUM");
+        navigate("PREMIUM");
       }
     });
   };
@@ -266,7 +265,7 @@ export default function Setting({ navigation }) {
       if (role && role.role === "PREMIUM") {
         setLongBreakTime(index);
       } else {
-        navigation.navigate("PREMIUM");
+        navigate("PREMIUM");
       }
     });
   };
@@ -277,7 +276,17 @@ export default function Setting({ navigation }) {
       if (role && role.role === "PREMIUM") {
         setBreakAfter(index);
       } else {
-        navigation.navigate("PREMIUM");
+        navigate("PREMIUM");
+      }
+    });
+  };
+
+  const handlePressDevice = async () => {
+    getRole().then((role) => {
+      if (role && role.role === "PREMIUM") {
+        navigate("ManageDevice");
+      } else {
+        navigate("PREMIUM");
       }
     });
   };
@@ -384,7 +393,6 @@ export default function Setting({ navigation }) {
     try {
       const id = Device.osInternalBuildId;
       const ids = [{ id: id }];
-      console.log(ids);
       const [rsLogout, rsUpdate] = await Promise.all([
         LogOut(ids).catch((error) => {
           throw new Error("Logout failed");
@@ -639,13 +647,15 @@ export default function Setting({ navigation }) {
           </View>
         </TouchableOpacity>
 
-        <View style={s`flex flex-row justify-between py-2`}>
-          <Text style={s`text-lg font-medium`}>Application notifications</Text>
+        <Pressable
+          onPress={handlePressDevice}
+          style={s`flex flex-row justify-between py-2`}
+        >
+          <Text style={s`text-lg font-medium`}>Manage Device</Text>
           <View style={s`flex flex-row`}>
-            <Text style={s`text-gray-500 text-lg`}>{appNotification}</Text>
             <AntDesign style={s`text-lg`} name="right" />
           </View>
-        </View>
+        </Pressable>
 
         <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Daily reminder</Text>

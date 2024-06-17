@@ -258,6 +258,7 @@ const MainPage = () => {
       }
       if (role && role.role === "PREMIUM") {
         const response = await CheckStatusDevice();
+        console.log(response)
         if (!response.success) {
           ClearData()
         }else{

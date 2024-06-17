@@ -70,6 +70,7 @@ import ReportUserSubmit from "../components/ReportUserSubmit";
 import GroupChat from "../pages/guest/GroupChat";
 import TransactionPayment from "../pages/user/TransactionPayment";
 import ChatBot from "../pages/user/ChatBot";
+import ManageDevice from "../pages/user/ManageDevice";
 
 const Stack = createStackNavigator();
 
@@ -159,6 +160,7 @@ const Navigator = () => {
       <Stack.Screen name="GroupChat" component={GroupChat} />
       <Stack.Screen name="Transaction" component={TransactionPayment} />
       <Stack.Screen name="ChatBot" component={ChatBot} />
+      <Stack.Screen name="ManageDevice" component={ManageDevice} />
     </Stack.Navigator>
   );
 };

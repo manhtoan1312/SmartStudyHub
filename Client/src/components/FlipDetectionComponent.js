@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Vibration, Platform } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Vibration,
+  Platform,
+  Alert,
+} from "react-native";
 import { Accelerometer } from "expo-sensors";
-
+import { Audio } from "expo-av";
 const FlipDetectionComponent = ({ isFlipPhone, isPause, workMode, stopPo }) => {
   const [alertShown, setAlertShown] = useState(false);
   const [countdown, setCountdown] = useState(10);
@@ -23,12 +30,10 @@ const FlipDetectionComponent = ({ isFlipPhone, isPause, workMode, stopPo }) => {
     };
 
     const handleFlipDetected = () => {
-      if (alertShown) {
-        setCountdown(10);
-        clearInterval(countdownInterval);
-        cancelVibration();
-        setAlertShown(false);
-      }
+      setCountdown(10);
+      clearInterval(countdownInterval);
+      cancelVibration();
+      setAlertShown(false);
     };
 
     const startCountdown = () => {
@@ -40,7 +45,6 @@ const FlipDetectionComponent = ({ isFlipPhone, isPause, workMode, stopPo }) => {
           if (prevCountdown <= 1) {
             cancelVibration();
             handleFlipNotDetected();
-            return 0;
           }
           return prevCountdown - 1;
         });
@@ -48,11 +52,18 @@ const FlipDetectionComponent = ({ isFlipPhone, isPause, workMode, stopPo }) => {
       setCountdownInterval(interval);
     };
 
+    const playSound = async () => {
+      const newSoundObject = new Audio.Sound();
+      await newSoundObject.loadAsync(require("../sound/fail.mp3"));
+      await newSoundObject.playAsync();
+    };
+
     const handleFlipNotDetected = () => {
-      setCountdown(10);
-      setAlertShown(false);
       cancelVibration();
       clearInterval(countdownInterval);
+      setCountdown(10);
+      setAlertShown(false);
+      playSound();
       stopPo();
     };
 
@@ -72,11 +83,9 @@ const FlipDetectionComponent = ({ isFlipPhone, isPause, workMode, stopPo }) => {
       handleFlipCheck();
     } else {
       cancelVibration();
-      if (alertShown) {
-        setCountdown(10);
-        setAlertShown(false);
-        clearInterval(countdownInterval);
-      }
+      clearInterval(countdownInterval);
+      setCountdown(10);
+      setAlertShown(false);
     }
 
     return () => {

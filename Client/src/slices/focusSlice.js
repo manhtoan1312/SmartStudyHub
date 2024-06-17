@@ -23,7 +23,8 @@ const initialState = {
   extraWorkName: null,
   defaultTimePomodoro: 25,
   numberOfPomodoro: 0,
-  numberOfPomodorosDone: 0
+  numberOfPomodorosDone: 0,
+  isFlipPhone:false
 };
 
 const focusSlice = createSlice({
@@ -54,6 +55,7 @@ const focusSlice = createSlice({
         defaultTimePomodoro,
         numberOfPomodoro,
         numberOfPomodorosDone,
+        isFlipPhone
       } = action.payload;
       state.isStop = isStop !== undefined ? isStop : state.isStop;
       state.isPause = isPause !== undefined ? isPause : state.isPause;
@@ -77,6 +79,7 @@ const focusSlice = createSlice({
       state.defaultTimePomodoro = defaultTimePomodoro !== undefined ? defaultTimePomodoro : state.defaultTimePomodoro;
       state.numberOfPomodoro = numberOfPomodoro !== undefined ? numberOfPomodoro : state.numberOfPomodoro;
       state.numberOfPomodorosDone = numberOfPomodorosDone !== undefined ? numberOfPomodorosDone : state.numberOfPomodorosDone;
+      state.isFlipPhone = isFlipPhone !== undefined ? isFlipPhone : state.isFlipPhone;
     },
     resetFocus: () => initialState, 
   },

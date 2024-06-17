@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell } from '@fortawesome/free-regular-svg-icons'
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
 const DropdownNotification = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -53,7 +54,7 @@ const DropdownNotification = () => {
         >
           <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-[#be3c3c] opacity-75"></span>
         </span>
-        <FontAwesomeIcon icon={faBell} className="fill-current m-1 duration-300 ease-in-out" />
+        <FontAwesomeIcon icon={faEnvelope} className="fill-current m-1 duration-300 ease-in-out" />
       </Link>
 
       <div

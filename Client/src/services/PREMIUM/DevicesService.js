@@ -70,22 +70,22 @@ const CheckStatusDevice = async () => {
     const id = Device.osInternalBuildId || "unknown";
     if (role && role.role === "PREMIUM") {
       const { token } = role;
-
       const response = await fetch(`${uri}/get/${id}`, {
         method: "get",
         headers: {
           "Content-Type": "application/json",
           authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          id,
-        }),
       });
 
       const data = await response.json();
+      console.log(data);
       if (response.status === 200) {
         if (data.meta.code === "16_5_f") return { success: false };
-        return { success: true, data: data.data };
+        if (data.data.status !== "LOGIN") {
+          return { success: false };
+        }
+        return { success: true };
       } else {
         return { success: false, message: data.meta.message };
       }
@@ -141,14 +141,12 @@ const DeleteDevice = async (id) => {
       const { token } = role;
 
       const response = await fetch(`${uri}/delete`, {
-        method: "put",
+        method: "delete",
         headers: {
           "Content-Type": "application/json",
           authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          id,
-        }),
+        body: JSON.stringify(id),
       });
 
       if (response.status === 200) {

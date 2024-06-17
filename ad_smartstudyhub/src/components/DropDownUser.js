@@ -146,16 +146,6 @@ const DropdownUser = () => {
                 My Profile
               </Link>
             </li>
-
-            <li>
-              <Link
-                to="/pages/settings"
-                className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-[#3C50E0] text-gray-600 dark:text-gray-400 lg:text-base"
-              >
-                <FontAwesomeIcon icon={faCog} className="" />
-                Account Settings
-              </Link>
-            </li>
           </ul>
           <button
             className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-[#3C50E0] text-gray-600 dark:text-gray-400 lg:text-base"

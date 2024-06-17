@@ -42,7 +42,6 @@ const Focus = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [isSoundVisible, setSoundVisible] = useState(false);
   const [meditationVisible, setMeditationVisible] = useState(false);
-  const [isFlipPhone, setIsFlipPhone] = useState(false);
   const dispatch = useDispatch();
   const {
     isStop,
@@ -58,6 +57,7 @@ const Focus = () => {
     defaultTimePomodoro,
     numberOfPomodoro,
     numberOfPomodorosDone,
+    isFlipPhone,
   } = useSelector((state) => state.focus);
   const [selectedMode, setSelectedMode] = useState(mode);
   const [theme, setTheme] = useState(null);
@@ -173,9 +173,9 @@ const Focus = () => {
   };
 
   const backtoHome = async () => {
-    if(isFlipPhone && !isPause && workMode === "work"){
-      Alert.alert('Warning',"You are in strict work mode and cannot escape")
-    }else{
+    if (isFlipPhone && !isPause && workMode === "work") {
+      Alert.alert("Warning", "You are in strict work mode and cannot escape");
+    } else {
       navigation.goBack();
     }
   };
@@ -249,7 +249,7 @@ const Focus = () => {
   };
   const handleSelectStrictMode = async (value) => {
     const role = await getRole();
-    setIsFlipPhone(value);
+    dispatch(setFocus({ isFlipPhone: value }));
     if (role && role.role === "PREMIUM") {
     } else {
       if (value) {

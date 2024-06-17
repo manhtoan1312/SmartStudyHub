@@ -90,7 +90,6 @@ function Login({ navigation }) {
               if (!response.success) {
                 console.log("Error update device, message:", response.message);
               }else{
-                console.log('success')
               }
             }
           }
