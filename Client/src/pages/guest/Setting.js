@@ -27,6 +27,7 @@ import ClearData from "../../services/ClearData";
 import { useDispatch, useSelector } from "react-redux";
 import { setFocus } from "../../slices/focusSlice";
 import { getUserInfor } from "../../services/UserService";
+import { LogOut } from "../../services/PREMIUM/DevicesService";
 export default function Setting({ navigation }) {
   const [preTime, setPreTime] = useState(0);
   const [workSound, setWorkSound] = useState("None");
@@ -379,10 +380,25 @@ export default function Setting({ navigation }) {
   };
 
   const submitLogOut = async () => {
-    await ClearData();
-    const response = await UpdateTimeLastUse();
-    if (!response.success) {
-      Alert.alert("Update time last use fail");
+    try {
+      const [rsClear, rsLogout, rsUpdate] = await Promise.all([
+        ClearData(),
+        LogOut().catch((error) => {
+          throw new Error("Logout failed");
+        }),
+        UpdateTimeLastUse().catch((error) => {
+          throw new Error("Update time last use fail");
+        }),
+      ]);
+      if (!rsLogout.success) {
+        throw new Error("Logout failed");
+      }
+
+      if (!rsUpdate.success) {
+        throw new Error("Update time last use fail");
+      }
+    } catch (error) {
+      Alert.alert(error.message || "Failed to perform one or more operations");
     }
     navigation.navigate("Home");
   };
@@ -417,7 +433,10 @@ export default function Setting({ navigation }) {
         <Text style={s`font-medium text-2xl`}>Setting</Text>
       </Pressable>
       <View>
-        <Pressable onPress={() => handleHeader()} style={s`flex flex-row h-auto py-4 pl-4 bg-white`}>
+        <Pressable
+          onPress={() => handleHeader()}
+          style={s`flex flex-row h-auto py-4 pl-4 bg-white`}
+        >
           <Pressable onPress={() => navigate("PersonalUser")}>
             <View>
               <Image

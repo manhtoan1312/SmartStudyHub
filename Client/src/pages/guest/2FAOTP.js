@@ -11,6 +11,7 @@ import { ResendOTP } from "../../services/AccountService";
 import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import jwtDecode from "jwt-decode";
+import getRole from "../../services/RoleService";
 const TFAOTP = ({ route, navigation }) => {
   const { otpCode, time, email, token} = route.params;
   const [otpInput, setOtpInput] = useState("");
@@ -35,6 +36,15 @@ const TFAOTP = ({ route, navigation }) => {
     if (currentTime < expiredTime) {
       if (otpInput === otp) {
         await AsyncStorage.setItem("token", token);
+        const role = await getRole()
+        if(role.role){
+          if (role && role.role === "PREMIUM") {
+            const response = await CreateOrUpdateDevice();
+            if (!response.success) {
+              console.log("Error update device, message:", response.message);
+            }
+          }
+        }
         navigation.navigate("Home");
       } else {
         Alert.alert("Invalid OTP", "Please enter the correct OTP.");

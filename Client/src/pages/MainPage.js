@@ -9,6 +9,7 @@ import { Audio } from "expo-av";
 import { CreatePomodoro } from "../services/Guest/PomodoroService";
 import getRole from "../services/RoleService";
 import { UpdateTimeLastUse } from "../services/GuestService";
+import { CheckStatusDevice, CreateOrUpdateDevice } from "../services/PREMIUM/DevicesService";
 
 const MainPage = () => {
   const dispatch = useDispatch();
@@ -59,7 +60,7 @@ const MainPage = () => {
       setIsPlaying(true);
       const newSoundObject = new Audio.Sound();
       if (isLocal) {
-        await newSoundObject.loadAsync(require('../sound/Done.mp3'));
+        await newSoundObject.loadAsync(require("../sound/Done.mp3"));
       } else {
         await newSoundObject.loadAsync({ uri: uri });
       }
@@ -109,7 +110,7 @@ const MainPage = () => {
 
     fetchSettingsFromStorage();
     return () => {
-      stopSound(); 
+      stopSound();
     };
   }, [dispatch]);
 
@@ -195,7 +196,7 @@ const MainPage = () => {
         const parse = JSON.parse(sound);
         playSoundWithLimit(parse.url, 2);
       } else {
-        playSoundWithLimit(null,2, false);
+        playSoundWithLimit(null, 2, false);
       }
     } else {
       Alert.alert("Create Pomodoro fail!", response.message);
@@ -252,6 +253,14 @@ const MainPage = () => {
         const response = await UpdateTimeLastUse();
         if (!response.success) {
           console.log("Error update time last use, message:", response.message);
+        }
+      }
+      if (role && role.role === "PREMIUM") {
+        const response = await CreateOrUpdateDevice();
+        if (!response.success) {
+          console.log("Error check device status, message:", response.message);
+        }else{
+
         }
       }
     };
