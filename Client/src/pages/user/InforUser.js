@@ -31,6 +31,8 @@ import DateOfBirthPickerModal from "../../components/DateOfBirthPickerModal";
 import AddressPicker from "../../components/AddressPicker";
 import ClearData from "../../services/ClearData";
 import { LogOut } from "../../services/PREMIUM/DevicesService";
+import { useDispatch } from "react-redux";
+import { resetFocus } from "../../slices/focusSlice";
 const InforUser = ({ navigation }) => {
   const [infor, setInfor] = useState(null);
   const [editNameModalVisible, setEditNameModalVisible] = useState(false);
@@ -81,7 +83,7 @@ const InforUser = ({ navigation }) => {
       infor.country ? infor.country : null,
       infor.imageUrl,
       infor?.isTwoFactor ? infor?.isTwoFactor : false,
-      infor?.coverImage ? infor?.coverImage : null,
+      infor?.coverImage ? infor?.coverImage : null
     );
     if (!response.success) {
       Alert.alert("Change User Information fail", response.message);
@@ -184,20 +186,28 @@ const InforUser = ({ navigation }) => {
         text: "OK",
         onPress: async () => {
           try {
+            const dispatch = useDispatch();
+            dispatch(resetFocus());
             const [rsClear, rsLogout, rsUpdate] = await Promise.all([
               ClearData(),
-              LogOut().catch(error => { throw new Error("Logout failed") }),
-              UpdateTimeLastUse().catch(error => { throw new Error("Update time last use fail") })
+              LogOut().catch((error) => {
+                throw new Error("Logout failed");
+              }),
+              UpdateTimeLastUse().catch((error) => {
+                throw new Error("Update time last use fail");
+              }),
             ]);
             if (!rsLogout.success) {
               throw new Error("Logout failed");
             }
-          
+
             if (!rsUpdate.success) {
               throw new Error("Update time last use fail");
             }
           } catch (error) {
-            Alert.alert(error.message || "Failed to perform one or more operations");
+            Alert.alert(
+              error.message || "Failed to perform one or more operations"
+            );
           }
           navigation.navigate("Home");
         },
@@ -345,9 +355,7 @@ const InforUser = ({ navigation }) => {
                         source={{ uri: infor?.coverImage }}
                       />
                     ) : (
-                      <Text style={styles.infoValue}>
-                        None
-                      </Text>
+                      <Text style={styles.infoValue}>None</Text>
                     )}
                     <MaterialIcons
                       name="navigate-next"

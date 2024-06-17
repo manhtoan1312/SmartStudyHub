@@ -10,6 +10,7 @@ import { CreatePomodoro } from "../services/Guest/PomodoroService";
 import getRole from "../services/RoleService";
 import { UpdateTimeLastUse } from "../services/GuestService";
 import { CheckStatusDevice, CreateOrUpdateDevice } from "../services/PREMIUM/DevicesService";
+import ClearData from "../services/ClearData";
 
 const MainPage = () => {
   const dispatch = useDispatch();
@@ -256,9 +257,9 @@ const MainPage = () => {
         }
       }
       if (role && role.role === "PREMIUM") {
-        const response = await CreateOrUpdateDevice();
+        const response = await CheckStatusDevice();
         if (!response.success) {
-          console.log("Error check device status, message:", response.message);
+          ClearData()
         }else{
 
         }
@@ -266,7 +267,6 @@ const MainPage = () => {
     };
     updateTime();
   }, []);
-
   return (
     <NavigationContainer>
       <SafeAreaView style={styles.container}>

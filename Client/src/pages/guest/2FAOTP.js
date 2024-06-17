@@ -12,6 +12,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import jwtDecode from "jwt-decode";
 import getRole from "../../services/RoleService";
+import { CreateOrUpdateDevice } from "../../services/PREMIUM/DevicesService";
 const TFAOTP = ({ route, navigation }) => {
   const { otpCode, time, email, token} = route.params;
   const [otpInput, setOtpInput] = useState("");

@@ -18,6 +18,7 @@ import {
   Feather,
   FontAwesome6,
 } from "@expo/vector-icons";
+import * as Device from "expo-device";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import getRole from "../../services/RoleService";
@@ -25,7 +26,7 @@ import { Picker } from "react-native-wheel-pick";
 import { DeleteGuest, UpdateTimeLastUse } from "../../services/GuestService";
 import ClearData from "../../services/ClearData";
 import { useDispatch, useSelector } from "react-redux";
-import { setFocus } from "../../slices/focusSlice";
+import { resetFocus, setFocus } from "../../slices/focusSlice";
 import { getUserInfor } from "../../services/UserService";
 import { LogOut } from "../../services/PREMIUM/DevicesService";
 export default function Setting({ navigation }) {
@@ -381,17 +382,22 @@ export default function Setting({ navigation }) {
 
   const submitLogOut = async () => {
     try {
-      const [rsClear, rsLogout, rsUpdate] = await Promise.all([
-        ClearData(),
-        LogOut().catch((error) => {
+      const id = Device.osInternalBuildId;
+      const ids = [{ id: id }];
+      console.log(ids);
+      const [rsLogout, rsUpdate] = await Promise.all([
+        LogOut(ids).catch((error) => {
           throw new Error("Logout failed");
         }),
         UpdateTimeLastUse().catch((error) => {
           throw new Error("Update time last use fail");
         }),
       ]);
+
       if (!rsLogout.success) {
-        throw new Error("Logout failed");
+        throw new Error(rsLogout.message);
+      } else {
+        await ClearData();
       }
 
       if (!rsUpdate.success) {
@@ -410,8 +416,8 @@ export default function Setting({ navigation }) {
     } else {
       Alert.alert("Smart Study Hub Announcement", "Delete data successfully");
     }
-    console.log("hi");
     await AsyncStorage.removeItem("id");
+    dispatch(resetFocus());
     await ClearData();
     navigation.navigate("Home");
   };

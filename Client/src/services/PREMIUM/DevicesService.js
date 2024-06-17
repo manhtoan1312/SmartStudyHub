@@ -1,7 +1,5 @@
 import getRole from "../RoleService";
 import * as Device from "expo-device";
-import Constants from "expo-constants";
-import * as Location from "expo-location";
 import * as Localization from "expo-localization";
 const uri =
   "https://api-smart-study-hub.onrender.com/mobile/v1/user/premium/device";
@@ -32,30 +30,28 @@ const CreateOrUpdateDevice = async () => {
       const ipAddress = await getIPAddress();
       const localization = Localization.locale;
       const detailLocation = detailedMapLocalizationToName(localization);
-      console.log(id, deviceName, deviceType, ipAddress, detailLocation);
-      // const response = await fetch(`${uri}/create-update`, {
-      //   method: "put",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     authorization: `Bearer ${token}`,
-      //   },
-      //   body: JSON.stringify({
-      //     id,
-      //     deviceName,
-      //     deviceType,
-      //     ipAddress,
-      //     location,
-      //     status: "LOGIN",
-      //   }),
-      // });
+      const response = await fetch(`${uri}/create-update`, {
+        method: "put",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          id,
+          deviceName,
+          deviceType,
+          ipAddress,
+          location: detailLocation,
+          status: "LOGIN",
+        }),
+      });
 
-      // if (response.status === 200) {
-      //   const data = await response.json();
-      //   return { success: true, data: data.data };
-      // } else {
-      //   const data = await response.json();
-      //   return { success: false, message: data.meta.message };
-      // }
+      const data = await response.json();
+      if (response.status === 200) {
+        return { success: true, data: data.data };
+      } else {
+        return { success: false, message: data.meta.message };
+      }
     } else {
       return {
         success: false,
@@ -83,15 +79,14 @@ const CheckStatusDevice = async () => {
         },
         body: JSON.stringify({
           id,
-          registrationToken,
         }),
       });
 
+      const data = await response.json();
       if (response.status === 200) {
-        const data = await response.json();
+        if (data.meta.code === "16_5_f") return { success: false };
         return { success: true, data: data.data };
       } else {
-        const data = await response.json();
         return { success: false, message: data.meta.message };
       }
     } else {
@@ -106,29 +101,24 @@ const CheckStatusDevice = async () => {
   }
 };
 
-const LogOut = async () => {
+const LogOut = async (ids) => {
   try {
     const role = await getRole();
-    const id = Constants.deviceId;
     if (role && role.role === "PREMIUM") {
       const { token } = role;
-
       const response = await fetch(`${uri}/logout`, {
         method: "put",
         headers: {
           "Content-Type": "application/json",
           authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          id,
-        }),
+        body: JSON.stringify(ids),
       });
 
+      const data = await response.json();
       if (response.status === 200) {
-        const data = await response.json();
         return { success: true, data: data.data };
       } else {
-        const data = await response.json();
         return { success: false, message: data.meta.message };
       }
     } else {

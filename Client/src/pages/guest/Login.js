@@ -21,6 +21,8 @@ import {
 import { ResendOTP, login } from "../../services/AccountService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import jwt_decode from "jwt-decode";
+import { CreateOrUpdateDevice } from "../../services/PREMIUM/DevicesService";
+import getRole from "../../services/RoleService";
 
 function Login({ navigation }) {
   const [email, setEmail] = useState("");
@@ -77,11 +79,22 @@ function Login({ navigation }) {
               token: response.token,
             });
           } else {
-            Alert.alert("Register failed", response.message);
+            Alert.alert("Login failed", response.message);
           }
         } else {
           await AsyncStorage.setItem("token", response.token);
-          navigation.navigate("Home");
+          const role = await getRole();
+          if (role.role) {
+            if (role && role.role === "PREMIUM") {
+              const response = await CreateOrUpdateDevice();
+              if (!response.success) {
+                console.log("Error update device, message:", response.message);
+              }else{
+                console.log('success')
+              }
+            }
+          }
+          navigation.goBack();
         }
       } else {
         if (response.status === "2_4_f") {

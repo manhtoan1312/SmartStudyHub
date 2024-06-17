@@ -1,11 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useDispatch } from "react-redux";
-import { resetFocus } from "../slices/focusSlice";
 
 const ClearData = async () => {
-  try {
-    const dispatch = useDispatch();
-    dispatch(resetFocus());
+  try { 
     await AsyncStorage.removeItem("secondsLeft");
     await AsyncStorage.removeItem("countWork");
     await AsyncStorage.removeItem("play");
