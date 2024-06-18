@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "Smart Study Hub",
-    "slug": "Client",
+    "slug": "client",
     "privacy": "public",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "smartstudyhub",
+    "scheme": ["smartstudyhub"],
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
@@ -13,9 +13,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "your.bundle.identifier",

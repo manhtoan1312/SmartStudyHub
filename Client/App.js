@@ -1,62 +1,38 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Platform, StyleSheet, View } from "react-native";
-import * as Notifications from "expo-notifications";
-import Constants from "expo-constants";
 import { Provider } from "react-redux";
 import { registerRootComponent } from "expo";
 import MainPage from "./src/pages/MainPage";
 import store from "./src/stores";
-import * as Linking from "expo-linking"
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
+import * as Linking from "expo-linking";
 
 const App = () => {
-  // const url = Linking.makeUrl('/')
-  // const linking={
-  //   prefixes:[url]
-  // }
+  useEffect(() => {
+    const handleDeepLink = (event) => {
+      const { url } = event;
+      const parsedUrl = Linking.parse(url);
+      console.log(parsedUrl);
+    };
+
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        handleDeepLink({ url });
+      }
+    });
+    const subscription = Linking.addEventListener("url", handleDeepLink);
+    Linking.openURL("smartstudyhub://");
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   return (
     <Provider store={store}>
       <MainPage />
     </Provider>
   );
 };
-
-async function registerForPushNotificationsAsync() {
-  let token;
-  if (!Constants.isDevice) {
-    const { status: existingStatus } =
-      await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== "granted") {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== "granted") {
-      alert("Failed to get push token for push notification!");
-      return;
-    }
-    token = (await Notifications.getExpoPushTokenAsync()).data;
-  } else {
-    alert("Must use physical device for Push Notifications");
-  }
-
-  if (Platform.OS === "android") {
-    Notifications.setNotificationChannelAsync("default", {
-      name: "default",
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: "#FF231F7C",
-    });
-  }
-
-  return token;
-}
 
 const styles = StyleSheet.create({
   container: {
