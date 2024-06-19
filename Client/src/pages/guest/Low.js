@@ -74,10 +74,12 @@ const Low = ({ navigation }) => {
   };
 
   const renderKey = (key) => {
-    if(sortType==='DUEDATE'){
-      return new Date(key).toISOString().split('T')[0];
+    if (typeof key === "number" && key.toString().length === 13) {
+      return new Date(key).toISOString().split("T")[0];
+    } else {
+      return key;
     }
-  }
+  };
   
   useEffect(() => {
     fetchData();

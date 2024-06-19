@@ -8,7 +8,7 @@ import * as Linking from "expo-linking";
 
 const App = () => {
   useEffect(() => {
-    const handleDeepLink = (event) => {
+    const handleDeepLink =async (event) => {
       const { url } = event;
       const parsedUrl = Linking.parse(url);
       console.log(parsedUrl);
@@ -20,7 +20,6 @@ const App = () => {
       }
     });
     const subscription = Linking.addEventListener("url", handleDeepLink);
-    Linking.openURL("smartstudyhub://");
 
     return () => {
       subscription.remove();

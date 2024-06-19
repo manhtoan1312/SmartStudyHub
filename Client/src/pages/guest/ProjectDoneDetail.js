@@ -151,6 +151,14 @@ const ProjectDoneDetail = ({ route, navigation }) => {
   const handleReload = async () => {
     await fetchData();
   };
+
+  const renderKey = (key) => {
+    if (typeof key === "number" && key.toString().length === 13) {
+      return new Date(key).toISOString().split("T")[0];
+    } else {
+      return key;
+    }
+  };
   
 
   return (
@@ -200,7 +208,7 @@ const ProjectDoneDetail = ({ route, navigation }) => {
                 </TouchableOpacity>
                 {isSort ? (project.workActive?.map((workItem) => (
                   <View key={workItem?.key}>
-                    <Text>{workItem?.key}</Text>
+                    <Text>{renderKey(workItem?.key)}</Text>
                     {workItem?.worksSorted?.map((item) => (
                       <WorkActive
                     key={item.id}
@@ -252,7 +260,7 @@ const ProjectDoneDetail = ({ route, navigation }) => {
                 {doneVisible &&
                   (isSort ? (project.workCompleted?.map((workItem) => (
                     <View key={workItem?.key}>
-                      <Text>{workItem?.key}</Text>
+                      <Text>{renderKey(workItem?.key)}</Text>
                       {workItem?.worksSorted?.map((item) => (
                         <WorkDone
                         key={item.id}

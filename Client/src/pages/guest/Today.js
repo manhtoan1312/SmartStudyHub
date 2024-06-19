@@ -118,11 +118,13 @@ const Today = ({ navigation }) => {
   };
 
   const renderKey = (key) => {
-    if(sortType==='DUEDATE'){
-      return new Date(key).toISOString().split('T')[0];
+    if (typeof key === "number" && key.toString().length === 13) {
+      return new Date(key).toISOString().split("T")[0];
+    } else {
+      return key;
     }
-  }
-  
+  };
+
   const handleDone = async (
     projectId,
     priority,
@@ -233,7 +235,7 @@ const Today = ({ navigation }) => {
                       navigation={navigation}
                     />
                   ))}
-                  {project.listWorkActive.length === 0 && (
+              {project.listWorkActive.length === 0 && (
                 <View
                   style={{
                     height: 100,
@@ -287,7 +289,7 @@ const Today = ({ navigation }) => {
                         navigation={navigation}
                       />
                     )))}
-                    {project.listWorkCompleted.length === 0 && doneVisible && (
+              {project.listWorkCompleted.length === 0 && doneVisible && (
                 <View
                   style={{
                     height: 100,

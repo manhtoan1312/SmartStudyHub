@@ -90,6 +90,14 @@ const Today = ({ navigation }) => {
     // }
   };
 
+  const renderKey = (key) => {
+    if (typeof key === "number" && key.toString().length === 13) {
+      return new Date(key).toISOString().split("T")[0];
+    } else {
+      return key;
+    }
+  };
+
   const handleClosekeyboard = () => {
     setCloseKeyboard(true);
     Keyboard.dismiss();
@@ -208,7 +216,7 @@ const Today = ({ navigation }) => {
               {isSort
                 ? project.workActive?.map((workItem) => (
                     <View key={workItem?.key}>
-                      <Text>{workItem?.key}</Text>
+                      <Text>{renderKey(workItem?.key)}</Text>
                       {workItem?.worksSorted?.map((item) => (
                         <WorkActive
                           key={item.id}
@@ -262,7 +270,7 @@ const Today = ({ navigation }) => {
                 (isSort
                   ? project.workCompleted?.map((workItem) => (
                       <View key={workItem?.key}>
-                        <Text>{workItem?.key}</Text>
+                        <Text>{renderKey(workItem?.key)}</Text>
                         {workItem?.worksSorted?.map((item) => (
                           <WorkDone
                             key={item.id}
@@ -297,7 +305,6 @@ const Today = ({ navigation }) => {
                   </Text>
                 </View>
               )}
-
             </View>
           </>
         )}
