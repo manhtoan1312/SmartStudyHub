@@ -1,12 +1,15 @@
 {
   "cli": {
     "version": ">= 5.9.1",
-    "requireCommit":true  
+    "requireCommit": true
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      }
     },
     "preview": {
       "distribution": "internal"

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Smart Study Hub",
-    "slug": "Client",
+    "name": "smart-study-hub",
+    "slug": "smart-study-hub",
     "privacy": "public",
     "version": "1.0.0",
     "orientation": "portrait",
