@@ -4,6 +4,7 @@
     "slug": "Client",
     "privacy": "public",
     "version": "1.0.0",
+    "scheme": "smartstudyhub",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

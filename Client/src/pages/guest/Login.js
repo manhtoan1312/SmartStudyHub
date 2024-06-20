@@ -36,22 +36,8 @@ function Login({ navigation }) {
       const { url } = event;
       const parsedUrl = Link.parse(url);
       const { hostname, queryParams } = parsedUrl;
-      const excludeUrl = {
-        hostname: "smartstudyhub-manhtoan1312-8081.exp.direct",
-        queryParams: {
-          status: "SUCCESS",
-          transactionPaymentId: "5",
-        },
-      };
-      const isExcludedUrl = (parsedUrl, excludeUrl) => {
-        return (
-          parsedUrl.hostname === excludeUrl.hostname &&
-          parsedUrl.queryParams.status === excludeUrl.queryParams.status &&
-          parsedUrl.queryParams.transactionPaymentId ===
-            excludeUrl.queryParams.transactionPaymentId
-        );
-      };
-      if (queryParams.token && !isExcludedUrl(parsedUrl, excludeUrl)) {
+      console.log(parsedUrl);
+      if (queryParams?.token) {
         try {
           await AsyncStorage.setItem("token", queryParams.token);
           const response = await getUserInfor();
@@ -66,7 +52,21 @@ function Login({ navigation }) {
           Alert.log("Login fail", "Please try again");
         }
       } else {
-        console.log("Token not found or URL is excluded.");
+        if (queryParams?.status === "FAIL") {
+          Alert.alert(
+            "Account was banned or delete",
+            "Do you want to report this problem?",
+            [
+              {
+                text: "No",
+                style: "cancel",
+              },
+              { text: "Yes", onPress: () => navigation.navigate("Report") },
+            ]
+          );
+        } else {
+          console.log(parsedUrl);
+        }
       }
     };
 
@@ -81,39 +81,7 @@ function Login({ navigation }) {
       subscription.remove();
     };
   }, []);
-  // useEffect(() => {
-  //   const handleUrlChange = async ({ url }) => {
-  //     const tokenIndex = url.indexOf("token=");
-  //     if (tokenIndex !== -1) {
-  //       const token = url.slice(tokenIndex + 6);
-  //       const decodedToken = jwt_decode(token);
-  //       const subArray = decodedToken.sub.split("-");
-  //       await AsyncStorage.setItem("token", tokenIndex);
-  //       const firstName = subArray[subArray.length - 1].trim().split(" ")[0];
-  //       const lastName = subArray[subArray.length - 1].trim().split(" ")[1];
-  //       await AsyncStorage.setItem("accountName", `${lastName} ${firstName}`);
-  //       navigation.navigate("Home");
-  //     } else if (url.includes("account-deleted")) {
-  //       Alert.alert(
-  //         "Your account was deleted",
-  //         "Do you want to recover your account?",
-  //         [
-  //           { text: "No", style: "cancel" },
-  //           { text: "Yes", onPress: () => navigation.navigate("Recover") },
-  //         ]
-  //       );
-  //     } else if (url.includes("account-banned")) {
-  //       Alert.alert("Your account was banned", "Please create a new account.");
-  //     }
-  //   };
 
-  //   unsubscribeRef.current = Linking.addEventListener("url", handleUrlChange);
-  //   return () => {
-  //     if (unsubscribeRef.current) {
-  //       unsubscribeRef.current.remove();
-  //     }
-  //   };
-  // }, [navigation]);
   const handleLogin = async (e) => {
     if (email && password) {
       e.preventDefault();
@@ -194,7 +162,6 @@ function Login({ navigation }) {
       "https://api-smart-study-hub.onrender.com/oauth2/authorization/github"
     );
   };
-
 
   return (
     <View style={styles.container}>
@@ -279,15 +246,6 @@ function Login({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.facebookButton}
-            onPress={handleFacebookLogin}
-          >
-            <Entypo name="facebook-with-circle" size={24} color="white" />
-            <Text style={styles.buttonTextSecondary}>Login With Facebook</Text>
-          </TouchableOpacity>
-        </View> */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.registerBtn}

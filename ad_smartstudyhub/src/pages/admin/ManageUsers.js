@@ -49,9 +49,9 @@ function ManageUsers() {
         }
       } else {
         const rs = await SearchUser(searchTerm);
-        if (rs.success && rs.data.meta?.code) {
+        if (rs.success) {
           setUsers(rs.data.data);
-          setPageLength(rs.data.length);
+          setPageLength(rs.data.data.length);
         } else {
           setErrorMessage(rs?.message ? rs.message : rs.data.meta.message);
         }
@@ -74,7 +74,7 @@ function ManageUsers() {
       </h4>
       <div>
         <div className="w-full flex justify-end md:flex-row flex-col items-end">
-          <div className="relative w-[300px] md:mx-5 mb-2 flex -z-10">
+          <div className="relative w-[300px] md:mx-5 mb-2 flex z-10">
             <input
               type="text"
               className="pl-10 pr-4 py-2 border rounded-lg w-full dark:bg-gray-700 dark:text-white"
@@ -90,9 +90,7 @@ function ManageUsers() {
       </div>
       {users.length !== 0 ? (
         <>
-          <div
-            className="overflow-x-auto max-h-[500px] min-h-[200px] mt-5"
-          >
+          <div className="overflow-x-auto max-h-[500px] min-h-[200px] mt-5">
             <UsersTable
               users={users}
               firstItemRef={firstItemRef}
@@ -121,7 +119,7 @@ function ManageUsers() {
         </>
       ) : (
         <div className="flex justify-center items-center">
-          <h2 className="text-4xl pl-10">No User Active</h2>
+          <h2 className="text-4xl pl-10 dark:text-white">No User Active</h2>
         </div>
       )}
       <Link to="/create/user" className="py-12 flex justify-end pr-16">

@@ -19,7 +19,7 @@ import getRole from "../../services/RoleService";
 
 const Report = ({ route, navigation }) => {
   const type = route.params?.reportType || "HELP";
-
+  const uId = route.params?.id;
   const [report, setReport] = useState({
     userWasReportedId: null,
     email: null,
@@ -122,9 +122,13 @@ const Report = ({ route, navigation }) => {
     }
 
     let id = await AsyncStorage.getItem("id");
-    const role = await getRole();
-    if (role) {
-      id = role.id;
+    if (uId) {
+      id = uId;
+    } else {
+      const role = await getRole();
+      if (role) {
+        id = role.id;
+      }
     }
     if (file) {
       const response = await UploadReportFile(file, id);
