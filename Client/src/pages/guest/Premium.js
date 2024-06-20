@@ -75,38 +75,38 @@ function PREMIUM({ navigation }) {
   };
 
   const handlePaymentOption = async (option) => {
-    if(checkRole){
+    if (checkRole) {
       const packageDetails = packages[selectedPackage];
-    const orderDate = new Date().toLocaleDateString();
-    const orderInfor = `${packageDetails.description} ${orderDate}`;
-    const payAmount = parseInt(packageDetails.price * 25000);
-    const packageType = selectedPackage;
-    let response;
-    if (option === "PayPal") {
-      response = await PayPaypal(orderInfor, payAmount, packageType);
-    } else {
-      response = await PayVNPay(orderInfor, payAmount, packageType);
-    }
-    if (response.success) {
-      Linking.openURL(response.data);
-    } else {
-      Alert.alert("Payment fail!", response.message);
-    }
+      const orderDate = new Date().toLocaleDateString();
+      const orderInfor = `${packageDetails.description} ${orderDate}`;
+      const payAmount = parseInt(packageDetails.price * 25000);
+      const packageType = selectedPackage;
+      let response;
+      if (option === "PayPal") {
+        response = await PayPaypal(orderInfor, payAmount, packageType);
+      } else {
+        response = await PayVNPay(orderInfor, payAmount, packageType);
+      }
+      if (response.success) {
+        Linking.openURL(response.data);
+      } else {
+        Alert.alert("Payment fail!", response.message);
+      }
 
-    console.log(
-      `Selected package: ${selectedPackage}, Payment option: ${option}`
-    );
-    }else{
-      navigation.navigate('Login')
+      console.log(
+        `Selected package: ${selectedPackage}, Payment option: ${option}`
+      );
+    } else {
+      navigation.navigate("Login");
     }
     closeModal();
   };
 
-  const handlePressPayment = () =>{
-  if(checkRole){
-  navigation.navigate('Transaction')
-  }
-  }
+  const handlePressPayment = () => {
+    if (checkRole) {
+      navigation.navigate("Transaction");
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -121,7 +121,11 @@ function PREMIUM({ navigation }) {
             Upgrade to Premium
           </Text>
           <Pressable onPress={handlePressPayment}>
-            <Ionicons name="document-text-outline" size={24} color={checkRole ? "#333" :"white"} />
+            <Ionicons
+              name="document-text-outline"
+              size={24}
+              color={checkRole ? "#333" : "white"}
+            />
           </Pressable>
         </View>
       </View>
@@ -251,9 +255,9 @@ function PREMIUM({ navigation }) {
       </ScrollView>
       <View style={styles.payContainer}>
         <View style={styles.dueDate}>
-          {infor?.dueDatePremium && (
+          {infor?.dueDatePremium !== undefined && (
             <Text style={styles.dueDateText}>
-              Remaining time to use the premium version: {infor?.dueDatePremium}{" "}
+              Remaining time to use the premium version: {infor?.dueDatePremium}
               Day
             </Text>
           )}

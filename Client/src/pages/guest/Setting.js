@@ -391,25 +391,35 @@ export default function Setting({ navigation }) {
 
   const submitLogOut = async () => {
     try {
-      const id = Device.osInternalBuildId;
-      const ids = [{ id: id }];
-      const [rsLogout, rsUpdate] = await Promise.all([
-        LogOut(ids).catch((error) => {
-          throw new Error("Logout failed");
-        }),
-        UpdateTimeLastUse().catch((error) => {
-          throw new Error("Update time last use fail");
-        }),
-      ]);
+      const role = await getRole();
+      if (role && role.token === "PREMIUM") {
+        const id = Device.osInternalBuildId;
+        const ids = [{ id: id }];
+        const [rsLogout, rsUpdate] = await Promise.all([
+          LogOut(ids).catch((error) => {
+            throw new Error("Logout failed");
+          }),
+          UpdateTimeLastUse().catch((error) => {
+            throw new Error("Update time last use fail");
+          }),
+        ]);
 
-      if (!rsLogout.success) {
-        throw new Error(rsLogout.message);
-      } else {
+        if (!rsLogout.success) {
+          throw new Error(rsLogout.message);
+        }
         await ClearData();
-      }
 
-      if (!rsUpdate.success) {
-        throw new Error("Update time last use fail");
+        if (!rsUpdate.success) {
+          throw new Error("Update time last use fail");
+        }
+      } else {
+        ClearData();
+        const response = await UpdateTimeLastUse();
+        if (response.success) {
+          Alert.alert("Log out success");
+        } else {
+          console.log(response.data);
+        }
       }
     } catch (error) {
       Alert.alert(error.message || "Failed to perform one or more operations");

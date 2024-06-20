@@ -23,7 +23,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import jwt_decode from "jwt-decode";
 import { CreateOrUpdateDevice } from "../../services/PREMIUM/DevicesService";
 import getRole from "../../services/RoleService";
-
+import * as Link from "expo-linking";
+import { getUserInfor } from "../../services/UserService";
 function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,38 +32,88 @@ function Login({ navigation }) {
   const unsubscribeRef = useRef(null);
 
   useEffect(() => {
-    const handleUrlChange = async ({ url }) => {
-      const tokenIndex = url.indexOf("token=");
-      if (tokenIndex !== -1) {
-        const token = url.slice(tokenIndex + 6);
-        const decodedToken = jwt_decode(token);
-        const subArray = decodedToken.sub.split("-");
-        await AsyncStorage.setItem("token", tokenIndex);
-        const firstName = subArray[subArray.length - 1].trim().split(" ")[0];
-        const lastName = subArray[subArray.length - 1].trim().split(" ")[1];
-        await AsyncStorage.setItem("accountName", `${lastName} ${firstName}`);
-        navigation.navigate("Home");
-      } else if (url.includes("account-deleted")) {
-        Alert.alert(
-          "Your account was deleted",
-          "Do you want to recover your account?",
-          [
-            { text: "No", style: "cancel" },
-            { text: "Yes", onPress: () => navigation.navigate("Recover") },
-          ]
+    const handleDeepLink = async (event) => {
+      const { url } = event;
+      const parsedUrl = Link.parse(url);
+      const { hostname, queryParams } = parsedUrl;
+      const excludeUrl = {
+        hostname: "smartstudyhub-manhtoan1312-8081.exp.direct",
+        queryParams: {
+          status: "SUCCESS",
+          transactionPaymentId: "5",
+        },
+      };
+      const isExcludedUrl = (parsedUrl, excludeUrl) => {
+        return (
+          parsedUrl.hostname === excludeUrl.hostname &&
+          parsedUrl.queryParams.status === excludeUrl.queryParams.status &&
+          parsedUrl.queryParams.transactionPaymentId ===
+            excludeUrl.queryParams.transactionPaymentId
         );
-      } else if (url.includes("account-banned")) {
-        Alert.alert("Your account was banned", "Please create a new account.");
+      };
+      if (queryParams.token && !isExcludedUrl(parsedUrl, excludeUrl)) {
+        try {
+          await AsyncStorage.setItem("token", queryParams.token);
+          const response = await getUserInfor();
+          if (response.success) {
+            await AsyncStorage.setItem("img", response.data.imageUrl);
+            await AsyncStorage.setItem("accountName", response.data.firstName);
+          }
+          console.log("Token saved to AsyncStorage:", queryParams.token);
+          navigation.goBack();
+        } catch (error) {
+          console.error("Failed to save token to AsyncStorage:", error);
+          Alert.log("Login fail", "Please try again");
+        }
+      } else {
+        console.log("Token not found or URL is excluded.");
       }
     };
 
-    unsubscribeRef.current = Linking.addEventListener("url", handleUrlChange);
-    return () => {
-      if (unsubscribeRef.current) {
-        unsubscribeRef.current.remove();
+    Link.getInitialURL().then((url) => {
+      if (url) {
+        handleDeepLink({ url });
       }
+    });
+    const subscription = Link.addEventListener("url", handleDeepLink);
+
+    return () => {
+      subscription.remove();
     };
-  }, [navigation]);
+  }, []);
+  // useEffect(() => {
+  //   const handleUrlChange = async ({ url }) => {
+  //     const tokenIndex = url.indexOf("token=");
+  //     if (tokenIndex !== -1) {
+  //       const token = url.slice(tokenIndex + 6);
+  //       const decodedToken = jwt_decode(token);
+  //       const subArray = decodedToken.sub.split("-");
+  //       await AsyncStorage.setItem("token", tokenIndex);
+  //       const firstName = subArray[subArray.length - 1].trim().split(" ")[0];
+  //       const lastName = subArray[subArray.length - 1].trim().split(" ")[1];
+  //       await AsyncStorage.setItem("accountName", `${lastName} ${firstName}`);
+  //       navigation.navigate("Home");
+  //     } else if (url.includes("account-deleted")) {
+  //       Alert.alert(
+  //         "Your account was deleted",
+  //         "Do you want to recover your account?",
+  //         [
+  //           { text: "No", style: "cancel" },
+  //           { text: "Yes", onPress: () => navigation.navigate("Recover") },
+  //         ]
+  //       );
+  //     } else if (url.includes("account-banned")) {
+  //       Alert.alert("Your account was banned", "Please create a new account.");
+  //     }
+  //   };
+
+  //   unsubscribeRef.current = Linking.addEventListener("url", handleUrlChange);
+  //   return () => {
+  //     if (unsubscribeRef.current) {
+  //       unsubscribeRef.current.remove();
+  //     }
+  //   };
+  // }, [navigation]);
   const handleLogin = async (e) => {
     if (email && password) {
       e.preventDefault();
@@ -89,7 +140,7 @@ function Login({ navigation }) {
               const response = await CreateOrUpdateDevice();
               if (!response.success) {
                 console.log("Error update device, message:", response.message);
-              }else{
+              } else {
               }
             }
           }
@@ -213,7 +264,7 @@ function Login({ navigation }) {
         <View style={styles.buttonContainer}>
           <Text style={styles.textMin}>Or</Text>
         </View>
-        {/* <View style={styles.buttonContainer}>
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.googleButton}
             onPress={handleGoogleLogin}
@@ -241,7 +292,7 @@ function Login({ navigation }) {
             <Entypo name="facebook-with-circle" size={24} color="white" />
             <Text style={styles.buttonTextSecondary}>Login With Facebook</Text>
           </TouchableOpacity>
-        </View> */}
+        </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.registerBtn}
