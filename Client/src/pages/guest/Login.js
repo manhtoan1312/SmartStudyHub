@@ -195,11 +195,6 @@ function Login({ navigation }) {
     );
   };
 
-  const handleFacebookLogin = () => {
-    Linking.openURL(
-      "https://api-smart-study-hub.onrender.com/oauth2/authorization/facebook"
-    );
-  };
 
   return (
     <View style={styles.container}>
@@ -284,7 +279,7 @@ function Login({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.buttonContainer}>
+        {/* <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.facebookButton}
             onPress={handleFacebookLogin}
@@ -292,7 +287,7 @@ function Login({ navigation }) {
             <Entypo name="facebook-with-circle" size={24} color="white" />
             <Text style={styles.buttonTextSecondary}>Login With Facebook</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.registerBtn}
