@@ -40,7 +40,7 @@ function PREMIUM({ navigation }) {
   };
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [navigation]);
 
   useEffect(() => {
     const fetchDataOnFocus = async () => {
@@ -57,8 +57,8 @@ function PREMIUM({ navigation }) {
       price: 1.99,
       description: "Pay the 3-month Premium account registration bill on",
     },
-    FOREVER: {
-      name: "Forever",
+    ONEYEAR: {
+      name: "One Year",
       price: 4.99,
       description: "Pay the Lifetime Premium account registration bill on",
     },
@@ -273,9 +273,9 @@ function PREMIUM({ navigation }) {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => openModal("FOREVER")}
+              onPress={() => openModal("ONEYEAR")}
             >
-              <Text style={styles.buttonText}>Forever</Text>
+              <Text style={styles.buttonText}>One Year</Text>
               <View style={{ flexDirection: "row", justifyContent: "center" }}>
                 <Text style={styles.buttonText}>4.99 USD </Text>
                 <Text style={styles.sale}>9.99 USD</Text>

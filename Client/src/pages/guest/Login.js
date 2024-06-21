@@ -117,7 +117,11 @@ function Login({ navigation }) {
       } else {
         if (response.status === "2_4_f") {
           Alert.alert(
-            "Your account has been deleted",
+            `Your account was banned ${
+              response.data?.numberDatesDeleted
+            } days ago, it will be deleted in ${
+              30 - response.data?.numberDatesDeleted
+            } days`,
             "Do you want to recover your account?",
             [
               {
@@ -132,7 +136,7 @@ function Login({ navigation }) {
           );
         } else if (response.status === "2_3_f") {
           Alert.alert(
-            "Account was banned",
+            `Your account was banned ${response.data?.numberDatesBanned} days ago`,
             "Do you want to report this problem?",
             [
               {
@@ -143,7 +147,7 @@ function Login({ navigation }) {
             ]
           );
         } else {
-          Alert.alert("Error", response.message);
+          Alert.alert("Error", response.data?.message);
         }
       }
     } else {

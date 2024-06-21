@@ -25,7 +25,7 @@ const login = async (email, password) => {
       };
     } else {
       const data = await response.json();
-      return { success: false, message: data.data.message, status:data.meta.code };
+      return { success: false, data: data.data, status:data.meta.code };
     }
   } catch (err) {
     console.log(err);
