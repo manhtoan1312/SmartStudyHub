@@ -8,6 +8,7 @@ import {
   faCalendarDays,
   faGear,
   faEnvelope,
+  faFile,
 } from "@fortawesome/free-solid-svg-icons";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
@@ -107,7 +108,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               </li>
               <li className="py-2 cursor-pointer">
                 <Link to={"/files"}>
-                  <FontAwesomeIcon icon={faCalendarDays} /> File
+                <FontAwesomeIcon icon={faFile} /> File
                 </Link>
               </li>
               <li className="py-2 cursor-pointer">
