@@ -868,7 +868,7 @@ const WorkDetail = ({ route, navigation }) => {
                       }}
                       value={work.workName}
                       placeholder="enter Work name"
-                      onChange={(text) => handleChangeName(text)}
+                      onChangeText={(text) => handleChangeName(text)}
                     />
                     <View style={styles.tagsContainer}>
                       {listTagSelected?.map((tag) => (
