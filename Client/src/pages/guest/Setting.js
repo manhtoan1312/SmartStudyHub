@@ -566,7 +566,7 @@ export default function Setting({ navigation }) {
           </View>
         </View>
 
-        <View style={s`flex flex-row justify-between py-2`}>
+        {/* <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Vibration Alert</Text>
           <Switch
             trackColor={{ false: "gray", true: "red" }}
@@ -574,7 +574,7 @@ export default function Setting({ navigation }) {
             value={vibrate}
             onValueChange={() => setVibrate(!vibrate)}
           />
-        </View>
+        </View> */}
       </View>
 
       <View style={s`flex flex-col justify-between px-2 mt-6 bg-white py-4`}>
@@ -668,16 +668,6 @@ export default function Setting({ navigation }) {
         </Pressable>
 
         <View style={s`flex flex-row justify-between py-2`}>
-          <Text style={s`text-lg font-medium`}>Daily reminder</Text>
-          <Switch
-            trackColor={{ false: "gray", true: "red" }}
-            thumbColor={"white"}
-            value={notifyEveryday}
-            onValueChange={() => setNotifyEveryday(!notifyEveryday)}
-          />
-        </View>
-
-        <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Group</Text>
           <Switch
             trackColor={{ false: "gray", true: "red" }}
@@ -699,11 +689,6 @@ export default function Setting({ navigation }) {
       </View>
 
       <View style={s`flex flex-col justify-between px-2 mt-6 bg-white py-4`}>
-        <View style={s`flex flex-row justify-between py-2`}>
-          <Text style={s`text-lg font-medium`}>User manual</Text>
-          <AntDesign style={s`text-lg`} name="right" />
-        </View>
-
         <TouchableOpacity
           onPress={() => navigate("HelpAndFeedBack")}
           style={s`flex flex-row justify-between py-2`}
@@ -711,15 +696,6 @@ export default function Setting({ navigation }) {
           <Text style={s`text-lg font-medium`}>Help and feedback</Text>
           <AntDesign style={s`text-lg`} name="right" />
         </TouchableOpacity>
-
-        <TouchableOpacity style={s`flex flex-row justify-between py-2`}>
-          <Text style={s`text-lg font-medium`}>Application Reviews</Text>
-          <AntDesign style={s`text-lg`} name="right" />
-        </TouchableOpacity>
-        <View style={s`flex flex-row justify-between py-2`}>
-          <Text style={s`text-lg font-medium`}>Application information</Text>
-          <AntDesign style={s`text-lg`} name="right" />
-        </View>
         {/* <View style={s`flex flex-row justify-between py-2`}>
             <Text style={s`text-lg font-medium`}>Ratings App</Text>
             <AntDesign style={s`text-lg`} name="right" />
@@ -765,7 +741,7 @@ const styles = StyleSheet.create({
   },
   labelText: {
     fontSize: 18,
-    fontWeight: 900,
+    fontWeight: "medium",
   },
   selectedValueText: {
     color: "gray",
