@@ -38,10 +38,9 @@ const statisticalWorks = async (startDate, endDate, userId, type) => {
         },
       }
     );
-
     const data = await response.json();
     if (response.status === 200) {
-      if (data.metacode === "15_3_f") {
+      if (data.meta.code === "15_3_f") {
         return { success: true, data: [] };
       }
       return { success: true, data: data.data };

@@ -212,7 +212,7 @@ const Report = ({ route, navigation }) => {
             {report.typeReport === "HELP" && (
               <View>
                 <TextInput
-                  placeholder="problem details*"
+                  placeholder="Problem Details*"
                   multiline
                   numberOfLines={6}
                   value={report.descriptionDetail}
@@ -279,7 +279,7 @@ const Report = ({ route, navigation }) => {
                   style={styles.input}
                 />
                 <TextInput
-                  placeholder="Describe your feelings"
+                  placeholder="Describe your feelings*"
                   multiline
                   numberOfLines={6}
                   value={report.descriptionDetail}

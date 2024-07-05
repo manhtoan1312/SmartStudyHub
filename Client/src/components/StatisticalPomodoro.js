@@ -1,13 +1,17 @@
 import { View } from "react-native";
 import PomodoroHeader from "./PomodoroHeader";
 import StatisticByMonth from "./StatisticByMonth";
+import StatisticPomodoro from "./StatisticPomodoro";
+import { ScrollView } from "react-native-gesture-handler";
 
 const StatisticalPomodoro = () => {
   return (
-    <View>
+    <ScrollView>
       <PomodoroHeader />
       <StatisticByMonth />
-    </View>
+      <StatisticPomodoro />
+      <View style={{ height: 200 }}></View>
+    </ScrollView>
   );
 };
 

@@ -28,6 +28,8 @@ const ImageFocus = () => {
     if (theme) {
       const parse = JSON.parse(theme);
       setTheme(parse);
+    } else {
+      setTheme(null);
     }
   };
   useEffect(() => {

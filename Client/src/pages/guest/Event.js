@@ -151,13 +151,17 @@ const Event = ({ navigation }) => {
           >
             <View style={[styles.item, { backgroundColor: "#f9c2ff" }]}>
               <View style={{ flexDirection: "row" }}>
-                <MaterialIcons
-                  name="task"
-                  style={{ paddingRight: 5 }}
-                  size={20}
-                  color="black"
-                />
-                <Text>{item.workName}</Text>
+                {item?.status === "COMPLETED" ? (
+                  <MaterialIcons
+                    name="task"
+                    style={{ paddingRight: 5 }}
+                    size={20}
+                    color="black"
+                  />
+                ) : (
+                  <AntDesign name="filetext1" size={18} color="black" />
+                )}
+                <Text> {item.workName}</Text>
               </View>
 
               <Text>{new Date(item.dueDate).toLocaleTimeString()}</Text>
@@ -194,11 +198,11 @@ const Event = ({ navigation }) => {
               />
               <Text style={styles.eventName}>
                 {item.eventName}{" "}
-                {item.isAllDay &&
+                {item.nowDateOutOfTotalDays &&
                   `(Day ${item.nowDateOutOfTotalDays}/${item.totalDays})`}
               </Text>
             </View>
-            {!item.isAllDay && (
+            {!item.nowDateOutOfTotalDays && (
               <Text style={styles.eventTime}>
                 {new Date(item.startTime).toLocaleTimeString()} -{" "}
                 {new Date(item.endTime).toLocaleTimeString()}

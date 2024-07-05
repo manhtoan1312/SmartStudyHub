@@ -41,20 +41,51 @@ const ReportHistory = ({ navigation }) => {
     fetchData();
   }, []);
 
+  const renderIcon = (item) => {
+    if (item.typeReport === "REPORTUSER") {
+      return (
+        <Image
+          style={{ width: 50, height: 50, resizeMode: "cover" }}
+          source={require("../../images/reportUser.png")}
+          resizeMode="cover"
+        ></Image>
+      );
+    }
+    if (item.typeReport === "REPORTPROBLEM") {
+      return (
+        <Image
+          style={{ width: 50, height: 50, resizeMode: "cover" }}
+          source={require("../../images/problem.png")}
+          resizeMode="cover"
+        ></Image>
+      );
+    }
+    if (item.typeReport === "HELP") {
+      return (
+        <Image
+          style={{ width: 50, height: 50, resizeMode: "cover" }}
+          source={require("../../images/help.webp")}
+          resizeMode="cover"
+        ></Image>
+      );
+    }
+    if (item.typeReport === "FEEDBACK") {
+      return (
+        <Image
+          style={{ width: 50, height: 50, resizeMode: "cover" }}
+          source={require("../../images/feedback.png")}
+          resizeMode="cover"
+        ></Image>
+      );
+    }
+  };
   const renderReport = (item) => {
     return (
       <Pressable
         onPress={() => navigation.navigate("ReportDetail", { id: item.id })}
         style={styles.itemContainer}
       >
-        <View style={styles.itemImage}>
-          {item?.urlFile && (
-            <Image
-              style={{ width: 50, height: 50, resizeMode: "cover" }}
-              source={{ uri: item?.urlFile }}
-            ></Image>
-          )}
-        </View>
+        <View style={styles.itemImage}>{renderIcon(item)}</View>
         <View>
           <View style={styles.itemInfo}>
             <Text style={styles.itemTitle}>{item?.title} </Text>

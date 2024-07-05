@@ -90,6 +90,9 @@ const ThisWeek = ({ navigation }) => {
     if (typeof key === "number" && key.toString().length === 13) {
       return new Date(key).toISOString().split("T")[0];
     } else {
+      if (key === 0 && typeof key === "number") {
+        return "Some Day";
+      }
       return key;
     }
   };

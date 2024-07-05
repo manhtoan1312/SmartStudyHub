@@ -61,7 +61,7 @@ const MainPage = () => {
       setIsPlaying(true);
       const newSoundObject = new Audio.Sound();
       if (isLocal) {
-        await newSoundObject.loadAsync(require("../sound/Done.mp3"));
+        await newSoundObject.loadAsync(require("../sound/DefaultBell.mp3"));
       } else {
         await newSoundObject.loadAsync({ uri: uri });
       }
@@ -195,9 +195,9 @@ const MainPage = () => {
       const sound = await AsyncStorage.getItem("soundDone");
       if (sound) {
         const parse = JSON.parse(sound);
-        playSoundWithLimit(parse.url, 2);
+        playSoundWithLimit(parse.url, 2, false);
       } else {
-        playSoundWithLimit(null, 2, false);
+        playSoundWithLimit(null, 2, true);
       }
     } else {
       Alert.alert("Create Pomodoro fail!", response.message);
@@ -258,7 +258,6 @@ const MainPage = () => {
       }
       if (role && role.role === "PREMIUM") {
         const response = await CheckStatusDevice();
-        console.log(response)
         if (!response.success) {
           ClearData()
         }else{

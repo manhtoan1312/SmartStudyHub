@@ -10,7 +10,7 @@ const StatisticalWork = () => {
         <WorkStatisticalHeader />
         <StatisticalWorkByType />
         <StatisticalWorkByProject />
-        {/* <StatisticWork /> */}
+        <StatisticWork />
         <View style={{height:200}}></View>
     </ScrollView>
   );

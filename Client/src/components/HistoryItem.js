@@ -100,6 +100,7 @@ const HistoryItem = ({ item, reload, navigation }) => {
           ></View>
         </View>
       </Swipeable>
+      {item?.works?.length > 0 && <Text>Works:</Text>}
       {item?.works &&
         item?.works.map((work, index) =>
           work?.id ? (
@@ -115,6 +116,7 @@ const HistoryItem = ({ item, reload, navigation }) => {
             </View>
           )
         )}
+      {item?.pomodoros?.length > 0 && <Text>Pomodoros:</Text>}
       {item?.pomodoros &&
         item?.pomodoros.map((pomo, index) =>
           pomo?.id ? (

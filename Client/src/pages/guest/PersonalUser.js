@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { getInforGuest } from "../../services/Guest/getDataService";
 import {
-  ScrollView,
-  Text,
   View,
+  Text,
   StyleSheet,
   TouchableOpacity,
   Pressable,
   Image,
+  FlatList,
 } from "react-native";
-import { AntDesign, Entypo } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import PomodoroHeader from "../../components/PomodoroHeader";
 import WorkStatisticalHeader from "../../components/WorkStatisticalHeader";
 import { getHistoryDaily } from "../../services/Guest/HistoryDailyService";
@@ -24,9 +24,11 @@ const PersonalUser = ({ route, navigation }) => {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(0);
   const [isMore, setIsMore] = useState(true);
-  const size = 2;
+  const size = 5;
   const isFocused = useIsFocused();
+
   const fetchDataHistory = async () => {
+    console.log("loading...");
     let id = await AsyncStorage.getItem("id");
     const role = await getRole();
     if (role) {
@@ -34,7 +36,18 @@ const PersonalUser = ({ route, navigation }) => {
     }
     const response = await getHistoryDaily(id, page, size);
     if (response.success) {
-      const updatedList = [...data, ...response.data];
+      const updatedList = [
+        ...data,
+        ...response.data.map((item) => ({
+          id: item.id,
+          userId: item.userId,
+          dates: item.dates,
+          works: item.works,
+          totalWorksDone: item.totalWorksDone,
+          totalPomodorosDone: item.totalPomodorosDone,
+          totalTimeFocus: item.totalTimeFocus,
+        })),
+      ];
       setData(updatedList);
       setPage((prevPage) => prevPage + 1);
     } else {
@@ -73,6 +86,7 @@ const PersonalUser = ({ route, navigation }) => {
       fetchDataHistory();
     }
   }, []);
+
   useEffect(() => {
     const fetchDataOnFocus = async () => {
       if (isFocused) {
@@ -81,9 +95,11 @@ const PersonalUser = ({ route, navigation }) => {
     };
     fetchDataOnFocus();
   }, [isFocused]);
+
   const handlePressMore = () => {
     navigation.navigate("Infor");
   };
+
   const handleClickAvt = () => {
     if (infor.role !== "GUEST") {
       navigation.navigate("Infor");
@@ -91,6 +107,22 @@ const PersonalUser = ({ route, navigation }) => {
       navigation.navigate("Login");
     }
   };
+
+  const renderItem = ({ item }) => (
+    <HistoryItem
+      key={item.id}
+      item={item}
+      reload={fetchDataNew}
+      navigation={navigation}
+    />
+  );
+
+  const handleLoadMore = () => {
+    if (isMore) {
+      fetchDataHistory();
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -131,29 +163,28 @@ const PersonalUser = ({ route, navigation }) => {
           {infor?.firstName} {infor?.lastName}
         </Text>
       </View>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <PomodoroHeader />
-        <WorkStatisticalHeader />
-        <View>
-          {data.length > 0 ? (
-            data.map((item) => (
-              <HistoryItem
-                key={item.id}
-                item={item}
-                reload={fetchDataNew}
-                navigation={navigation}
-              />
-            ))
-          ) : (
-            <View style={styles.noData}>
-              <Text style={styles.noDataText}>
-                You Do Not Have Any History In App
-              </Text>
-              <Text style={styles.noDataSubText}>Let's do something</Text>
-            </View>
-          )}
-        </View>
-      </ScrollView>
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+        ListHeaderComponent={() => (
+          <>
+            <PomodoroHeader />
+            <WorkStatisticalHeader />
+          </>
+        )}
+        ListEmptyComponent={() => (
+          <View style={styles.noData}>
+            <Text style={styles.noDataText}>
+              You Do Not Have Any History In App
+            </Text>
+            <Text style={styles.noDataSubText}>Let's do something</Text>
+          </View>
+        )}
+        contentContainerStyle={styles.scrollContent}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.3}
+      />
     </View>
   );
 };
@@ -191,7 +222,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: -40,
-    marginBottom:10
+    marginBottom: 10,
   },
   avtBorder: {
     width: 90,

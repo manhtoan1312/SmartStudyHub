@@ -67,10 +67,6 @@ const SoundDone = ({ navigation }) => {
       setSoundList(response.data);
     } else {
       Alert.alert("Error!", response.message);
-      // if(response.message==='Wrong token'){
-      //   await ClearData()
-      //   navigation.navigate('Login')
-      // }
     }
   };
 

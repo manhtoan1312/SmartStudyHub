@@ -336,9 +336,19 @@ const ModalSelectWork = ({ isVisible, play, onClose }) => {
           <View style={styles.modalContent}>
             <TouchableOpacity
               onPress={() => setChooseTypeVisible(true)}
-              style={{ justifyContent: "center", alignItems: "center" }}
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
             >
               <Text style={styles.modalTitle}>{selectedType}</Text>
+              <AntDesign
+                style={{ paddingLeft: 5, paddingBottom: 10 }}
+                name="caretdown"
+                size={20}
+                color="black"
+              />
             </TouchableOpacity>
             <ScrollView style={styles.workList}>{renderWorkItems()}</ScrollView>
           </View>

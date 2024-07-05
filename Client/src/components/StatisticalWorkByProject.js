@@ -111,14 +111,15 @@ const StatisticalWorkByProject = () => {
 
   const handleDayTypeChange = (text) => {
     setTypeDay(text);
+    const now = new Date(); 
     if (text === "Every Day") {
       setStartDate(now.getTime());
       setEndDate(setEndOfDay(now).getTime());
     } else if (text === "Every Week") {
-      const firstDayOfWeek = now.getDate() - now.getDay();
-      const lastDayOfWeek = firstDayOfWeek + 6;
-      setStartDate(new Date(now.setDate(firstDayOfWeek)).getTime());
-      setEndDate(setEndOfDay(new Date(now.setDate(lastDayOfWeek))).getTime());
+      const firstDayOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+      const lastDayOfWeek = new Date(now.setDate(firstDayOfWeek.getDate() + 6));
+      setStartDate(new Date(firstDayOfWeek.getTime()).getTime());
+      setEndDate(setEndOfDay(new Date(lastDayOfWeek.getTime())).getTime());
     } else if (text === "Every Month") {
       setStartDate(firstDayOfMonth.getTime());
       setEndDate(setEndOfDay(lastDayOfMonth).getTime());

@@ -106,7 +106,6 @@ const StatisticByMonth = () => {
         </TouchableOpacity>
       </View>
       <Calendar
-        current={selectedMonth}
         markingType={"custom"}
         dayComponent={({ date, state }) => renderDay(date)}
         hideExtraDays={true}

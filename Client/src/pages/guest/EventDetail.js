@@ -79,7 +79,7 @@ const EventDetail = ({ route, navigation }) => {
         `The event's end time cannot occur before the event's start time`
       );
     } else {
-      if (isAllDay) {
+      if (event.isAllDay) {
         eTime.setHours(23, 59);
       }
       changeData('endTime', eTime.getTime());
@@ -158,7 +158,6 @@ const EventDetail = ({ route, navigation }) => {
     const year = date.getFullYear();
     const hours = date.getHours().toString().padStart(2, "0");
     const minutes = date.getMinutes().toString().padStart(2, "0");
-
     if (event.isAllDay) {
       return `${day}/${month}/${year}`;
     } else {

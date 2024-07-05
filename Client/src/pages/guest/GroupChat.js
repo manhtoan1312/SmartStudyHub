@@ -14,7 +14,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
@@ -299,7 +299,21 @@ const GroupChat = ({ navigation }) => {
         <Pressable onPress={handleBack} style={styles.backButton}>
           <AntDesign name="left" size={24} color="black" />
         </Pressable>
-        <Text style={styles.title}>Group Chat</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <MaterialCommunityIcons
+            name="account-group-outline"
+            style={styles.itemRow}
+            size={20}
+            color="black"
+          />
+          <Text style={styles.title}>Group Chat</Text>
+        </View>
         <View style={{ width: 40 }} />
       </View>
       <FlatList
@@ -420,6 +434,11 @@ const styles = StyleSheet.create({
     padding: 10,
     marginLeft: 10,
     borderRadius: 20,
+  },
+  title: {
+    fontWeight: "700",
+    paddingLeft: 10,
+    fontSize: 18,
   },
 });
 

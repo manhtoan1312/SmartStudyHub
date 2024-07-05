@@ -410,10 +410,9 @@ const deleteAvtUploaded = async (publicId) => {
   }
 };
 
-const PayVNPay = async (vnpOrderInfor, vnpAmount, packagePremium) => {
+const PayVNPay = async (vnpOrderInfo, vnpAmount, packagePremium) => {
   try {
     const role = await getRole();
-
     if (role) {
       const { token } = role;
       const response = await fetch(`${uri}/payment/vnpay`, {
@@ -423,7 +422,7 @@ const PayVNPay = async (vnpOrderInfor, vnpAmount, packagePremium) => {
           authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          vnpOrderInfor,
+          vnpOrderInfo,
           vnpAmount,
           packagePremium,
         }),

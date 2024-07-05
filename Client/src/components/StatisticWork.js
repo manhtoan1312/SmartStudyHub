@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
-  TouchableOpacity,
-  Pressable,
   ScrollView,
+  Pressable,
+  StyleSheet,
+  Dimensions,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
@@ -14,18 +14,18 @@ import getRole from "../services/RoleService";
 import { statisticalWorks } from "../services/Guest/StatiscalService";
 import {
   format,
-  addDays,
   subDays,
-  addWeeks,
   subWeeks,
-  addMonths,
   subMonths,
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
   startOfDay,
   endOfDay,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  addDays,
+  addWeeks,
+  addMonths,
 } from "date-fns";
 
 const StatisticWork = () => {
@@ -34,13 +34,30 @@ const StatisticWork = () => {
   const [loading, setLoading] = useState(false);
   const now = new Date();
 
-  const [startDate, setStartDate] = useState(subMonths(now, 5).getTime());
-  const [endDate, setEndDate] = useState(now.getTime());
   const [typeDay, setTypeDay] = useState("Every Month");
+  const [startDate, setStartDate] = useState(subMonths(now, 4).getTime());
+  const [endDate, setEndDate] = useState(now.getTime());
 
   useEffect(() => {
-    fetchData(startDate, endDate);
-  }, [startDate, endDate]);
+    setInitialDateRange();
+  }, [typeDay]);
+
+  const setInitialDateRange = () => {
+    let initialStartDate, initialEndDate;
+    if (typeDay === "Every Day") {
+      initialStartDate = startOfDay(subDays(now, 15)).getTime(); // 15 days
+      initialEndDate = endOfDay(now).getTime();
+    } else if (typeDay === "Every Week") {
+      initialStartDate = startOfWeek(subWeeks(now, 4)).getTime(); // 4 weeks
+      initialEndDate = endOfWeek(now).getTime();
+    } else if (typeDay === "Every Month") {
+      initialStartDate = startOfMonth(subMonths(now, 4)).getTime(); // 4 months
+      initialEndDate = endOfMonth(now).getTime();
+    }
+    setStartDate(initialStartDate);
+    setEndDate(initialEndDate);
+    fetchData(initialStartDate, initialEndDate);
+  };
 
   const fetchData = async (start, end) => {
     setLoading(true);
@@ -50,19 +67,25 @@ const StatisticWork = () => {
       if (role) {
         id = role.id;
       }
+
       let type = "MONTH";
       if (typeDay === "Every Day") {
         type = "DAY";
-      }
-      if (typeDay === "Every Week") {
+      } else if (typeDay === "Every Week") {
         type = "WEEK";
       }
+
+      const formattedStart = new Date(start).toISOString();
+      const formattedEnd = new Date(end).toISOString();
+      console.log(
+        `Fetching data from ${formattedStart} to ${formattedEnd} with type ${type}`
+      );
       const response = await statisticalWorks(start, end, id, type);
-      if (response.success) {
-        setData((prevData) => [...prevData, ...response.data?.listDate]);
-      } else {
-        console.log("Error fetch data in app:", response.message);
-      }
+      let fetchedData = response.success ? response.data?.listDate || [] : [];
+      console.log(fetchedData)
+      let completeData = generateCompleteData(start, end, fetchedData, type);
+
+      setData(completeData);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -70,88 +93,108 @@ const StatisticWork = () => {
     }
   };
 
-  const handleDayTypeChange = (text) => {
-    setTypeDay(text);
-    setData([]);
-    let newStartDate, newEndDate;
-    if (text === "Every Day") {
-      newStartDate = startOfDay(subDays(now, 5)).getTime();
-      newEndDate = endOfDay(now).getTime();
-    } else if (text === "Every Week") {
-      newStartDate = startOfWeek(subWeeks(now, 5)).getTime();
-      newEndDate = endOfWeek(now).getTime();
-    } else if (text === "Every Month") {
-      newStartDate = startOfMonth(subMonths(now, 5)).getTime();
-      newEndDate = endOfMonth(now).getTime();
+  const generateCompleteData = (start, end, fetchedData, type) => {
+    let date = new Date(start);
+    let endDate = new Date(end);
+    let completeData = [];
+
+    while (date <= endDate) {
+      const formattedDate = format(date, "yyyy-MM-dd");
+      const existingData = fetchedData.find(
+        (item) =>
+          format(new Date(item.startDate), "yyyy-MM-dd") === formattedDate ||
+          format(new Date(item.endDate), "yyyy-MM-dd") === formattedDate
+      );
+
+      if (existingData) {
+        completeData.push(existingData);
+      } else {
+        completeData.push({
+          totalValue: 0,
+          startDate: date.getTime(),
+          endDate: date.getTime(),
+        });
+      }
+
+      if (type === "DAY") {
+        date = addDays(date, 1);
+      } else if (type === "WEEK") {
+        date = addWeeks(date, 1);
+      } else if (type === "MONTH") {
+        date = addMonths(date, 1);
+      }
     }
-    setStartDate(newStartDate);
-    setEndDate(newEndDate);
-    
-    fetchData(newStartDate, newEndDate);
+
+    return completeData;
+  };
+
+  const generateChartData = () => {
+    const screenWidth = Dimensions.get("window").width;
+    const barWidth = screenWidth / (data.length || 1);
+
+    return data.map((item, index) => ({
+      value: item.totalValue,
+      label: `${format(new Date(item?.endDate), "dd/MM")}`,
+      topLabelComponent: () => renderTopLabel(index),
+      onPress: () => setSelectedBar(index),
+    }));
   };
 
   const renderTopLabel = (index) => {
     if (data && data.length > 0) {
       if (selectedBar === index && data[index]) {
         const { totalValue, startDate, endDate } = data[index];
-        return (
-          <View style={styles.topLabelContainer}>
-            <Text style={styles.totalValue}>{totalValue}</Text>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.date}>
-                {format(new Date(startDate), "MM/dd")}-
-              </Text>
-              <Text style={styles.date}>
-                {format(new Date(endDate), "MM/dd")}
-              </Text>
+        try {
+          return (
+            <View style={styles.topLabelContainer}>
+              <Text style={styles.totalValue}>{totalValue}</Text>
+              <Text style={styles.date}>{format(new Date(startDate), "MM/dd")}</Text>
+              <Text style={styles.date}>{format(new Date(endDate), "MM/dd")}</Text>
             </View>
-          </View>
-        );
+          );
+        } catch (error) {
+          console.error("Error formatting date:", startDate, endDate, error);
+        }
       }
     }
     return null;
   };
 
-  const chartData =
-    data.length > 0
-      ? data.map((item, index) => ({
-          value: item.totalValue,
-          label: format(new Date(item.startDate), "MM/dd"),
-          topLabelComponent: () => renderTopLabel(index),
-          onPress: () => setSelectedBar(index),
-        }))
-      : [];
-
-  const handleScroll = ({ nativeEvent }) => {
-    if (isCloseToBottom(nativeEvent)) {
-      if (!loading) {
-        let newStartDate, newEndDate;
-        if (typeDay === "Every Day") {
-          newStartDate = startOfDay(subDays(new Date(startDate), 5)).getTime();
-          newEndDate = startOfDay(new Date(startDate)).getTime();
-        } else if (typeDay === "Every Week") {
-          newStartDate = startOfWeek(subWeeks(new Date(startDate), 5)).getTime();
-          newEndDate = startOfWeek(new Date(startDate)).getTime();
-        } else if (typeDay === "Every Month") {
-          newStartDate = startOfMonth(subMonths(new Date(startDate), 5)).getTime();
-          newEndDate = startOfMonth(new Date(startDate)).getTime();
-        }
-        setStartDate(newStartDate);
-        fetchData(newStartDate, newEndDate);
-      }
-    }
+  const handleDayTypeChange = (text) => {
+    setTypeDay(text);
+    setData([]);
+    setInitialDateRange();
   };
 
-  const isCloseToBottom = ({
-    layoutMeasurement,
-    contentOffset,
-    contentSize,
-  }) => {
-    const paddingToBottom = 20;
-    return (
-      layoutMeasurement.height + contentOffset.y >=
-      contentSize.height - paddingToBottom
-    );
+  const handleScroll = (direction) => {
+    setData([])
+    let newStartDate, newEndDate;
+    if (typeDay === "Every Day") {
+      if (direction === "left") {
+        newStartDate = subDays(new Date(startDate), 15).getTime();
+        newEndDate = subDays(new Date(endDate), 15).getTime();
+      } else {
+        newStartDate = addDays(new Date(startDate), 15).getTime();
+        newEndDate = addDays(new Date(endDate), 15).getTime();
+      }
+    } else if (typeDay === "Every Week") {
+      if (direction === "left") {
+        newStartDate = subWeeks(new Date(startDate), 4).getTime();
+        newEndDate = subWeeks(new Date(endDate), 4).getTime();
+      } else {
+        newStartDate = addWeeks(new Date(startDate), 4).getTime();
+        newEndDate = addWeeks(new Date(endDate), 4).getTime();
+      }
+    } else if (direction === "left") {
+      newStartDate = subMonths(new Date(startDate), 4).getTime();
+      newEndDate = subMonths(new Date(endDate), 4).getTime();
+    } else {
+      newStartDate = addMonths(new Date(startDate), 4).getTime();
+      newEndDate = addMonths(new Date(endDate), 4).getTime();
+    }
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
+    fetchData(newStartDate, newEndDate);
   };
 
   return (
@@ -164,22 +207,31 @@ const StatisticWork = () => {
           <View style={styles.content}>
             <View>
               <Text style={styles.text}>
-                Total: {data.reduce((acc, item) => acc + item.totalValue, 0)}{" "}
+                Total:{" "}
+                {data.length > 0
+                  ? data.reduce((acc, item) => acc + item.totalValue, 0)
+                  : 0}{" "}
                 Work
               </Text>
             </View>
             <View>
               <Text style={styles.text}>
-                Max: {Math.max(...data.map((item) => item.totalValue))} Work
+                Max:{" "}
+                {data.length > 0
+                  ? Math.max(...data.map((item) => item.totalValue))
+                  : 0}{" "}
+                Work
               </Text>
             </View>
             <View>
               <Text style={styles.text}>
                 Average:{" "}
-                {(
-                  data.reduce((acc, item) => acc + item.totalValue, 0) /
-                  data.length
-                ).toFixed(2)}{" "}
+                {data.length > 0
+                  ? (
+                      data.reduce((acc, item) => acc + item.totalValue, 0) /
+                      data.length
+                    ).toFixed(2)
+                  : 0}{" "}
                 Work
               </Text>
             </View>
@@ -215,12 +267,12 @@ const StatisticWork = () => {
           <Text>Every Month</Text>
         </Pressable>
       </View>
-      <ScrollView onScroll={handleScroll} scrollEventThrottle={16}>
+
+      <ScrollView horizontal>
         <View style={styles.charts}>
-          {chartData.length > 0 ? (
+          {data.length > 0 ? (
             <BarChart
-              width={300}
-              data={chartData}
+              data={generateChartData()}
               frontColor="#177AD5"
               barWidth={30}
               noOfSections={5}
@@ -242,6 +294,20 @@ const StatisticWork = () => {
           )}
         </View>
       </ScrollView>
+      <View style={styles.navigationContainer}>
+        <Pressable
+          style={styles.navButton}
+          onPress={() => handleScroll("left")}
+        >
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </Pressable>
+        <Pressable
+          style={styles.navButton}
+          onPress={() => handleScroll("right")}
+        >
+          <Ionicons name="arrow-forward" size={24} color="black" />
+        </Pressable>
+      </View>
     </View>
   );
 };
@@ -306,6 +372,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 50,
     maxHeight: 300,
+    width: Dimensions.get("window").width,
   },
   topLabelContainer: {
     alignItems: "center",
@@ -321,6 +388,15 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 8,
     color: "white",
+  },
+  navigationContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 10,
+    paddingBottom:20
+  },
+  navButton: {
+    marginHorizontal: 10,
   },
 });
 
