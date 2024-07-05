@@ -1,6 +1,3 @@
-const TextEncodingPolyfill = require("text-encoding");
-const { TextDecoder, TextEncoder } = TextEncodingPolyfill;
-
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
@@ -44,7 +41,12 @@ const GroupChat = ({ navigation }) => {
       }
       setId(uId);
       await fetchMessages(0, true);
-      flatListRef.current.scrollToEnd({ animated: true });
+      // Scroll to bottom after fetching initial messages
+      setTimeout(() => {
+        if (flatListRef.current) {
+          flatListRef.current.scrollToEnd({ animated: true });
+        }
+      }, 500);
       connect(uId);
     };
     fetchData(0);
@@ -105,6 +107,12 @@ const GroupChat = ({ navigation }) => {
               ? result.data.reverse()
               : [...result.data.reverse(), ...prevMessages]
           );
+          // Scroll to bottom after fetching initial messages
+          if (initial && flatListRef.current) {
+            setTimeout(() => {
+              flatListRef.current.scrollToEnd({ animated: true });
+            }, 500);
+          }
         }
       } else {
         setEndList(true);
@@ -148,6 +156,10 @@ const GroupChat = ({ navigation }) => {
   const onMessageReceived = (message) => {
     const receivedMessage = JSON.parse(message.body);
     setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+    // Scroll to bottom when a new message is received
+    if (flatListRef.current) {
+      flatListRef.current.scrollToEnd({ animated: true });
+    }
   };
 
   const handleBack = () => {
@@ -323,6 +335,7 @@ const GroupChat = ({ navigation }) => {
         keyExtractor={(item, index) => index.toString()}
         onStartReached={handleLoadMore}
         onStartReachedThreshold={0.5}
+        ListFooterComponent={() => <View style={{ height: 20 }}></View>}
         ListHeaderComponent={() => (
           <View style={styles.headerContainer}>
             {loading && !endList && <ActivityIndicator size="large" />}
