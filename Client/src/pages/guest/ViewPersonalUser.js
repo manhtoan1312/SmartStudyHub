@@ -9,6 +9,7 @@ import {
   Pressable,
   Image,
   Alert,
+  Modal,
 } from "react-native";
 import { AntDesign, Entypo } from "@expo/vector-icons";
 import PomodoroHeader from "../../components/PomodoroHeader";
@@ -25,6 +26,8 @@ const ViewPersonalUser = ({ route, navigation }) => {
   const [reportVisible, setReportVisible] = useState(false);
   const [submitVisible, setSubmitVisible] = useState(false);
   const [title, setTitle] = useState();
+  const [modalVisible, setModalVisible] = useState(false);
+
   const fetchData = async () => {
     const response = await getInforGuest(id);
     if (response.success) {
@@ -37,8 +40,9 @@ const ViewPersonalUser = ({ route, navigation }) => {
   useEffect(() => {
     fetchData();
   }, []);
+
   const handlePressReport = () => {
-    setReportVisible(true)
+    setReportVisible(true);
   };
 
   const handleSubmitTitle = (text) => {
@@ -58,15 +62,19 @@ const ViewPersonalUser = ({ route, navigation }) => {
       userWasReportedId: id,
       title: title,
       descriptionDetail: desc,
-      typeReport:'REPORTUSER'
+      typeReport: "REPORTUSER",
     });
-    if(response.success){
-      Alert.alert("Send Report successfully!")
-    }
-    else{
-      Alert.alert("Send Report fail!", response.message)
+    if (response.success) {
+      Alert.alert("Send Report successfully!");
+    } else {
+      Alert.alert("Send Report fail!", response.message);
     }
   };
+
+  const handleAvatarPress = () => {
+    setModalVisible(true);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -92,7 +100,7 @@ const ViewPersonalUser = ({ route, navigation }) => {
         </View>
       )}
       <View style={styles.avtContainter}>
-        <Pressable style={styles.avtBorder}>
+        <Pressable style={styles.avtBorder} onPress={handleAvatarPress}>
           <Image
             style={styles.avt}
             resizeMode="cover"
@@ -139,6 +147,26 @@ const ViewPersonalUser = ({ route, navigation }) => {
           </View>
         )}
       </ScrollView>
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+        animationType="slide"
+      >
+        <View style={styles.modalContainer}>
+          <Image
+            style={styles.fullScreenImage}
+            resizeMode="contain"
+            source={{ uri: infor?.imageUrl }}
+          />
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.closeButtonText}>X</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
       <ModalReportUser
         visible={reportVisible}
         onClose={() => setReportVisible(false)}
@@ -188,7 +216,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: -40,
-    marginBottom:10
+    marginBottom: 10,
   },
   avtBorder: {
     width: 90,
@@ -226,6 +254,28 @@ const styles = StyleSheet.create({
   userInfoText: {
     marginLeft: 10,
     fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  fullScreenImage: {
+    width: "90%",
+    height: "90%",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 10,
+  },
+  closeButtonText: {
+    fontSize: 20,
+    fontWeight: "700",
   },
 });
 

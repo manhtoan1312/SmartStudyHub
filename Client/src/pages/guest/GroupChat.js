@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+const TextEncodingPolyfill = require("text-encoding");
+const { TextDecoder, TextEncoder } = TextEncodingPolyfill;
 import {
   View,
   Text,
@@ -86,8 +88,7 @@ const GroupChat = ({ navigation }) => {
         body: JSON.stringify({ userId, type: "JOIN" }),
       });
     } else {
-      console.error("WebSocket is not connected. Retrying in 1 second...");
-      setTimeout(() => sendJoinMessage(stompClient, userId), 1000);
+      console.error("WebSocket is not connected. Please Retry again...");
     }
   };
 
@@ -156,7 +157,6 @@ const GroupChat = ({ navigation }) => {
   const onMessageReceived = (message) => {
     const receivedMessage = JSON.parse(message.body);
     setMessages((prevMessages) => [...prevMessages, receivedMessage]);
-    // Scroll to bottom when a new message is received
     if (flatListRef.current) {
       flatListRef.current.scrollToEnd({ animated: true });
     }
@@ -356,8 +356,6 @@ const GroupChat = ({ navigation }) => {
             )}
           </View>
         )}
-        // refreshing={refreshing}
-        // onRefresh={handleRefresh}
       />
       <View style={styles.inputContainer}>
         <TextInput

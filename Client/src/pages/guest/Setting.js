@@ -49,7 +49,6 @@ export default function Setting({ navigation }) {
   const [email, setEmail] = useState("");
   const [img, setImg] = useState(null);
   const [name, setName] = useState("");
-  const [infor, setInfor] = useState({});
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const { isStop } = useSelector((state) => state.focus);
@@ -71,9 +70,17 @@ export default function Setting({ navigation }) {
       const uName = await AsyncStorage.getItem("accountName");
       if (role) {
         setEmail(role.email);
+        const response = await getUserInfor();
+        if (response.success) {
+          setPreTime(response.data.dueDatePremium);
+        }
+      } else {
+        setEmail(null);
       }
       if (uName) {
         setName(uName);
+      } else {
+        setName(null);
       }
       const storedImg = await AsyncStorage.getItem("img");
       setImg(storedImg ? storedImg : null);
@@ -88,12 +95,6 @@ export default function Setting({ navigation }) {
       if (breakSound) {
         const parse = JSON.parse(breakSound);
         setBreakSound(parse?.nameSound);
-      }
-      if (role) {
-        const response = await getUserInfor();
-        if (response.success) {
-          setPreTime(response.data.dueDatePremium);
-        }
       }
       const storedSettings = await AsyncStorage.getItem("settings");
       if (storedSettings) {
@@ -696,10 +697,15 @@ export default function Setting({ navigation }) {
           <Text style={s`text-lg font-medium`}>Help and feedback</Text>
           <AntDesign style={s`text-lg`} name="right" />
         </TouchableOpacity>
-        {/* <View style={s`flex flex-row justify-between py-2`}>
-            <Text style={s`text-lg font-medium`}>Ratings App</Text>
+        {email && (
+          <TouchableOpacity
+            onPress={() => navigate("Infor")}
+            style={s`flex flex-row justify-between py-2`}
+          >
+            <Text style={s`text-lg font-medium`}>Profile</Text>
             <AntDesign style={s`text-lg`} name="right" />
-          </View> */}
+          </TouchableOpacity>
+        )}
       </View>
 
       {!email && (

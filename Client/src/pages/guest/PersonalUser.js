@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { getInforGuest } from "../../services/Guest/getDataService";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,15 +7,19 @@ import {
   Pressable,
   Image,
   FlatList,
+  Modal,
+  Button,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import PomodoroHeader from "../../components/PomodoroHeader";
 import WorkStatisticalHeader from "../../components/WorkStatisticalHeader";
+import { getInforGuest } from "../../services/Guest/getDataService";
 import { getHistoryDaily } from "../../services/Guest/HistoryDailyService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import getRole from "../../services/RoleService";
 import HistoryItem from "../../components/HistoryItem";
 import { useIsFocused } from "@react-navigation/native";
+import { Menu, Provider } from "react-native-paper";
 
 const PersonalUser = ({ route, navigation }) => {
   const [id, setId] = useState(1);
@@ -24,6 +27,8 @@ const PersonalUser = ({ route, navigation }) => {
   const [data, setData] = useState([]);
   const [page, setPage] = useState(0);
   const [isMore, setIsMore] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
   const size = 5;
   const isFocused = useIsFocused();
 
@@ -100,7 +105,22 @@ const PersonalUser = ({ route, navigation }) => {
     navigation.navigate("Infor");
   };
 
-  const handleClickAvt = () => {
+  const handleClickAvt = async () => {
+    const role = await getRole();
+    if (role) {
+      setMenuVisible(true);
+    } else {
+      navigation.navigate("Login");
+    }
+  };
+
+  const handleViewAvatar = () => {
+    setMenuVisible(false);
+    setModalVisible(true);
+  };
+
+  const handleProfile = () => {
+    setMenuVisible(false);
     if (infor.role !== "GUEST") {
       navigation.navigate("Infor");
     } else {
@@ -124,68 +144,99 @@ const PersonalUser = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <AntDesign name="left" size={24} color="black" />
-        </TouchableOpacity>
-        <Text style={styles.dateText}>User Information</Text>
-        <Pressable onPress={handlePressMore}>
-          {infor.role !== "GUEST" ? (
-            <AntDesign name="right" size={24} color="black" />
-          ) : (
-            <></>
-          )}
-        </Pressable>
-      </View>
-      {infor?.coverImage ? (
-        <Image
-          resizeMode="cover"
-          style={styles.coverImage}
-          source={{ uri: infor?.coverImage }}
-        />
-      ) : (
-        <View style={styles.image}>
-          <Text style={{ color: "#333", fontWeight: "500", fontSize: 18 }}>
-            No Cover Image
-          </Text>
+    <Provider>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <AntDesign name="left" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.dateText}>User Information</Text>
+          <Pressable onPress={handlePressMore}>
+            {infor.role !== "GUEST" ? (
+              <AntDesign name="right" size={24} color="black" />
+            ) : (
+              <></>
+            )}
+          </Pressable>
         </View>
-      )}
-      <View style={styles.avtContainter}>
-        <Pressable onPress={() => handleClickAvt()} style={styles.avtBorder}>
+        {infor?.coverImage ? (
           <Image
-            style={styles.avt}
             resizeMode="cover"
-            source={{ uri: infor?.imageUrl }}
+            style={styles.coverImage}
+            source={{ uri: infor?.coverImage }}
           />
-        </Pressable>
-        <Text>
-          {infor?.firstName} {infor?.lastName}
-        </Text>
-      </View>
-      <FlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        ListHeaderComponent={() => (
-          <>
-            <PomodoroHeader />
-            <WorkStatisticalHeader />
-          </>
-        )}
-        ListEmptyComponent={() => (
-          <View style={styles.noData}>
-            <Text style={styles.noDataText}>
-              You Do Not Have Any History In App
+        ) : (
+          <View style={styles.image}>
+            <Text style={{ color: "#333", fontWeight: "500", fontSize: 18 }}>
+              No Cover Image
             </Text>
-            <Text style={styles.noDataSubText}>Let's do something</Text>
           </View>
         )}
-        contentContainerStyle={styles.scrollContent}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.3}
-      />
-    </View>
+        <View style={styles.avtContainter}>
+          <Menu
+            visible={menuVisible}
+            onDismiss={() => setMenuVisible(false)}
+            anchor={
+              <Pressable onPress={handleClickAvt} style={styles.avtBorder}>
+                <Image
+                  style={styles.avt}
+                  resizeMode="cover"
+                  source={{ uri: infor?.imageUrl }}
+                />
+              </Pressable>
+            }
+          >
+            <Menu.Item onPress={handleViewAvatar} title="View Avatar" />
+            <Menu.Item onPress={handleProfile} title="Profile" />
+          </Menu>
+          <Text>
+            {infor?.firstName} {infor?.lastName}
+          </Text>
+        </View>
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          ListHeaderComponent={() => (
+            <>
+              <PomodoroHeader />
+              <WorkStatisticalHeader />
+            </>
+          )}
+          ListEmptyComponent={() => (
+            <View style={styles.noData}>
+              <Text style={styles.noDataText}>
+                You Do Not Have Any History In App
+              </Text>
+              <Text style={styles.noDataSubText}>Let's do something</Text>
+            </View>
+          )}
+          contentContainerStyle={styles.scrollContent}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.3}
+        />
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          onRequestClose={() => setModalVisible(false)}
+          animationType="slide"
+        >
+          <View style={styles.modalContainer}>
+            <Image
+              style={styles.fullScreenImage}
+              resizeMode="contain"
+              source={{ uri: infor?.imageUrl }}
+            />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>X</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </View>
+    </Provider>
   );
 };
 
@@ -261,6 +312,28 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "500",
     color: "gray",
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  fullScreenImage: {
+    width: "90%",
+    height: "90%",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 10,
+  },
+  closeButtonText: {
+    fontSize: 20,
+    fontWeight: "700",
   },
 });
 
