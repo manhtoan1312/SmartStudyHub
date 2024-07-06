@@ -20,6 +20,7 @@ const FullScreenMode = ({ navigation }) => {
     pomodoroTime,
     defaultTimePomodoro,
     workMode,
+    mode,
   } = useSelector((state) => state.focus);
   const dispatch = useDispatch();
 
@@ -33,8 +34,7 @@ const FullScreenMode = ({ navigation }) => {
       }}
     >
       <TouchableOpacity style={styles.back} onPress={() => navigation.goBack()}>
-      <AntDesign name="closecircle" size={24} color="white" />
-
+        <AntDesign name="closecircle" size={24} color="white" />
       </TouchableOpacity>
       <View style={styles.numberBorder}>
         <AnimatedNumbers
@@ -85,11 +85,12 @@ const FullScreenMode = ({ navigation }) => {
               onPress={() =>
                 dispatch(
                   setFocus({
-                    isStop: true,
                     isPause: true,
-                    secondsLeft: workId
-                      ? pomodoroTime * 60
-                      : defaultTimePomodoro * 60,
+                    isStop: true,
+                    secondsLeft:
+                      mode === "+"
+                        ? 0
+                        : (workId ? pomodoroTime : defaultTimePomodoro) * 60,
                   })
                 )
               }
@@ -136,11 +137,11 @@ const FullScreenMode = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  back:{
-    position:'absolute',
-    left:20,
-    top:20,
-    padding:10
+  back: {
+    position: "absolute",
+    left: 20,
+    top: 20,
+    padding: 10,
   },
   number: {
     fontSize: 150,
