@@ -74,13 +74,9 @@ export default function Setting({ navigation }) {
         if (response.success) {
           setPreTime(response.data.dueDatePremium);
         }
-      } else {
-        setEmail(null);
       }
       if (uName) {
         setName(uName);
-      } else {
-        setName(null);
       }
       const storedImg = await AsyncStorage.getItem("img");
       setImg(storedImg ? storedImg : null);
