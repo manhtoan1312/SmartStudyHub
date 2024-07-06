@@ -555,14 +555,6 @@ export default function Setting({ navigation }) {
           </View>
         </TouchableOpacity>
 
-        <View style={s`flex flex-row justify-between py-2`}>
-          <Text style={s` text-lg font-medium`}>Noise helps concentration</Text>
-          <View style={s`flex flex-row`}>
-            <Text style={s`text-gray-500 text-lg`}>{focusSound}</Text>
-            <AntDesign style={s`text-lg`} name="right" />
-          </View>
-        </View>
-
         {/* <View style={s`flex flex-row justify-between py-2`}>
           <Text style={s`text-lg font-medium`}>Vibration Alert</Text>
           <Switch
