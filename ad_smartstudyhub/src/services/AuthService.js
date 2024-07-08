@@ -14,12 +14,19 @@ const login = async (email, password) => {
 
     const { status, data } = response;
     if (status === 200) {
-      return {
-        success: true,
-        message: data.meta.message,
-        token: data.data.token,
-        image: data.data.imageUrl,
-      };
+      if (data.data.role !== "ADMIN") {
+        return {
+          success: false,
+          message: "You need login as admin",
+        };
+      } else {
+        return {
+          success: true,
+          message: data.meta.message,
+          token: data.data.token,
+          image: data.data.imageUrl,
+        };
+      }
     }
   } catch (err) {
     if (err.response) {
