@@ -5,7 +5,8 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,SafeAreaView
+  Alert,
+  SafeAreaView,
 } from "react-native";
 import { ResendOTP } from "../../services/AccountService";
 import { FontAwesome } from "@expo/vector-icons";
@@ -13,11 +14,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import jwtDecode from "jwt-decode";
 import getRole from "../../services/RoleService";
 import { CreateOrUpdateDevice } from "../../services/PREMIUM/DevicesService";
+import { useDispatch } from "react-redux";
+import { resetFocus } from "../../slices/focusSlice";
 const TFAOTP = ({ route, navigation }) => {
-  const { otpCode, time, email, token} = route.params;
+  const { otpCode, time, email, token } = route.params;
   const [otpInput, setOtpInput] = useState("");
   const [resendDisabled, setResendDisabled] = useState(true);
   const [countdown, setCountdown] = useState(60);
+  const dispatch = useDispatch();
   let expiredTime = time;
   let otp = otpCode;
   useEffect(() => {
@@ -36,9 +40,23 @@ const TFAOTP = ({ route, navigation }) => {
     const currentTime = new Date().getTime();
     if (currentTime < expiredTime) {
       if (otpInput === otp) {
-        await AsyncStorage.setItem("token", token);
-        const role = await getRole()
-        if(role.role){
+        dispatch(resetFocus());
+        await ClearData();
+        try {
+          await AsyncStorage.setItem("token", queryParams.token);
+          const response = await getUserInfor();
+          if (response.success) {
+            await AsyncStorage.setItem("img", response.data.imageUrl);
+            await AsyncStorage.setItem("accountName", `${response.data?.firstName} ${response.data?.lastName}`);
+          }
+          console.log("Token saved to AsyncStorage:", queryParams.token);
+          navigation.goBack();
+        } catch (error) {
+          console.error("Failed to save token to AsyncStorage:", error);
+          Alert.log("Login fail", "Please try again");
+        }
+        const role = await getRole();
+        if (role.role) {
           if (role && role.role === "PREMIUM") {
             const response = await CreateOrUpdateDevice();
             if (!response.success) {

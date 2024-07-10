@@ -114,15 +114,20 @@ const DoneDetail = ({ navigation }) => {
     setSelectedCategory(category);
     toggleModal();
   };
-  const handleCreatePomodoro = () => {
-    navigation.navigate("CreatePomodoro", {
-      work: {
-        id: -1,
-        projectId: -1,
-        workName: "None",
-        projectName: "None",
-      },
-    });
+  const handleCreatePomodoro = async () => {
+    const role = await getRole();
+    if (role && role.role === "PREMIUM") {
+      navigation.navigate("CreatePomodoro", {
+        work: {
+          id: -1,
+          projectId: -1,
+          workName: "None",
+          projectName: "None",
+        },
+      });
+    } else {
+      navigation.navigate("PREMIUM");
+    }
   };
   const translatePomodoro = (listPo) => {
     if (listPo) {
@@ -293,7 +298,7 @@ const DoneDetail = ({ navigation }) => {
       {/* Content based on selected category */}
       {selectedCategory === "Work" && (
         <ScrollView>
-          {listwork?.map((item,index) => (
+          {listwork?.map((item, index) => (
             <View key={index}>
               <View
                 style={{

@@ -10,7 +10,7 @@ import HourPicker from "./HourPicker";
 
 const StatisticByMonth = () => {
   const [data, setData] = useState({});
-  const [goal, setGoal] = useState(2); // in hours
+  const [goal, setGoal] = useState(2);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [pickerVisible, setPickerVisible] = useState(false);
   const daysToCompleteGoal = useMemo(() => {
@@ -58,7 +58,7 @@ const StatisticByMonth = () => {
   const renderDay = (day) => {
     const date = new Date(day.dateString);
     const entry = data?.listDate?.find(
-      (d) => new Date(d.date).toDateString() === date.toDateString()
+      (d) => new Date(d.startDate).toDateString() === date.toDateString()
     );
     const progress = entry ? (entry.totalValue / 60 / goal) * 100 : 0;
     return (

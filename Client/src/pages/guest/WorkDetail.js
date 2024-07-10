@@ -298,9 +298,14 @@ const WorkDetail = ({ route, navigation }) => {
   const handleCreatePomodoro = async () => {
     setMoreOptionsModalVisible(false);
     await updateWork();
-    navigation.navigate("CreatePomodoro", {
-      work: work,
-    });
+    const role = await getRole()
+    if(role && role.role==='PREMIUM'){
+      navigation.navigate("CreatePomodoro", {
+        work: work,
+      });
+    }else{
+      navigation.navigate('PREMIUM')
+    }
   };
   const stringToNumberArray = (str) => {
     return String(str).split(",").map(Number);

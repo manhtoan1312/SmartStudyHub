@@ -404,8 +404,8 @@ export default function Setting({ navigation }) {
         if (!rsLogout.success) {
           throw new Error(rsLogout.message);
         }
+        dispatch(resetFocus())
         await ClearData();
-
         if (!rsUpdate.success) {
           throw new Error("Update time last use fail");
         }

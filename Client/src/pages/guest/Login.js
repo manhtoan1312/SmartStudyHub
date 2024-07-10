@@ -25,12 +25,15 @@ import { CreateOrUpdateDevice } from "../../services/PREMIUM/DevicesService";
 import getRole from "../../services/RoleService";
 import * as Link from "expo-linking";
 import { getUserInfor } from "../../services/UserService";
+import ClearData from "../../services/ClearData";
+import { useDispatch } from "react-redux";
+import { resetFocus } from "../../slices/focusSlice";
 function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [hide, setHide] = useState(true);
   const unsubscribeRef = useRef(null);
-
+  const dispatch = useDispatch();
   useEffect(() => {
     const handleDeepLink = async (event) => {
       const { url } = event;
@@ -43,7 +46,7 @@ function Login({ navigation }) {
           const response = await getUserInfor();
           if (response.success) {
             await AsyncStorage.setItem("img", response.data.imageUrl);
-            await AsyncStorage.setItem("accountName", response.data.firstName);
+            await AsyncStorage.setItem("accountName", `${response.data?.firstName} ${response.data?.lastName}`);
           }
           console.log("Token saved to AsyncStorage:", queryParams.token);
           navigation.goBack();
@@ -101,7 +104,12 @@ function Login({ navigation }) {
             Alert.alert("Login failed", response.message);
           }
         } else {
-          await AsyncStorage.setItem("token", response.token);
+          dispatch(resetFocus());
+          await ClearData();
+          await AsyncStorage.setItem("token", response.data.token);
+          await AsyncStorage.setItem("img", response.data.imageUrl);
+          await AsyncStorage.setItem("accountName", `${response.data?.firstName} ${response.data?.lastName}`);
+
           const role = await getRole();
           if (role.role) {
             if (role && role.role === "PREMIUM") {
