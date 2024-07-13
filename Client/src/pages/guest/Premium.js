@@ -21,13 +21,44 @@ import { s } from "react-native-wind";
 import getRole from "../../services/RoleService";
 import { PayVNPay, getUserInfor, PayPaypal } from "../../services/UserService";
 import { useIsFocused } from "@react-navigation/native";
-
+import * as Link from "expo-linking";
 function PREMIUM({ navigation }) {
   const [infor, setInfor] = useState({});
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const isFocused = useIsFocused();
   const [checkRole, setCheckRole] = useState(false);
+  useEffect(() => {
+    const handleDeepLink = async (event) => {
+      const { url } = event;
+      const parsedUrl = Link.parse(url);
+      const { hostname, queryParams } = parsedUrl;
+      if (queryParams?.status === "SUCCESS") {
+        fetchData()
+        Alert.alert('Payment success!!')
+        const role = await getRole();
+        if (role.role !== "PREMIUM") {
+          Alert.alert(
+            "Payment success!",
+            "Please login again to access new advantages"
+          );
+        }
+      } else if (queryParams?.status === "FAIL") {
+        Alert.alert("Payment fail!", "We got an error in your payment action");
+      }
+    };
+
+    Link.getInitialURL().then((url) => {
+      if (url) {
+        handleDeepLink({ url });
+      }
+    });
+    const subscription = Link.addEventListener("url", handleDeepLink);
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
   const fetchData = async () => {
     const role = await getRole();
     if (role) {

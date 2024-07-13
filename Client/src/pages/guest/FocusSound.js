@@ -217,23 +217,28 @@ const FocusSound = ({ navigation }) => {
   };
 
   const handleAddSound = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: "audio/*",
-      });
-
-      if (!result.canceled) {
-        const file = {
-          uri: result.assets[0].uri,
-          name: result.assets[0].fileName || "audio.m4a",
-          type: "audio/mp3",
-        };
-        const response = await UploadAvt(file, "SOUNDCONCENTRATION");
-        addSoundStep2(response.data);
+    const role = await getRole()
+    if(role && role.role==='PREMIUM'){
+      try {
+        const result = await DocumentPicker.getDocumentAsync({
+          type: "audio/*",
+        });
+  
+        if (!result.canceled) {
+          const file = {
+            uri: result.assets[0].uri,
+            name: result.assets[0].fileName || "audio.m4a",
+            type: "audio/mp3",
+          };
+          const response = await UploadAvt(file, "SOUNDCONCENTRATION");
+          addSoundStep2(response.data);
+        }
+      } catch (error) {
+        console.error("Error picking sound:", error);
+        Alert.alert("Error", "Failed to pick sound.");
       }
-    } catch (error) {
-      console.error("Error picking sound:", error);
-      Alert.alert("Error", "Failed to pick sound.");
+    }else{
+      navigation.navigate('PREMIUM')
     }
   };
 

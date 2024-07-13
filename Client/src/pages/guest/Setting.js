@@ -548,7 +548,7 @@ export default function Setting({ navigation }) {
           style={s`flex flex-row justify-between py-2`}
           onPress={() => navigate("SoundDone")}
         >
-          <Text style={s` text-lg font-medium`}>Break bell</Text>
+          <Text style={s` text-lg font-medium`}>Sound Done</Text>
           <View style={s`flex flex-row`}>
             <Text style={s`text-gray-500 text-lg`}>{breakSound}</Text>
             <AntDesign style={s`text-lg `} name="right" />
