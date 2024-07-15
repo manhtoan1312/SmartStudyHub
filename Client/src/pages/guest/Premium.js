@@ -34,8 +34,8 @@ function PREMIUM({ navigation }) {
       const parsedUrl = Link.parse(url);
       const { hostname, queryParams } = parsedUrl;
       if (queryParams?.status === "SUCCESS") {
-        fetchData()
-        Alert.alert('Payment success!!')
+        fetchData();
+        Alert.alert("Payment success!!");
         const role = await getRole();
         if (role.role !== "PREMIUM") {
           Alert.alert(

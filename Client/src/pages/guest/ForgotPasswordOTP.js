@@ -5,7 +5,8 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,SafeAreaView
+  Alert,
+  SafeAreaView,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { ResendOTP, ForgotPassword } from "../../services/AccountService";
@@ -49,34 +50,33 @@ function ForgotPasswordOTP({ route, navigation }) {
   };
 
   const handleNext = async () => {
-    if(rePassword !== newPassword) {
+    if (rePassword === newPassword) {
       const currentTime = new Date().getTime();
-    if (currentTime < expiredTime) {
-      if (otpInput === otp) {
-        const response = await ForgotPassword(email, newPassword, otpInput);
-        if (response.success) {
-          Alert.alert("Announce", response.message);
-          navigation.navigate("Login");
-        } else {
-          Alert.alert("Invalid OTP", "Please enter the correct OTP.");
-          setOtpInput('')
+      if (currentTime < expiredTime) {
+        if (otpInput === otp) {
+          const response = await ForgotPassword(email, newPassword, otpInput);
+          if (response.success) {
+            Alert.alert("Announce", response.message);
+            navigation.navigate("Login");
+          } else {
+            Alert.alert("Invalid OTP", "Please enter the correct OTP.");
+            setOtpInput("");
+          }
         }
+      } else {
+        setOtpInput("");
+        Alert.alert("OTP Expired", "The OTP has expired. Please resend OTP.");
       }
     } else {
-          setOtpInput('')
-          Alert.alert("OTP Expired", "The OTP has expired. Please resend OTP.");
-    }
-    }
-    else{
-      Alert.alert('Warning',"passwords are not the same")
-      setRePassword('')
-      setNewPassword('')
+      Alert.alert("Warning", "passwords are not the same");
+      setRePassword("");
+      setNewPassword("");
     }
   };
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={{paddingLeft:15, paddingTop:10}}
+        style={{ paddingLeft: 15, paddingTop: 10 }}
         onPress={() => navigation.goBack()}
       >
         <FontAwesome name="angle-left" size={24} color="black" />
@@ -93,7 +93,7 @@ function ForgotPasswordOTP({ route, navigation }) {
             value={otpInput}
             onChangeText={(text) => setOtpInput(text)}
             style={styles.input}
-            placeholderTextColor={'#686868'}
+            placeholderTextColor={"#686868"}
           />
         </View>
         <View style={styles.inputContainer}>
@@ -102,7 +102,7 @@ function ForgotPasswordOTP({ route, navigation }) {
             secureTextEntry={true}
             value={newPassword}
             onChangeText={(text) => setNewPassword(text)}
-            placeholderTextColor={'#686868'}
+            placeholderTextColor={"#686868"}
             style={styles.input}
           />
         </View>
@@ -112,7 +112,7 @@ function ForgotPasswordOTP({ route, navigation }) {
             secureTextEntry={true}
             value={rePassword}
             onChangeText={(text) => setRePassword(text)}
-            placeholderTextColor={'#686868'}
+            placeholderTextColor={"#686868"}
             style={styles.input}
           />
         </View>
