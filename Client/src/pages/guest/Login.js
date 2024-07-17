@@ -248,7 +248,7 @@ function Login({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.buttonContainer}>
+        {/* <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.githubButton}
             onPress={handleGitHubLogin}
@@ -256,7 +256,7 @@ function Login({ navigation }) {
             <AntDesign name="github" size={24} color="white" />
             <Text style={styles.buttonTextSecondary}>Login With GitHub</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity
