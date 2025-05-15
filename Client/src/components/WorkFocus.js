@@ -1,0 +1,113 @@
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { MaterialCommunityIcons, Ionicons, AntDesign } from "@expo/vector-icons";
+
+const WorkItem = ({ workItem, onSelect }) => {
+  const handleSelect = () => {
+    onSelect(workItem, "WORK", false);
+  };
+  const handleSelectExtra = (item) => {
+    onSelect(item, "EXTRA", false);
+  };
+
+  const playWork = () => {
+    onSelect(workItem, "WORK", true);
+  }
+  const playExtra = (item) => {
+    onSelect(item, "EXTRA", true);
+  }
+  return (
+    <View>
+      <TouchableOpacity
+        style={styles.itemContainer}
+        onPress={() => handleSelect()}
+      >
+        <View style={styles.itemContent}>
+          <Text style={styles.itemName}>{workItem.workName}</Text>
+          {(workItem.numberOfPomodoros !== 0 || workItem.numberOfPomodorosDone !==0) && (
+            <View style={styles.pomodoroContainer}>
+              <MaterialCommunityIcons
+                name="clock-check"
+                size={14}
+                color="#ff3232"
+              />
+              <Text style={styles.pomodoroText}>
+                {workItem.numberOfPomodorosDone}/
+              </Text>
+              <MaterialCommunityIcons name="clock" size={14} color="#ff9999" />
+              <Text style={[styles.pomodoroText, { marginRight: 5 }]}>
+                {workItem.numberOfPomodoros}
+              </Text>
+            </View>
+          )}
+        </View>
+        <TouchableOpacity style={styles.playButton} onPress={playWork}>
+        <AntDesign name="play" size={26} color="#ff3232" />
+        </TouchableOpacity>
+      </TouchableOpacity>
+      {workItem.extraWorks.length > 0 &&
+        workItem.extraWorks
+          .filter((item) => item.status === "ACTIVE")
+          .map((extraWork, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[styles.itemContainer, styles.extraItemContainer]}
+              onPress={() => handleSelectExtra(extraWork)}
+            >
+              <View style={styles.itemContent}>
+                <Text style={styles.extraItemName}>
+                  {extraWork.extraWorkName}
+                </Text>
+              </View>
+              <TouchableOpacity style={styles.playButton} onPress={() => playExtra(extraWork)}>
+              <AntDesign name="play" size={26} color="#ff3232" />
+              </TouchableOpacity>
+            </TouchableOpacity>
+          ))}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  itemContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: "lightgray",
+    paddingVertical: 10,
+  },
+  itemContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  itemName: {
+    fontSize: 16,
+    marginRight: 10,
+  },
+  pomodoroContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  pomodoroText: {
+    fontSize: 14,
+    marginRight: 10,
+  },
+  playButton: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  extraItemContainer: {
+    paddingLeft: 20,
+    borderLeftWidth: 2,
+    borderColor: "#333",
+    justifyContent: "space-between", 
+    alignItems: "center", 
+  },
+
+  extraItemName: {
+    fontSize: 16,
+    marginRight: 10,
+  },
+});
+
+export default WorkItem;

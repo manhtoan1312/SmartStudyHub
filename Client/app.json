@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "Smart Study Hub",
+    "slug": "Client",
+    "privacy": "public",
+    "version": "1.0.0",
+    "scheme": "smartstudyhub",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "your.bundle.identifier",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSExceptionDomains": {
+            "localhost": {
+              "NSTemporaryExceptionAllowsInsecureHTTPLoads": true
+            }
+          }
+        }
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "your.bundle.identifier"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c6e2723e-03b4-41a3-8a1b-2b29f050dd74"
+      }
+    },
+    "plugins": [
+      "expo-localization",
+      "expo-web-browser"
+    ]
+  }
+}
